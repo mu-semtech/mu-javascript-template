@@ -4,7 +4,7 @@ if (process.env.MU_APPLICATION_GRAPH === undefined) {
   throw new Error('missing environment variable MU_APPLICATION_GRAPH')
 }
 
-const graph_iri = process.env.MU_APPLICATION_GRAPH
+const graph = process.env.MU_APPLICATION_GRAPH
 
 const selectExample = {
   method: 'GET',
@@ -40,7 +40,7 @@ const customHandlerExample = {
   handler: (request, reply) => {
     const endpoint = request.server.plugins['hapi-sparql'].endpoint
     endpoint.selectQuery(
-      `SELECT * FROM <${graph_iri}> WHERE {?s ?p ?o}`, (err, result) => {
+      `SELECT * FROM <${graph}> WHERE {?s ?p ?o}`, (err, result) => {
         if (err) {
           throw err
         }
