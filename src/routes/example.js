@@ -12,7 +12,7 @@ const selectExample = {
   handler: {
     'sparql': {
       type: 'select',
-      query: `SELECT * FROM <${graph_iri}> WHERE {?s ?p ?o}`,
+      query: `SELECT * FROM <${graph}> WHERE {?s ?p ?o}`,
       placeholders: [
         's', 'p', 'o'
       ]
