@@ -1,3 +1,5 @@
+import util from 'util'
+
 if (process.env.MU_APPLICATION_GRAPH === undefined) {
   throw new Error('missing environment variable MU_APPLICATION_GRAPH')
 }
@@ -32,4 +34,22 @@ const constructExample = {
   }
 }
 
-export default [selectExample, constructExample]
+const customHandlerExample = {
+  method: 'GET',
+  path: '/custom',
+  handler: (request, reply) => {
+    const endpoint = request.server.plugins['hapi-sparql'].endpoint
+    endpoint.selectQuery(
+      `SELECT * FROM <${graph_iri}> WHERE {?s ?p ?o}`, (err, result) => {
+        if (err) {
+          throw err
+        }
+        const jsonResult = JSON.parse(result.body)
+        request.server.log('info', 'reply: ' +
+          util.inspect(jsonResult, {colors: true, depth: null}))
+        reply(jsonResult)
+      })
+  }
+}
+
+export default [selectExample, constructExample, customHandlerExample]
