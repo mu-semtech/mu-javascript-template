@@ -6,6 +6,9 @@
   "standard": {
     "parser": "babel-eslint",
     "globals": [
+      "after",
+      "before",
+      "describe",
       "it"
     ]
   },
@@ -30,10 +33,13 @@
   "homepage": "https://git.tenforce.com/mu-semtech/mu-hapi-template",
   "devDependencies": {
     "babel-eslint": "^6.0.2",
+    "babel-plugin-transform-runtime": "^6.8.0",
     "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "isparta": "^4.0.0",
     "mocha": "^2.4.5",
     "mocha.parallel": "^0.12.0",
+    "nock": "^8.0.0",
     "nodemon": "^1.9.1",
     "standard": "^6.0.8"
   },
