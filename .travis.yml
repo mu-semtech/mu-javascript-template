@@ -1,0 +1,19 @@
+sudo: false
+language: node_js
+
+node_js:
+- "5"
+
+env:
+  - MU_APPLICATION_GRAPH=http://mu.semte.ch/application
+
+install:
+  - npm install
+  - npm install -g codeclimate-test-reporter
+
+script:
+  - npm run lint
+  - npm run test:cov
+
+after_script:
+  - codeclimate-test-reporter < coverage/lcov.info

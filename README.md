@@ -1,3 +1,9 @@
+[![Build Status](https://travis-ci.org/mu-semtech/mu-javascript-template.svg?branch=master)](https://travis-ci.org/mu-semtech/mu-javascript-template)
+[![Code Climate](https://codeclimate.com/github/mu-semtech/mu-javascript-template/badges/gpa.svg)](https://codeclimate.com/github/mu-semtech/mu-javascript-template)
+[![Test Coverage](https://codeclimate.com/github/mu-semtech/mu-javascript-template/badges/coverage.svg)](https://codeclimate.com/github/mu-semtech/mu-javascript-template/coverage)
+[![Issue Count](https://codeclimate.com/github/mu-semtech/mu-javascript-template/badges/issue_count.svg)](https://codeclimate.com/github/mu-semtech/mu-javascript-template)
+
+
 Mu Hapi Template
 ================
 
