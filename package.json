@@ -17,7 +17,7 @@
     "start": "babel-node src/index.js",
     "test": "mocha --compilers js:babel-core/register --recursive",
     "test:watch": "npm run test -- --watch",
-    "test:cov": "isparta cover _mocha --root src --include-all-sources -- --compilers js:babel-core/register --recursive",
+    "test:cov": "isparta cover _mocha --root src --include-all-sources -x index.js -- --compilers js:babel-core/register --recursive",
     "lint": "standard"
   },
   "repository": {

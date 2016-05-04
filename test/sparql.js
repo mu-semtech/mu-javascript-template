@@ -5,24 +5,30 @@ import {
   endpoint, constructQuery, selectQuery, updateQuery
 } from '../src/sparql'
 import parallel from 'mocha.parallel'
+import request from 'request'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
 parallel('sparql helper module', () => {
+  before(() => {
+    endpoint.request = (method, url, headers, body, callback) => {
+      return request({method, url, headers, body, timeout: 100}, callback)
+    }
+  })
+
   after(nock.cleanAll)
 
   it('makes promise for CONSTRUCT query', () => {
     const scope = nock(endpoint.endpointUrl)
-      .get('?query=CONSTRUCT1')
-      .reply()
-      .get('?query=CONSTRUCT2')
+      .get('?query=CONSTRUCT')
+      .times(2)
       .reply()
 
     return Promise.all([
-      expect(constructQuery('CONSTRUCT1'))
+      expect(constructQuery('CONSTRUCT'))
         .to.eventually.be.fulfilled,
-      expect(constructQuery('CONSTRUCT2', {accept: 'something'}))
+      expect(constructQuery('CONSTRUCT', {accept: 'something'}))
         .to.eventually.be.fulfilled
         .to.eventually.have.deep.property('req.headers.accept', 'something')
     ]).then(() => expect(scope.isDone()).to.be.ok)
@@ -30,15 +36,14 @@ parallel('sparql helper module', () => {
 
   it('makes promise for SELECT query', () => {
     const scope = nock(endpoint.endpointUrl)
-      .get('?query=SELECT1')
-      .reply()
-      .get('?query=SELECT2')
+      .get('?query=SELECT')
+      .times(2)
       .reply()
 
     return Promise.all([
-      expect(selectQuery('SELECT1'))
+      expect(selectQuery('SELECT'))
         .to.eventually.be.fulfilled,
-      expect(selectQuery('SELECT2', {accept: 'something'}))
+      expect(selectQuery('SELECT', {accept: 'something'}))
         .to.eventually.be.fulfilled
         .to.eventually.have.deep.property('req.headers.accept', 'something')
     ]).then(() => expect(scope.isDone()).to.be.ok)
@@ -47,17 +52,28 @@ parallel('sparql helper module', () => {
   it('makes promise for UPDATE query', () => {
     const scope = nock(endpoint.endpointUrl)
       .post('')
-      .reply()
-      .post('')
+      .times(2)
       .reply()
 
     return Promise.all([
-      expect(updateQuery('UPDATE1'))
+      expect(updateQuery('UPDATE'))
         .to.eventually.be.fulfilled
-        .to.eventually.have.deep.property('request.body', 'query=UPDATE1'),
-      expect(updateQuery('UPDATE2', {accept: 'something'}))
+        .to.eventually.have.deep.property('request.body', 'query=UPDATE'),
+      expect(updateQuery('UPDATE', {accept: 'something'}))
         .to.eventually.be.fulfilled
         .to.eventually.have.deep.property('req.headers.accept', 'something')
     ]).then(() => expect(scope.isDone()).to.be.ok)
+  })
+
+  it('fails sometime with a timeout', () => {
+    const scope = nock(endpoint.endpointUrl)
+      .get(/\/sparql/)
+      .socketDelay(1000)
+      .reply()
+
+    return expect(selectQuery('SELECT'))
+      .to.eventually.be.rejected
+      .to.eventually.have.deep.property('code', 'ESOCKETTIMEDOUT')
+      .then(() => expect(scope.isDone()).to.be.ok)
   })
 })
