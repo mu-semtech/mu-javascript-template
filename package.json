@@ -41,7 +41,7 @@
     "mocha.parallel": "^0.12.0",
     "nock": "^8.0.0",
     "nodemon": "^1.9.1",
-    "standard": "^6.0.8"
+    "standard": "^7.0.1"
   },
   "dependencies": {
     "babel-cli": "^6.6.5",
