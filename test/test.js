@@ -18,8 +18,7 @@ const expect = chai.expect
  */
 
 parallel('mu-semtech-template', () => {
-  after(nock.cleanAll)
-
+  let server
   const endpointUrl = 'http://mu.semte.ch/application'
   const request = (method, url, headers, content, callback) => {
     callback(null, {
@@ -30,49 +29,41 @@ parallel('mu-semtech-template', () => {
       statusCode: 200
     })
   }
-  const plugin = {
-    register: require('hapi-sparql'),
-    options: {
-      request,
-      endpointUrl
+  const plugins = [
+    {
+      register: require('hapi-sparql'),
+      options: {
+        request,
+        endpointUrl
+      }
     }
-  }
+  ]
 
-  it('selects', (done) => {
-    const server = new Hapi.Server()
+  before(async () => {
+    server = new Hapi.Server({debug: {request: []}})
     server.connection({})
-    server.register(plugin, (err) => {
-      expect(err).to.be.not.ok
-      server.route(routes)
-      server.inject('/select', (res) => {
-        expect(res.statusCode).to.be.equal(200)
-        expect(res.result.method).to.be.equal('GET')
-        done()
+    await server.register(plugins)
+      .then((err) => {
+        expect(err).to.be.not.ok
+        server.route(routes)
       })
-    })
   })
 
-  it('constructs', (done) => {
-    const server = new Hapi.Server()
-    server.connection({})
-    server.register(plugin, (err) => {
-      expect(err).to.be.not.ok
-      server.route(routes)
-      server.inject('/select', (res) => {
-        expect(res.statusCode).to.be.equal(200)
-        expect(res.result.method).to.be.equal('GET')
-        done()
-      })
-    })
+  after(nock.cleanAll)
+
+  it('constructs', () => {
+    return expect(server.inject('/construct?o=ok'))
+      .to.eventually.be.fulfilled
+      .to.eventually.have.deep.property('result.url')
+      .to.eventually.be.equal(
+        'http://mu.semte.ch/application?query=' +
+        encodeURIComponent('CONSTRUCT {$s $p $o} WHERE {?s ?p "ok"}'))
   })
 
   it('enables creating custom handler', () => {
     const scope = nock(endpoint.endpointUrl)
       .get(/\?query=/)
       .reply(200, ['some', 'data'])
-    const server = new Hapi.Server()
-    server.connection({})
-    server.route(routes[2])
     return expect(server.inject('/custom'))
       .to.eventually.be.fulfilled
       .to.eventually.have.deep.property('result.data')
@@ -84,9 +75,6 @@ parallel('mu-semtech-template', () => {
     const scope = nock(endpoint.endpointUrl)
       .get(/\?query=/)
       .reply(400, 'private bad request message')
-    const server = new Hapi.Server({debug: {request: []}})
-    server.connection({})
-    server.route(routes[2])
     return expect(server.inject('/custom'))
       .to.eventually.be.fulfilled
       .to.eventually.have.deep.property('result')
