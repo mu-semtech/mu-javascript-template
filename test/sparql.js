@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import nock from 'nock'
 import {
   endpoint, constructQuery, selectQuery, updateQuery, isStringEscaped,
-  isVariable, isPrefixedName, isIRI
+  isVariable, isPrefixedName, isIRI, escapeString, escapeDate, escapeBoolean
 } from '../src/sparql'
 import parallel from 'mocha.parallel'
 import request from 'request'
@@ -129,5 +129,19 @@ parallel('sparql helper module', () => {
     expect(isIRI('<http://good.example.org/[]>')).to.be.ok
     expect(isIRI('<http://bad.example.org/\\>')).to.be.not.ok
     expect(isIRI('<http://bad.example.org/ >')).to.be.not.ok
+  })
+
+  it('can escapes strings', () => {
+    expect(escapeString('foo')).to.be.equal('"foo"')
+  })
+
+  it('can escapes dates', () => {
+    const now = new Date(Date('now'))
+    expect(escapeDate(now)).to.be.equal(`"${now.toISOString()}"^^xsd:dateTime`)
+  })
+
+  it('can escapes booleans', () => {
+    expect(escapeBoolean(false)).to.be.equal('false')
+    expect(escapeBoolean(true)).to.be.equal('true')
   })
 })
