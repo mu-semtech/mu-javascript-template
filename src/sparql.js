@@ -39,37 +39,28 @@ export const endpoint = new SparqlHttp({
   updateUrl: endpointUrl
 })
 
-function requestCallback (resolve, reject) {
-  return (err, res) => {
-    if (err) {
-      reject(err)
-    } else if (res.statusCode >= 300) {
-      const err = new Error(`${res.statusCode} ${res.statusMessage}`)
-      err.result = res
-      reject(err)
-    } else {
-      resolve(res)
-    }
-  }
-}
-
-export function constructQuery (query, options) {
+function promisifyQuery (queryFunc, query, options) {
   return new Promise((resolve, reject) => {
-    endpoint.constructQuery(query, requestCallback(resolve, reject), options)
+    queryFunc.call(this, query, (err, res) => {
+      if (err) {
+        reject(err)
+      } else if (res.statusCode >= 300) {
+        const err = new Error(`${res.statusCode} ${res.statusMessage}`)
+        err.result = res
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    }, options)
   })
 }
 
-export function selectQuery (query, options) {
-  return new Promise((resolve, reject) => {
-    endpoint.selectQuery(query, requestCallback(resolve, reject), options)
-  })
-}
-
-export function updateQuery (query, options) {
-  return new Promise((resolve, reject) => {
-    endpoint.updateQuery(query, requestCallback(resolve, reject), options)
-  })
-}
+export const constructQuery =
+  promisifyQuery.bind(endpoint, endpoint.constructQuery)
+export const selectQuery =
+  promisifyQuery.bind(endpoint, endpoint.selectQuery)
+export const updateQuery =
+  promisifyQuery.bind(endpoint, endpoint.updateQuery)
 
 export function isStringEscaped (value) {
   return !!value.match(new RegExp(`^(${String})$`))
