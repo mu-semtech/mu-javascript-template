@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import nock from 'nock'
 import {
   endpoint, constructQuery, selectQuery, updateQuery, isStringEscaped,
-  isVariable, isPrefixedName
+  isVariable, isPrefixedName, isIRI
 } from '../src/sparql'
 import parallel from 'mocha.parallel'
 import request from 'request'
@@ -118,5 +118,16 @@ parallel('sparql helper module', () => {
     expect(isPrefixedName(':invalid.pn%gg')).to.be.not.ok
     expect(isPrefixedName(':valid.pn\\$')).to.be.ok
     expect(isPrefixedName(':valid.pn\\.')).to.be.ok
+  })
+
+  it('validates SPARQL IRI', () => {
+    expect(isIRI('<http://example.org>')).to.be.ok
+    expect(isIRI('valid-iri:')).to.be.ok
+    expect(isIRI('-invalid-iri:')).to.be.not.ok
+    expect(isIRI('<http://bad.example.org>>')).to.be.not.ok
+    expect(isIRI('<http://bad.example.org{>')).to.be.not.ok
+    expect(isIRI('<http://good.example.org/[]>')).to.be.ok
+    expect(isIRI('<http://bad.example.org/\\>')).to.be.not.ok
+    expect(isIRI('<http://bad.example.org/ >')).to.be.not.ok
   })
 })
