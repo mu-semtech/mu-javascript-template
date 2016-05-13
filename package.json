@@ -26,7 +26,8 @@
   },
   "keywords": [
     "hapi",
-    "mu-semtech"
+    "mu-semtech",
+    "sparql"
   ],
   "author": "You <you@tenforce.com>",
   "license": "MIT",
@@ -54,8 +55,7 @@
     "good-console": "^5.3.1",
     "hapi": "^13.3.0",
     "hapi-sparql": "^1.0.0",
-    "sparql-http-client": "^0.1.0",
-    "uuid": "^2.0.2"
+    "sparql-http-client": "^0.1.0"
   },
   "config": {
     "pre-git": {
