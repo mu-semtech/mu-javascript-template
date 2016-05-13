@@ -1,0 +1,14 @@
+version: "2"
+services:
+
+  template:
+    build: .
+    volumes:
+      - /app/node_modules
+      - ./package.json:/app/package.json
+      - ./src/routes:/app/src/routes
+      - ./test:/app/test
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: "development"

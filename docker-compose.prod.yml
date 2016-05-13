@@ -1,0 +1,6 @@
+version: "2"
+services:
+
+  template:
+    environment:
+      NODE_ENV: "production"
