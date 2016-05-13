@@ -1,0 +1,22 @@
+version: "2"
+services:
+
+  db:
+    ports:
+      - 8890:8890
+
+  dispatcher:
+    ports:
+      - 8080:80
+
+  template:
+    build: .
+    volumes:
+      - /app/node_modules
+      - ./package.json:/app/package.json
+      - ./src:/app/src
+      - ./test:/app/test
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: "development"
