@@ -41,7 +41,6 @@
     "mocha.parallel": "^0.12.0",
     "nock": "^8.0.0",
     "nodemon": "^1.9.1",
-    "pre-git": "^3.8.3",
     "standard": "^7.0.1"
   },
   "dependencies": {
@@ -56,15 +55,5 @@
     "hapi": "^13.3.0",
     "hapi-sparql": "^1.0.0",
     "sparql-http-client": "^0.1.0"
-  },
-  "config": {
-    "pre-git": {
-      "pre-commit": [
-        "npm run lint -s"
-      ],
-      "pre-push": [
-        "npm run lint -s"
-      ]
-    }
   }
 }
