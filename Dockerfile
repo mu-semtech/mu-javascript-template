@@ -16,3 +16,7 @@ RUN npm install
 COPY src /app/src
 
 CMD ["npm", "run", "start"]
+
+ONBUILD ADD package.json .babelrc /app/
+ONBUILD RUN npm install
+ONBUILD ADD src /app/src
