@@ -1,10 +1,6 @@
 version: "2"
 services:
 
-  dispatcher:
-    ports:
-      - 80:80
-
   template:
     environment:
       NODE_ENV: "production"
