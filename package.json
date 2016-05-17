@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://git.tenforce.com/mu-semtech/mu-hapi-template.git"
+    "url": "git+https://github.com/mu-semtech/mu-javascript-template.git"
   },
   "keywords": [
     "hapi",
@@ -31,7 +31,7 @@
   ],
   "author": "You <you@tenforce.com>",
   "license": "MIT",
-  "homepage": "https://git.tenforce.com/mu-semtech/mu-hapi-template",
+  "homepage": "https://github.com/mu-semtech/mu-javascript-template",
   "devDependencies": {
     "babel-eslint": "^6.0.2",
     "chai": "^3.5.0",
