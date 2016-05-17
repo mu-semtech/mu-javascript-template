@@ -1,0 +1,5 @@
+version: "2"
+services:
+
+  template:
+    image: semtech/mu-javascript-template:latest
