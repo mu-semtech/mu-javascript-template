@@ -43,6 +43,9 @@ docker-compose.override.yml     # development environment override
 docker-compose.prod.yml         # production environment override
 ```
 
+**Note:** don't forget to change the image name in `docker-compose.yml` with
+yours.
+
 To start the development environment, you will need to start:
 
 ```
