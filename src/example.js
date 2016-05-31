@@ -1,11 +1,7 @@
 import Joi from 'joi'
-import { selectQuery } from '../sparql'
+import { selectQuery, graph } from 'helpers/sparql'
 import util from 'util'
 import Boom from 'boom'
-
-const graph = process.env.MU_APPLICATION_GRAPH !== undefined
-  ? process.env.MU_APPLICATION_GRAPH
-  : 'http://mu.semte.ch/application'
 
 export default [
   {

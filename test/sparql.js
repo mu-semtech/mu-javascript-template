@@ -4,7 +4,7 @@ import nock from 'nock'
 import {
   endpoint, constructQuery, selectQuery, updateQuery, isStringEscaped,
   isVariable, isPrefixedName, isIRI, escapeString, escapeDate, escapeBoolean
-} from '../src/sparql'
+} from 'helpers/sparql'
 import parallel from 'mocha.parallel'
 import request from 'request'
 

@@ -2,7 +2,7 @@
   "name": "mu-hapi-template",
   "version": "1.0.0",
   "description": "Template for running hapi microservices",
-  "main": "src/index.js",
+  "main": "server.js",
   "standard": {
     "parser": "babel-eslint",
     "globals": [
@@ -13,11 +13,11 @@
     ]
   },
   "scripts": {
-    "dev": "nodemon src/index.js --watch src/ --exec babel-node",
-    "start": "babel-node src/index.js",
-    "test": "mocha --colors --compilers js:babel-core/register --recursive",
+    "dev": "nodemon server.js --watch src/ --exec babel-node",
+    "start": "babel-node server.js",
+    "test": "mocha --colors --compilers js:babel-core/register --recursive -r ./test/test-helper.js",
     "test:watch": "npm run test -- --watch",
-    "test:cov": "isparta cover _mocha --root src --include-all-sources -x index.js -- --compilers js:babel-core/register --recursive",
+    "test:cov": "isparta cover _mocha --root src --include-all-sources -- --compilers js:babel-core/register --recursive -r ./test/test-helper.js",
     "lint": "standard"
   },
   "repository": {
@@ -44,6 +44,7 @@
     "standard": "^7.0.1"
   },
   "dependencies": {
+    "app-module-path": "^1.1.0",
     "babel-cli": "^6.6.5",
     "babel-core": "^6.7.4",
     "babel-plugin-transform-runtime": "^6.8.0",

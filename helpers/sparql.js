@@ -41,6 +41,10 @@ const endpointUrl = process.env.MU_SPARQL_ENDPOINT !== undefined
     ? process.env.MU_SPARQL_ENDPOINT
     : 'http://database:8890/sparql'
 
+export const graph = process.env.MU_APPLICATION_GRAPH !== undefined
+  ? process.env.MU_APPLICATION_GRAPH
+  : 'http://mu.semte.ch/application'
+
 export const endpoint = new SparqlHttp({
   request: SparqlHttp.requestModuleRequest(request),
   endpointUrl: endpointUrl,

@@ -7,7 +7,8 @@ ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
 
 EXPOSE 3000
 
-COPY package.json .babelrc /app/
+COPY package.json .babelrc server.js /app/
+COPY helpers /app/helpers
 WORKDIR /app
 
 RUN npm set progress=false

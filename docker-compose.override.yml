@@ -6,7 +6,8 @@ services:
     volumes:
       - /app/node_modules
       - ./package.json:/app/package.json
-      - ./src/routes:/app/src/routes
+      - ./.babelrc:/app/.babelrc
+      - ./src:/app/src
       - ./test:/app/test
     ports:
       - 3000:3000
