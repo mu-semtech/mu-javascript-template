@@ -1,3 +1,5 @@
+import 'babel-polyfill'
+
 // NOTE: this will register the app directory to the module path. It will
 // allows writing imports like:
 //

@@ -1,13 +1,7 @@
 import request from 'request'
 import SparqlHttp from 'sparql-http-client'
-import {
-  escapeString as _escapeString, escapeDate as _escapeDate,
-  escapeBoolean as _escapeBoolean
-} from 'hapi-sparql/dist/escaping'
 
-export const escapeString = _escapeString
-export const escapeDate = _escapeDate
-export const escapeBoolean = _escapeBoolean
+export * from 'hapi-sparql/dist/escaping'
 
 // grammar from:
 // https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#sparqlGrammar
