@@ -15,9 +15,9 @@
   "scripts": {
     "dev": "nodemon server.js --watch src/ --exec babel-node",
     "start": "babel-node server.js",
-    "test": "mocha --colors --compilers js:babel-core/register --recursive -r ./test/test-helper.js",
+    "test": "mocha --colors --compilers js:babel-core/register --recursive -r babel-polyfill -r app-module-path/cwd",
     "test:watch": "npm run test -- --watch",
-    "test:cov": "babel-node node_modules/.bin/babel-istanbul cover _mocha --root src -- --recursive -r ./test/test-helper.js",
+    "test:cov": "babel-node node_modules/.bin/babel-istanbul cover _mocha --root src -- --recursive -r babel-polyfill -r app-module-path/cwd",
     "lint": "standard"
   },
   "repository": {
