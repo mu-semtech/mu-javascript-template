@@ -17,7 +17,7 @@ install:
 
 script:
   - docker run -it --rm -v $PWD/node_modules:/app/node_modules -v $PWD/package.json:/app/package.json -v $PWD/.babelrc:/app/.babelrc -v $PWD/helpers:/app/helpers -v $PWD/src:/app/src -v $PWD/test:/app/test -e NODE_ENV=test semtech/mu-javascript-template npm run lint
-  - docker run -it --rm -v $PWD/node_modules:/app/node_modules -v $PWD/package.json:/app/package.json -v $PWD/.babelrc:/app/.babelrc -v $PWD/helpers:/app/helpers -v $PWD/src:/app/src -v $PWD/test:/app/test -v coverage:/app/coverage -e NODE_ENV=test semtech/mu-javascript-template npm run test:cov
+  - docker run -it --rm -v $PWD/node_modules:/app/node_modules -v $PWD/package.json:/app/package.json -v $PWD/.babelrc:/app/.babelrc -v $PWD/helpers:/app/helpers -v $PWD/src:/app/src -v $PWD/test:/app/test -v $PWD/coverage:/app/coverage -e NODE_ENV=test semtech/mu-javascript-template npm run test:cov
 
 after_script:
   - codeclimate-test-reporter < coverage/lcov.info
