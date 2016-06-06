@@ -2,11 +2,13 @@ version: "2"
 services:
 
   template:
+    command: sh -c "npm install && exec npm run dev"
     build: .
     volumes:
       - /app/node_modules
       - ./package.json:/app/package.json
-      - ./src/routes:/app/src/routes
+      - ./.babelrc:/app/.babelrc
+      - ./src:/app/src
       - ./test:/app/test
     ports:
       - 3000:3000
