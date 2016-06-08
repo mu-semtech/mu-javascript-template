@@ -1,7 +1,7 @@
 {
-  "name": "mu-hapi-template",
-  "version": "1.0.0",
-  "description": "Template for running hapi microservices",
+  "name": "mu-javascript-template",
+  "version": "0.1.0",
+  "description": "Template for running Javascript (hapi) microservices",
   "main": "server.js",
   "standard": {
     "parser": "babel-eslint",
@@ -29,9 +29,9 @@
     "mu-semtech",
     "sparql"
   ],
-  "author": "You <you@tenforce.com>",
+  "author": "Cécile Tonglet <cecile.tonglet@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/mu-semtech/mu-javascript-template",
+  "homepage": "https://mu.semte.ch",
   "devDependencies": {
     "babel-eslint": "^6.0.2",
     "babel-istanbul": "^0.8.0",
