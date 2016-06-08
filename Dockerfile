@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:6
 
 # Fix for "EXDEV: cross-device link not permitted", see https://github.com/npm/npm/issues/9863
 RUN cd $(npm root -g)/npm && npm install fs-extra && sed -i -e s/graceful-fs/fs-extra/ -e s/fs\.rename/fs.move/ ./lib/utils/rename.js
