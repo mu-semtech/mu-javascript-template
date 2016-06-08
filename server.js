@@ -17,7 +17,12 @@ if (process.env.MU_SPARQL_ENDPOINT === undefined) {
 }
 
 const server = new Hapi.Server()
-server.connection({ port: process.env.PORT || 3000 })
+server.connection({
+  port: process.env.PORT || 3000,
+  // NOTE: disable compression for now because mu-semtech/mu-dispatcher does
+  // not handle it yet
+  compression: false
+})
 
 server.register([
   {
