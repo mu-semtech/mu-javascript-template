@@ -1,5 +1,8 @@
 FROM node:latest
 
+# Fix for "EXDEV: cross-device link not permitted", see https://github.com/npm/npm/issues/9863
+RUN cd $(npm root -g)/npm && npm install fs-extra && sed -i -e s/graceful-fs/fs-extra/ -e s/fs\.rename/fs.move/ ./lib/utils/rename.js
+
 ENV NODE_ENV production
 ENV PORT 3000
 ENV MU_SPARQL_ENDPOINT 'http://database:8890/sparql'
