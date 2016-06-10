@@ -9,6 +9,13 @@ Mu JavaScript Template
 
 Template for running JavaScript microservices using [hapi](http://hapijs.com/).
 
+Minimum Requirements
+--------------------
+
+Tested and working on:
+ *  Docker: 1.10.3
+ *  Compose: 1.6.0
+
 Getting Started
 ---------------
 
