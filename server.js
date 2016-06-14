@@ -44,6 +44,7 @@ server.register([
       endpointUrl: process.env.MU_SPARQL_ENDPOINT
     }
   },
+  require('hapi-async-handler'),
   src
 ], (err) => {
   if (err) {

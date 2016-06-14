@@ -37,6 +37,7 @@ parallel('mu-semtech-template', () => {
         endpointUrl
       }
     },
+    require('hapi-async-handler'),
     src
   ]
 

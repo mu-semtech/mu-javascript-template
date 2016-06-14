@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import { selectQuery, graph } from 'helpers/sparql'
 import util from 'util'
-import Boom from 'boom'
 
 export default [
   {
@@ -25,22 +24,15 @@ export default [
   {
     method: 'GET',
     path: '/custom',
-    handler: async (request, reply) => {
+    handler: {async: async (request, reply) => {
       let result
-      try {
-        result = await selectQuery(
-          `SELECT * FROM <${graph}> WHERE {?s ?p ?o}`)
-      } catch (e) {
-        return reply(Boom.badImplementation(
-          `Received ${e.result.statusCode} ${e.result.statusMessage}: ` +
-          e.result.body))
-      }
+      result = await selectQuery(`SELECT * FROM <${graph}> WHERE {?s ?p ?o}`)
       const jsonResult = JSON.parse(result.body)
       request.server.log('info', 'reply: ' +
         util.inspect(jsonResult, {colors: true, depth: null}))
       return reply({
         data: jsonResult
       })
-    }
+    }}
   }
 ]

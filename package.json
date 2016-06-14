@@ -54,6 +54,7 @@
     "good": "^6.6.0",
     "good-console": "^5.3.1",
     "hapi": "^13.3.0",
+    "hapi-async-handler": "^1.0.3",
     "hapi-sparql": "^1.0.0",
     "sparql-http-client": "^0.1.0"
   }
