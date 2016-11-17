@@ -1,3 +1,5 @@
 #! /bin/sh
 npm install
-NODE_PATH=/usr/src/app/node_modules:$NODE_PATH node app.js
+
+NODE_PATH=`pwd`/node_modules:$NODE_PATH ./node_modules/babel-cli/bin/babel-node.js app.js --presets es2015,es2016,es2017
+
