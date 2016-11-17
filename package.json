@@ -1,0 +1,22 @@
+{
+  "name": "mu-javascript-template",
+  "version": "0.2.0",
+  "description": "Template for mu services written in JavaScript",
+  "scripts": {
+    "dev": "nodemon server.js --watch src/ --exec babel-node",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mu-semtech/mu-javascript-template.git"
+  },
+  "keywords": [
+    "mu-semtech"
+  ],
+  "dependencies": {
+    "express": "^4.14.0"
+  },
+  "author": "Aad Versteden <aad.versteden@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://mu.semte.ch"
+}
