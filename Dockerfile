@@ -11,7 +11,7 @@ COPY . /usr/src/app
 RUN ln -s /app/app.js /usr/src/app/
 RUN npm install
 
-CMD sh start.sh
+CMD sh boot.sh
 
 ONBUILD ADD . /app/
 ONBUILD RUN cd /usr/src/app && npm install
