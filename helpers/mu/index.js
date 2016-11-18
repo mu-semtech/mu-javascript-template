@@ -1,9 +1,8 @@
-import express from 'express';
+import app from './server';
 
-var app = express();
+const mu = {
+  app: app
+}
 
-app.listen( 80, function() {
-  console.log('Starting server on port 80');
-});
-
-export default app;
+export { app };
+export default mu;
