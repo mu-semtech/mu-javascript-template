@@ -1,5 +1,7 @@
 #! /bin/sh
+
 ## Install new dependencies
+npm install /app
 npm install
 
 ./node_modules/supervisor/lib/cli-wrapper.js \
