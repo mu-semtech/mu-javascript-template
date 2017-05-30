@@ -1,7 +1,9 @@
 #! /bin/sh
-
 ## Install new dependencies
-npm install /app
+if [ -f "/app/package.json" ];
+then
+   npm install /app
+fi
 npm install
 
 if [ "$NODE_ENV" == "production" ]; 

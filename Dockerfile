@@ -15,4 +15,4 @@ RUN npm install
 CMD sh boot.sh
 
 ONBUILD ADD . /app/
-ONBUILD RUN cd /usr/src/app && npm install && npm install /app
+ONBUILD RUN cd /usr/src/app && npm install && if [ -f "/app/package.json" ]; then npm install /app; fi
