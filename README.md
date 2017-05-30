@@ -51,6 +51,13 @@ The following importable variables are available:
   - `update(query) => Promise`: Function for sending updates to the triplestore
   - `uuid()` => string: Generates a random UUID
   - `sparql`: [Template tag](https://www.npmjs.com/package/sparql-client-2#using-the-sparql-template-tag) to create queries with interpolated values
+  - `sparqlEscapeString(value) => string`: Function to escape a string in SPARQL
+  - `sparqlEscapeUri(value) => string`: Function to escape a URI in SPARQL
+  - `sparqlEscapeInt(value) => string`: Function to escape an integer in SPARQL
+  - `sparqlEscapeFloat(value) => string`: Function to escape a float in SPARQL
+  - `sparqlEscapeDate(value) => string`: Function to escape a date in SPARQL
+  - `sparqlEscapeDateTime(value) => string`: Function to escape a datetime in SPARQL
+  - `sparqlEscapeBool(value) => string`: Function to escape a boolean in SPARQL
 
 You can either import specific attributes from the mu library, or import the whole mu object.
 

@@ -20,6 +20,33 @@ function query( queryString ){
 // executes an update query
 const update = query;
 
+function sparqlEscapeString( value ){
+  return '"' + value.replace(/[\\"']/, function(match) { return '\\' + match }) + '"';
+};
+
+function sparqlEscapeUri( value ){
+  return '<' + value.replace(/[\\"']/, function(match) { return '\\' + match }) + '>';
+};
+
+function sparqlEscapeInt( value ){
+  return '"' + Number.parseInt(value) + '"^^xsd:integer';
+};
+
+function sparqlEscapeFloat( value ){
+  return '"' + Number.parseFloat(value) + '"^^xsd:float';
+};
+
+function sparqlEscapeDate( value ){
+  return '"' + new Date(value).toISOString() + '"^^xsd:date';
+};
+
+function sparqlEscapeDateTime( value ){
+  return '"' + new Date(value).toISOString() + '"^^xsd:dateTime';
+};
+
+function sparqlEscapeBool( value ){
+  return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
+};
 
 //==-- exports --==//
 const exports = {
@@ -27,9 +54,29 @@ const exports = {
   SPARQL: SPARQL,
   sparql: SPARQL,
   query: query,
-  update: update
+  update: update,
+  sparqlEscapeString: sparqlEscapeString,
+  sparqlEscapeUri: sparqlEscapeUri,
+  sparqlEscapeInt: sparqlEscapeInt,
+  sparqlEscapeFloat: sparqlEscapeFloat,
+  sparqlEscapeDate: sparqlEscapeDate,
+  sparqlEscapeDateTime: sparqlEscapeDateTime,
+  sparqlEscapeBool: sparqlEscapeBool
 }
 export default exports;
 
-export { query, update, SPARQL as SPARQL, SPARQL as sparql, newSparqlClient };
+export {
+  newSparqlClient,
+  SPARQL as SPARQL,
+  SPARQL as sparql,
+  query,
+  update,
+  sparqlEscapeString,
+  sparqlEscapeUri,
+  sparqlEscapeInt,
+  sparqlEscapeFloat,
+  sparqlEscapeDate,
+  sparqlEscapeDateTime,
+  sparqlEscapeBool
+};
 
