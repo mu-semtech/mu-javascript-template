@@ -83,11 +83,12 @@ You can install additional dependencies by including a `package.json` file next 
 
 ## Developing with the template
 
-When developing, you can use the template image, mount the volume with your sources on `/app` and add a link to the database. The service will live-reload on changes. You'll need to restart the container when you define additional dependencies in your `package.json`.
+When developing, you can use the template image, mount the volume with your sources in `/app` and add a link to the database. Set the `NODE_ENV` environment variable to `development`. The service will live-reload on changes. You'll need to restart the container when you define additional dependencies in your `package.json`.
 
     docker run --link virtuoso:database \
            -v `pwd`:/app \
            -p 8888:80 \
+           -e NODE_ENV=development \
            --name my-js-test \
            semtech/mu-javascript-template
 
