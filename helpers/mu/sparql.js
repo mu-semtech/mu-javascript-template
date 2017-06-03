@@ -48,6 +48,28 @@ function sparqlEscapeBool( value ){
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
 };
 
+function sparqlEscape( value, type ){
+  switch(type) {
+  case 'string':
+    return sparqlEscapeString(value);
+  case 'uri':
+    return sparqlEscapeUri(value);
+  case 'bool':
+    return sparqlEscapeBool(value);
+  case 'int':
+    return sparqlEscapeInt(value);
+  case 'float':
+    return sparqlEscapeFloat(value);
+  case 'date':
+    return sparqlEscapeDate(value);
+  case 'dateTime':
+    return sparqlEscapeDateTime(value);
+  default:
+    console.error(`WARN: Unknown escape type '${type}'. Escaping as string`);
+    return sparqlEscapeString(value);
+  }
+}
+
 //==-- exports --==//
 const exports = {
   newSparqlClient: newSparqlClient,
@@ -55,6 +77,7 @@ const exports = {
   sparql: SPARQL,
   query: query,
   update: update,
+  sparqlEscape: sparqlEscape,
   sparqlEscapeString: sparqlEscapeString,
   sparqlEscapeUri: sparqlEscapeUri,
   sparqlEscapeInt: sparqlEscapeInt,
@@ -71,6 +94,7 @@ export {
   SPARQL as sparql,
   query,
   update,
+  sparqlEscape,
   sparqlEscapeString,
   sparqlEscapeUri,
   sparqlEscapeInt,

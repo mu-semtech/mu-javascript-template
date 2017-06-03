@@ -58,6 +58,7 @@ The following importable variables are available:
   - `sparqlEscapeDate(value) => string`: Function to escape a date in SPARQL
   - `sparqlEscapeDateTime(value) => string`: Function to escape a datetime in SPARQL
   - `sparqlEscapeBool(value) => string`: Function to escape a boolean in SPARQL
+  - `sparqlEscape(value, type) => string`: Function to escape a value in SPARQL according to the given type. Type must be one of `'string'`, `'uri'`, `'int'`, `'float'`, `'date'`, `'dateTime'`, `'bool'`.  
 
 You can either import specific attributes from the mu library, or import the whole mu object.
 
