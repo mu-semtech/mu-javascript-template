@@ -14,6 +14,7 @@ function newSparqlClient() {
 
 // executes a query (you can use the template syntax)
 function query( queryString ){
+  console.log(queryString);
   return newSparqlClient().query( queryString ).execute();
 };
 
