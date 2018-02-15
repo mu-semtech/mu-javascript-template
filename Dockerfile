@@ -1,4 +1,4 @@
-FROM node:7.1.0-alpine
+FROM node:9.5.0-alpine
 
 MAINTAINER Aad Versteden <madnificent@gmail.com>
 
