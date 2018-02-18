@@ -84,6 +84,9 @@ You can install additional dependencies by including a `package.json` file next 
 
 ## Developing with the template
 
+Livereload is enabled automatically when running in development mode.  You can embed the template easily in a running mu.semte.ch stack by launching it in the docker-compose.yml with the correct links.  If desired, the chrome inspecor can be attached during development, giving advanced javascript debugging features.
+
+### Live reload
 When developing, you can use the template image, mount the volume with your sources in `/app` and add a link to the database. Set the `NODE_ENV` environment variable to `development`. The service will live-reload on changes. You'll need to restart the container when you define additional dependencies in your `package.json`.
 
     docker run --link virtuoso:database \
@@ -93,4 +96,49 @@ When developing, you can use the template image, mount the volume with your sour
            --name my-js-test \
            semtech/mu-javascript-template
 
+### Develop in mu.semte.ch stack
+When developing inside an existing mu.semte.ch stack, it is easiest to set the development mode and mount the sources directly.  This makes it easy to setup links to the database and the dispatcher.
 
+Optionally, you can publish the microservice on a different port, so you can access it directly without the dispatcher.  In the example below, port 8888 is used to access the service directly.  We set the path to our sources directly, ensuring we can develop the microservice in its original place.
+
+    yourMicroserviceName:
+      image: semtech/mu-javascript-template
+      ports:
+        - 8888:80
+      environment:
+        NODE_ENV: "development"
+      links:
+        - db:database
+      volumes:
+        - /absolute/path/to/your/sources/:/app/
+
+### Attach the Chrome debugger
+When running in development mode, you can attach the chrome debugger to your microservice and add breakpoints as you're used to.  The chrome debugger requires port 9229 to be forwarded, and your service to run in development mode.  After launching your service, open Google Chrome or Chromium, and visit [chrome://inspect/](chrome://inspect/).
+
+Running through docker run, you could access the service as follows:
+
+    docker run --link virtuoso:database \
+           -v `pwd`:/app \
+           -p 8888:80 \
+           -p 9229:9229 \
+           -e NODE_ENV=development \
+           --name my-js-test \
+           semtech/mu-javascript-template
+
+Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
+
+When running inside a mu.semte.ch stack, you could mount your sources and connect to known microservices as follows:
+
+    yourMicroserviceName:
+      image: semtech/mu-javascript-template
+      ports:
+        - 8888:80
+        - 9229:9229
+      environment:
+        NODE_ENV: "development"
+      links:
+        - db:database
+      volumes:
+        - /absolute/path/to/your/sources/:/app/
+
+Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
