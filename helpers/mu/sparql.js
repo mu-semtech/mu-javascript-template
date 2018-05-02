@@ -38,7 +38,7 @@ function sparqlEscapeFloat( value ){
 };
 
 function sparqlEscapeDate( value ){
-  return '"' + new Date(value).toISOString() + '"^^xsd:date';
+  return '"' + new Date(value).toISOString().substring(0, 10) + '"^^xsd:date'; // only keep 'YYYY-MM-DD' portion of the string
 };
 
 function sparqlEscapeDateTime( value ){
