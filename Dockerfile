@@ -1,6 +1,6 @@
 FROM node:9.5.0-alpine
 
-MAINTAINER Aad Versteden <madnificent@gmail.com>
+LABEL maintainer="madnificent@gmail.com"
 
 ENV MU_SPARQL_ENDPOINT 'http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
