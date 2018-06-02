@@ -13,23 +13,12 @@ app.use('/', function(req, res, next) {
   next();
 });
 
-// development error handler - printing stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 400);
-    res.json({
-      errors: [ {title: err.message} ]
-    });
-  });
-}
-
-// production error handler - no stacktrace
-app.use(function(err, req, res, next) {
+const errorHandler = function(err, req, res, next) {
   res.status(err.status || 400);
   res.json({
     errors: [ {title: err.message} ]
   });
-});
+};
 
 // start server
 app.listen( 80, function() {
@@ -37,3 +26,8 @@ app.listen( 80, function() {
 });
 
 export default app;
+
+export {
+  app,
+  errorHandler
+}

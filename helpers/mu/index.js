@@ -1,4 +1,4 @@
-import app from './server';
+import { app, errorHandler } from './server';
 import sparql from './sparql';
 import uuidV1 from 'uuid/v1';
 
@@ -19,7 +19,8 @@ const mu = {
   sparqlEscapeDate: sparql.sparqlEscapeDate,
   sparqlEscapeDateTime: sparql.sparqlEscapeDateTime,
   sparqlEscapeBool: sparql.sparqlEscapeBool,
-  uuid: uuid
+  uuid,
+  errorHandler
 };
 
 const SPARQL = mu.SPARQL,
@@ -48,7 +49,8 @@ export {
   sparqlEscapeDate,
   sparqlEscapeDateTime,
   sparqlEscapeBool,
-  uuid
+  uuid,
+  errorHandler
 };
 
 export default mu;

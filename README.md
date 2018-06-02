@@ -11,7 +11,7 @@ Create a new folder.  Add the following Dockerfile:
 
 Create your microservice in `app.js`:
 
-    import { app, query } from 'mu';
+    import { app, query, errorHandler } from 'mu';
     
     app.get('/', function( req, res ) {
       res.send('Hello mu-javascript-template');
@@ -36,6 +36,8 @@ Create your microservice in `app.js`:
         });
     } );
 
+    app.use(errorHandler);
+
 Check [Express' Getting Started guide](https://expressjs.com/en/starter/basic-routing.html) to learn how to build a REST API in Express.
     
 ## Requirements
@@ -50,6 +52,7 @@ The following importable variables are available:
   - `query(query) => Promise`: Function for sending queries to the triplestore
   - `update(query) => Promise`: Function for sending updates to the triplestore
   - `uuid()` => string: Generates a random UUID
+  - `errorHandler(err, req, res, next)`: [Error handling middleware function for Express](https://expressjs.com/en/guide/error-handling.html). It needs to be loaded at the end.
   - `sparql`: [Template tag](https://www.npmjs.com/package/sparql-client-2#using-the-sparql-template-tag) to create queries with interpolated values
   - `sparqlEscapeString(value) => string`: Function to escape a string in SPARQL
   - `sparqlEscapeUri(value) => string`: Function to escape a URI in SPARQL
