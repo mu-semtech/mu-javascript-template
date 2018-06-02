@@ -22,11 +22,11 @@ function query( queryString ){
 const update = query;
 
 function sparqlEscapeString( value ){
-  return '"' + value.replace(/[\\"']/, function(match) { return '\\' + match }) + '"';
+  return '"' + value.replace(/[\\"']/, function(match) { return '\\' + match; }) + '"';
 };
 
 function sparqlEscapeUri( value ){
-  return '<' + value.replace(/[\\"']/, function(match) { return '\\' + match }) + '>';
+  return '<' + value.replace(/[\\"']/, function(match) { return '\\' + match; }) + '>';
 };
 
 function sparqlEscapeInt( value ){

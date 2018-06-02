@@ -20,7 +20,7 @@ const mu = {
   sparqlEscapeDateTime: sparql.sparqlEscapeDateTime,
   sparqlEscapeBool: sparql.sparqlEscapeBool,
   uuid: uuid
-}
+};
 
 const SPARQL = mu.SPARQL,
       query = mu.query,
@@ -32,7 +32,7 @@ const SPARQL = mu.SPARQL,
       sparqlEscapeFloat = mu.sparqlEscapeFloat,
       sparqlEscapeDate = mu.sparqlEscapeDate,
       sparqlEscapeDateTime = mu.sparqlEscapeDateTime,
-      sparqlEscapeBool = mu.sparqlEscapeBool
+      sparqlEscapeBool = mu.sparqlEscapeBool;
 
 export {
   app,
