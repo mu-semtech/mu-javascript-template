@@ -15,4 +15,10 @@ RUN npm install
 CMD sh boot.sh
 
 ONBUILD ADD . /app/
+ONBUILD RUN if [ -f /app/on-build.sh ]; \
+     then \
+        echo "Running custom on-build.sh of child" \
+        && chmod +x /app/on-build.sh \
+        && /bin/bash /app/on-build.sh ;\
+     fi
 ONBUILD RUN cd /usr/src/app && npm install && if [ -f "/app/package.json" ]; then npm install /app; fi
