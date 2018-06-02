@@ -1,6 +1,6 @@
 {
   "name": "mu",
-  "version": "0.0.1",
+  "version": "1.2.1",
   "description": "Helpers for javascript mu services",
   "author": "Aad Versteden <aad.versteden@gmail.com>",
   "license": "MIT",
