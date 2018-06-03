@@ -1,3 +1,4 @@
+import httpContext from 'express-http-context';
 import express from 'express';
 import bodyParser from 'body-parser';
 
@@ -10,6 +11,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // set JSONAPI content type
 app.use('/', function(req, res, next) {
   res.type('application/vnd.api+json');
+  next();
+});
+
+app.use(httpContext.middleware);
+
+app.use(function(req, res, next) {
+  httpContext.set('request', req);
+  httpContext.set('response', res);
   next();
 });
 

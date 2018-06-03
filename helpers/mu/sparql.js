@@ -1,3 +1,4 @@
+import httpContext from 'express-http-context';
 import SC2 from 'sparql-client-2';
 const { SparqlClient, SPARQL } = SC2;
 
@@ -5,7 +6,21 @@ const { SparqlClient, SPARQL } = SC2;
 
 // builds a new sparqlClient
 function newSparqlClient() {
-  return new SparqlClient( process.env.MU_SPARQL_ENDPOINT ).register({
+  let options = {
+    requestDefaults: {
+      headers: {
+        'mu-session-id': httpContext.get('request').get('mu-session-id')
+      }
+    }
+  };
+
+  const authorizationGroups = httpContext.get('response').get('mu-authorization-groups');
+  if (authorizationGroups)
+    options.requestDefaults.headers['mu-authorization-groups'] = authorizationGroups;
+
+  console.log(`Add options on SparqlClient: ${JSON.stringify(options)}`);
+
+  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options).register({
     mu: 'http://mu.semte.ch/vocabularies/',
     muCore: 'http://mu.semte.ch/vocabularies/core/',
     muExt: 'http://mu.semte.ch/vocabularies/ext/'
@@ -13,9 +28,29 @@ function newSparqlClient() {
 }
 
 // executes a query (you can use the template syntax)
-function query( queryString ){
+function query( queryString ) {
   console.log(queryString);
-  return newSparqlClient().query( queryString ).execute();
+  return newSparqlClient().queryRaw(queryString).execute().then(response => {
+    const authorizationGroups = response.headers['mu-authorization-groups'];
+    if (authorizationGroups) {
+      httpContext.get('response').setHeader('mu-authorization-groups', authorizationGroups);
+      console.log(`Set mu-authorization-groups header to ${authorizationGroups}`);
+    } else {
+      httpContext.get('response').removeHeader('mu-authorization-groups');
+      console.log('Remove mu-authorization-groups header');
+    }
+
+    function maybeParseJSON(body) {
+      // Catch invalid JSON
+      try {
+        return JSON.parse(body);
+      } catch (ex) {
+        return null;
+      }
+    }
+
+    return maybeParseJSON(response.body);
+  });
 };
 
 // executes an update query

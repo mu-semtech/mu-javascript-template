@@ -20,6 +20,7 @@
     "babel-preset-es2017": "^6.16.0",
     "body-parser": "~1.15.1",
     "express": "^4.14.0",
+    "express-http-context": "~1.0.2",
     "sparql-client-2": "^0.6.0",
     "supervisor": "^0.12.0"
   },
