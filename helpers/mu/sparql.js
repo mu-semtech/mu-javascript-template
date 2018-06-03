@@ -30,7 +30,7 @@ function newSparqlClient() {
 // executes a query (you can use the template syntax)
 function query( queryString ) {
   console.log(queryString);
-  return newSparqlClient().queryRaw(queryString).execute().then(response => {
+  return newSparqlClient().query(queryString).executeRaw().then(response => {
     const authorizationGroups = response.headers['mu-authorization-groups'];
     if (authorizationGroups) {
       httpContext.get('response').setHeader('mu-authorization-groups', authorizationGroups);
