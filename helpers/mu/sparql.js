@@ -9,7 +9,9 @@ function newSparqlClient() {
   let options = {
     requestDefaults: {
       headers: {
-        'mu-session-id': httpContext.get('request').get('mu-session-id')
+        'mu-session-id': httpContext.get('request').get('mu-session-id'),
+        'mu-call-id': httpContext.get('request').get('mu-call-id'),
+        'mu-authorization-groups': httpContext.get('request').get('mu-authorization-groups')
       }
     }
   };
