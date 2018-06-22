@@ -1,6 +1,6 @@
 {
   "name": "mu-javascript-template",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Template for mu services written in JavaScript",
   "scripts": {
     "dev": "nodemon server.js --watch src/ --exec babel-node",
