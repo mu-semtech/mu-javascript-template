@@ -6,19 +6,19 @@ const { SparqlClient, SPARQL } = SC2;
 
 // builds a new sparqlClient
 function newSparqlClient() {
-  let options = {
-    requestDefaults: {
-      headers: {
-        'mu-session-id': httpContext.get('request').get('mu-session-id'),
-        'mu-call-id': httpContext.get('request').get('mu-call-id'),
-        'mu-auth-allowed-groups': httpContext.get('request').get('mu-auth-allowed-groups') // groups of incoming request
-      }
-    }
-  };
+  let options = { requestDefaults: { headers: { } } };
 
-  const allowedGroups = httpContext.get('response').get('mu-auth-allowed-groups'); // groups returned by a previous SPARQL query
-  if (allowedGroups)
-    options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
+  if (httpContext.get('request')) {
+    options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
+    options.requestDefaults.headers['mu-call-id'] = httpContext.get('request').get('mu-call-id');
+    options.requestDefaults.headers['mu-auth-allowed-groups'] = httpContext.get('request').get('mu-auth-allowed-groups'); // groups of incoming request
+  }
+
+  if (httpContext.get('response')) {
+    const allowedGroups = httpContext.get('response').get('mu-auth-allowed-groups'); // groups returned by a previous SPARQL query
+    if (allowedGroups)
+      options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
+  }
 
   console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
 
@@ -34,24 +34,26 @@ function query( queryString ) {
   console.log(queryString);
   return newSparqlClient().query(queryString).executeRaw().then(response => {
 
-    // set mu-auth-allowed-groups on outgoing response
-    const allowedGroups = response.headers['mu-auth-allowed-groups'];
-    if (allowedGroups) {
-      httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
-      console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
-    } else {
-      httpContext.get('response').removeHeader('mu-auth-allowed-groups');
-      console.log('Remove mu-auth-allowed-groups');
-    }
+    if (httpContext.get('response')) {
+      // set mu-auth-allowed-groups on outgoing response
+      const allowedGroups = response.headers['mu-auth-allowed-groups'];
+      if (allowedGroups) {
+        httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
+        console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
+      } else {
+        httpContext.get('response').removeHeader('mu-auth-allowed-groups');
+        console.log('Remove mu-auth-allowed-groups');
+      }
 
-    // set mu-auth-used-groups on outgoing response
-    const usedGroups = response.headers['mu-auth-used-groups'];
-    if (usedGroups) {
-      httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
-      console.log(`Update mu-auth-used-groups to ${usedGroups}`);
-    } else {
-      httpContext.get('response').removeHeader('mu-auth-used-groups');
-      console.log('Remove mu-auth-used-groups');
+      // set mu-auth-used-groups on outgoing response
+      const usedGroups = response.headers['mu-auth-used-groups'];
+      if (usedGroups) {
+        httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
+        console.log(`Update mu-auth-used-groups to ${usedGroups}`);
+      } else {
+        httpContext.get('response').removeHeader('mu-auth-used-groups');
+        console.log('Remove mu-auth-used-groups');
+      }
     }
 
     function maybeParseJSON(body) {
