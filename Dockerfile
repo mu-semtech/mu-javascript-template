@@ -23,4 +23,4 @@ ONBUILD RUN if [ -f /app/on-build.sh ]; \
         && chmod +x /app/on-build.sh \
         && /bin/bash /app/on-build.sh ;\
      fi
-ONBUILD RUN cd /usr/src/app && npm install && if [ -f "/app/package.json" ]; then npm install /app; fi
+ONBUILD RUN if [ -f "/app/package.json" ]; then npm install /app; fi
