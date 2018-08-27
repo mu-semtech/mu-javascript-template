@@ -1,4 +1,4 @@
-FROM node:9.5.0-alpine
+FROM node:10.9.0-alpine
 
 LABEL maintainer="madnificent@gmail.com"
 
