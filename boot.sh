@@ -7,7 +7,7 @@ then
         -x sh start.sh
 else
     ## Install new dependencies
-    if [ -f "/app/package.json" ]; then npm install /app; fi
+    if [ -f "/app/package.json" ]; then npm config set unsafe-perm true && npm install /app; fi
     ## Boot the app in development mode
     ./node_modules/supervisor/lib/cli-wrapper.js \
         -w /usr/src/app,/app \
