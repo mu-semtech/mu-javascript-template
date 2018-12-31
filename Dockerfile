@@ -1,8 +1,8 @@
-FROM node:10.9.0-alpine
+FROM node:10.9.0
 
 LABEL maintainer="madnificent@gmail.com"
 
-RUN apk update && apk upgrade && apk add --no-cache bash git openssh
+RUN apt-get update && apt-get -y upgrade && apt-get install -y openssh-server
 
 ENV MU_SPARQL_ENDPOINT 'http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
