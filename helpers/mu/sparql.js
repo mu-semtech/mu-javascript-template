@@ -5,8 +5,13 @@ const { SparqlClient, SPARQL } = SC2;
 //==-- logic --==//
 
 // builds a new sparqlClient
-function newSparqlClient() {
-  let options = { requestDefaults: { headers: { } } };
+function newSparqlClient(args) {
+
+  if(!args){
+    args = {};
+  }
+
+  let options = { requestDefaults: { headers: {} } };
 
   if (httpContext.get('request')) {
     options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
@@ -20,9 +25,11 @@ function newSparqlClient() {
       options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
   }
 
+  Object.assign(options.requestDefaults.headers, args.headers || {});
+
   console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
 
-  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options).register({
+  return new SparqlClient(args.url || process.env.MU_SPARQL_ENDPOINT, options).register({
     mu: 'http://mu.semte.ch/vocabularies/',
     muCore: 'http://mu.semte.ch/vocabularies/core/',
     muExt: 'http://mu.semte.ch/vocabularies/ext/'
@@ -30,9 +37,9 @@ function newSparqlClient() {
 }
 
 // executes a query (you can use the template syntax)
-function query( queryString ) {
+function query( queryString, options ) {
   console.log(queryString);
-  return newSparqlClient().query(queryString).executeRaw().then(response => {
+  return newSparqlClient(options).query(queryString).executeRaw().then(response => {
     const temp = httpContext;
     if (httpContext.get('response') && !httpContext.get('response').headersSent) {
       // set mu-auth-allowed-groups on outgoing response
