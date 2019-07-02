@@ -7,7 +7,7 @@ Template for writing mu.semte.ch services in JavaScript using [Express 4](https:
 Create a new folder.  Add the following Dockerfile:
 
     FROM semtech/mu-javascript-template
-    MAINTAINER Aad Versteden <madnificent@gmail.com>
+    LABEL maintainer="madnificent@gmail.com"
 
 Create your microservice in `app.js`:
 
