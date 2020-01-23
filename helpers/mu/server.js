@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 var app = express();
 
 // parse JSONAPI content type
-app.use(bodyParser.json( { type: function(req) { return /^application\/vnd\.api\+json/.test(req.get('content-type')); } } ));
+app.use(bodyParser.json( { type: function(req) { return /^application\/vnd\.api\+json/.test(req.get('content-type')); }, limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // set JSONAPI content type
