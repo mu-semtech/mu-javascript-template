@@ -1,4 +1,4 @@
-FROM node:10.15.0-alpine
+FROM node:12.16.1-alpine
 
 LABEL maintainer="madnificent@gmail.com"
 
@@ -16,7 +16,7 @@ RUN npm config set unsafe-perm true && npm install
 
 CMD sh boot.sh
 
-ONBUILD ADD . /app/
+ONBUILD ADD . /app
 ONBUILD RUN if [ -f /app/on-build.sh ]; \
      then \
         echo "Running custom on-build.sh of child" \
