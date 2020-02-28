@@ -18,6 +18,6 @@ if [ "$NODE_ENV" == "development" ]
 then
   npm run babel-node-dev;
 else
-  #TODO: this should probably transpile and run instead
-  npm run babel-node-prod;
+  npm run build;
+  npm run node-prod;
 fi
