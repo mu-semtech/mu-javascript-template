@@ -1,14 +1,12 @@
 #! /bin/sh
-#echo Hello World!;
-
+#remove app folder if exists
+rm -rf ./app;
+#copy app folder
+cp -r /app ./;
+#install app dependencies
+npm install ./app;
+#remove package to avoid babel and imports breaking
+#TODO: if there are nested package.json files stuff will break but I think this is true for older versions too
+rm ./app/package.json;
+#run daemon and watch mounted app folder
 npm run daemon;
-
-# if [ "$NODE_ENV" == "production" ]; 
-# then 
-#     ./start.sh
-# else
-#     ## Install new dependencies
-#     if [ -f "./main/package.json" ]; then npm config set unsafe-perm true && npm install /app; fi
-#     ## Boot the app in development mode
-#     ./start.sh
-# fi
