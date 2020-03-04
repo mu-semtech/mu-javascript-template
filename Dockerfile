@@ -1,4 +1,4 @@
-FROM node:10.15.0-alpine
+FROM node:12.16.1-alpine
 
 LABEL maintainer="madnificent@gmail.com"
 
@@ -11,8 +11,8 @@ ENV NODE_ENV 'production'
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 
-RUN ln -s /app/app.js /usr/src/app/
 RUN npm config set unsafe-perm true && npm install
+RUN chmod +x ./run.sh
 
 CMD sh boot.sh
 
@@ -23,4 +23,3 @@ ONBUILD RUN if [ -f /app/on-build.sh ]; \
         && chmod +x /app/on-build.sh \
         && /bin/bash /app/on-build.sh ;\
      fi
-ONBUILD RUN if [ -f "/app/package.json" ]; then npm config set unsafe-perm true && npm install /app; fi
