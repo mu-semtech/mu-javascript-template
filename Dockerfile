@@ -24,4 +24,8 @@ ONBUILD RUN if [ -f /app/on-build.sh ]; \
         echo "Running custom on-build.sh of child" \
         && chmod +x /app/on-build.sh \
         && /bin/bash /app/on-build.sh ;\
+<<<<<<< HEAD
      fi
+=======
+     fi
+>>>>>>> 212c433934653df3d357349deaf0d5fa4c2d86fa
