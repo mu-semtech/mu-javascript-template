@@ -3,7 +3,6 @@
   "version": "1.3.5",
   "description": "Template for mu services written in JavaScript",
   "scripts": {
-<<<<<<< HEAD
     
     "daemon": "nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
     
@@ -12,13 +11,6 @@
     "build": "babel ./ --ignore \"./start-prod.js\",\"./start-dev.js\",\"./prod\",\"./node_modules\" --out-dir ./prod",
 
     "node-prod": "node ./start-prod.js"
-=======
-    "build": "babel ./ --ignore \"./prod\",\"./node_modules\" --out-dir ./prod",
-    "node-prod": "node ./prod/app/app.js",
-    "daemon": "nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
-    "babel-node-dev": "babel-node --inspect=0.0.0.0:9229 ./app/app.js",
-    "babel-node-prod": "babel-node ./app/app.js"
->>>>>>> 212c433934653df3d357349deaf0d5fa4c2d86fa
   },
   "repository": {
     "type": "git",
