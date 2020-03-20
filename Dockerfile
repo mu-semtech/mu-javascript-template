@@ -16,7 +16,9 @@ RUN chmod +x ./run.sh
 
 CMD sh boot.sh
 
+# this stuff only runs when building an image from the template
 ONBUILD ADD . /app/
+ONBUILD RUN cd /usr/src/app; rm -rf ./app; cp -r /app ./; npm install ./app; rm ./app/package.json; npm run build;
 ONBUILD RUN if [ -f /app/on-build.sh ]; \
      then \
         echo "Running custom on-build.sh of child" \
