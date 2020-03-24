@@ -3,13 +3,9 @@
   "version": "1.3.5",
   "description": "Template for mu services written in JavaScript",
   "scripts": {
-    
     "daemon": "nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
-    
     "babel-node-dev": "babel-node --inspect=0.0.0.0:9229 ./start-dev.js",
-    
     "build": "babel ./ --ignore \"./start-prod.js\",\"./start-dev.js\",\"./prod\",\"./node_modules\" --out-dir ./prod",
-
     "node-prod": "node ./start-prod.js"
   },
   "repository": {
@@ -27,13 +23,13 @@
     "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
     "babel-plugin-module-resolver": "4.0.0",
-    
+
     "body-parser": "~1.19.0",
     "express": "^4.17.1",
     "express-http-context": "~1.2.3",
-    "nodemon": "2.0.2",
+    "nodemon": "^2.0.2",
     "sparql-client-2": "https://github.com/erikap/node-sparql-client.git",
-    "uuid": "7.0.0"
+    "uuid": "^7.0.2"
   },
   "author": "Aad Versteden <aad.versteden@gmail.com>",
   "license": "MIT",
