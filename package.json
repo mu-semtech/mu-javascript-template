@@ -1,6 +1,6 @@
 {
   "name": "mu-javascript-template",
-  "version": "1.3.5",
+  "version": "1.4.0-beta.4",
   "description": "Template for mu services written in JavaScript",
   "scripts": {
     "daemon": "nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
