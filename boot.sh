@@ -1,6 +1,6 @@
 #! /bin/sh
-if [ "$NODE_ENV" == "development" ]
-then
+copyFolderAndInstall()
+{
   #remove app folder if exists
   rm -rf ./app;
   #copy app folder
@@ -10,9 +10,27 @@ then
   #remove package to avoid babel and imports breaking
   #TODO: if there are nested package.json files stuff will break but I think this is true for older versions too
   rm ./app/package.json;
+}
+
+if [ "$NODE_ENV" == "development" ] && [ "$IMAGE_STATUS" == "template" ]
+then
+  copyFolderAndInstall;
   #run daemon and watch mounted app folder
   npm run daemon;
-else
+elif [ "$NODE_ENV" == "production" ] && [ "$IMAGE_STATUS" == "template" ]
+then
+  copyFolderAndInstall;
+  #build production app
+  npm run build;
+  #run production app
+  npm run node-prod;
+elif [ "$NODE_ENV" == "development" ] && [ "$IMAGE_STATUS" == "standalone" ]
+then
+  copyFolderAndInstall
+  #run daemon and watch mounted app folder
+  npm run daemon;
+elif [ "$NODE_ENV" == "production" ] && [ "$IMAGE_STATUS" == "standalone" ]
+then
   #run production app
   npm run node-prod;
 fi
