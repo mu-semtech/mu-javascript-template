@@ -1,6 +1,6 @@
 {
   "name": "mu-javascript-template",
-  "version": "1.4.0-beta.5",
+  "version": "1.4.0",
   "description": "Template for mu services written in JavaScript",
   "scripts": {
     "daemon": "nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
@@ -23,7 +23,6 @@
     "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
     "babel-plugin-module-resolver": "4.0.0",
-
     "body-parser": "~1.19.0",
     "express": "^4.17.1",
     "express-http-context": "~1.2.3",
