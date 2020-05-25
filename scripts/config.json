@@ -1,0 +1,20 @@
+{
+  "version": "0.1",
+  "scripts": [
+    {
+      "documentation": {
+        "command": "dev-script",
+        "description": "Outputs a development script for this service",
+        "arguments": []
+      },
+      "environment": {
+        "image": "ubuntu",
+        "interactive": false,
+        "script": "dev-script/run.sh"
+      },
+      "mounts": {
+        "service": "/data/service"
+      }
+    }
+  ]
+}

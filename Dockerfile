@@ -11,13 +11,14 @@ ENV IMAGE_STATUS 'template'
 
 WORKDIR /usr/src/app
 COPY . /usr/src/app
-
+COPY ./scripts /app/scripts
 RUN npm config set unsafe-perm true && npm install
 RUN chmod +x ./run.sh
 
 CMD sh boot.sh
 
 # this stuff only runs when building an image from the template
+ONBUILD RUN rm -Rf /app/scripts
 ONBUILD ADD . /app/
 ONBUILD RUN cd /usr/src/app; rm -rf ./app; cp -r /app ./; npm install ./app; rm ./app/package.json; npm run build;
 ONBUILD ENV IMAGE_STATUS 'standalone'
