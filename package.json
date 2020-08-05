@@ -3,10 +3,10 @@
   "version": "1.4.0",
   "description": "Template for mu services written in JavaScript",
   "scripts": {
-    "daemon": "nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
+    "daemon": "exec nodemon --watch /app --ext js,mjs,cjs,json --exec ./run.sh",
     "babel-node-dev": "babel-node --inspect=0.0.0.0:9229 ./start-dev.js",
     "build": "babel ./ --ignore \"./start-prod.js\",\"./start-dev.js\",\"./prod\",\"./node_modules\" --out-dir ./prod",
-    "node-prod": "node ./start-prod.js"
+    "node-prod": "exec node ./start-prod.js"
   },
   "repository": {
     "type": "git",
