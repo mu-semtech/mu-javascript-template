@@ -158,5 +158,5 @@ When running inside a mu.semte.ch stack, you could mount your sources and connec
         - db:database
       volumes:
         - /absolute/path/to/your/sources/:/app/
-
+```
 Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
