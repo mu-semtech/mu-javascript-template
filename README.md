@@ -6,37 +6,41 @@ Template for writing mu.semte.ch services in JavaScript using [Express 4](https:
 
 Create a new folder.  Add the following Dockerfile:
 
-    FROM semtech/mu-javascript-template
-    LABEL maintainer="madnificent@gmail.com"
+```docker
+FROM semtech/mu-javascript-template
+LABEL maintainer="madnificent@gmail.com"
+```
 
 Create your microservice in `app.js`:
 
-    import { app, query, errorHandler } from 'mu';
-    
-    app.get('/', function( req, res ) {
-      res.send('Hello mu-javascript-template');
-    } );
+```js
+  import { app, query, errorHandler } from 'mu';
+  
+  app.get('/', function( req, res ) {
+    res.send('Hello mu-javascript-template');
+  } );
 
 
-    app.get('/query', function( req, res ) {
-      var myQuery = `
-        SELECT *
-        WHERE {
-          GRAPH <http://mu.semte.ch/application> {
-            ?s ?p ?o.
-          }
-        }`;
+  app.get('/query', function( req, res ) {
+    var myQuery = `
+      SELECT *
+      WHERE {
+        GRAPH <http://mu.semte.ch/application> {
+          ?s ?p ?o.
+        }
+      }`;
 
-      query( myQuery )
-        .then( function(response) {
-          res.send( JSON.stringify( response ) );
-        })
-        .catch( function(err) {
-          res.send( "Oops something went wrong: " + JSON.stringify( err ) );
-        });
-    } );
+    query( myQuery )
+      .then( function(response) {
+        res.send( JSON.stringify( response ) );
+      })
+      .catch( function(err) {
+        res.send( "Oops something went wrong: " + JSON.stringify( err ) );
+      });
+  } );
 
-    app.use(errorHandler);
+  app.use(errorHandler);
+```
 
 Check [Express' Getting Started guide](https://expressjs.com/en/starter/basic-routing.html) to learn how to build a REST API in Express.
     
@@ -67,19 +71,23 @@ You can either import specific attributes from the mu library, or import the who
 
 An example of importing specific variables:
 
-    import { app, query } from 'mu';
-    
-    app.get('/', function( req, res ) {
-      res.send('Hello mu-javascript-template');
-    } );
+```js
+import { app, query } from 'mu';
+
+app.get('/', function( req, res ) {
+  res.send('Hello mu-javascript-template');
+} );
+```
 
 An example of importing the whole library:
 
-    import mu from 'mu';
-    
-    mu.app.get('/', function( req, res ) {
-      res.send('Hello using full import');
-    } );
+```js
+import mu from 'mu';
+
+mu.app.get('/', function( req, res ) {
+  res.send('Hello using full import');
+} );
+```
 
 ## Dependencies
 
@@ -92,18 +100,21 @@ Livereload is enabled automatically when running in development mode.  You can e
 ### Live reload
 When developing, you can use the template image, mount the volume with your sources in `/app` and add a link to the database. Set the `NODE_ENV` environment variable to `development`. The service will live-reload on changes. You'll need to restart the container when you define additional dependencies in your `package.json`.
 
-    docker run --link virtuoso:database \
-           -v `pwd`:/app \
-           -p 8888:80 \
-           -e NODE_ENV=development \
-           --name my-js-test \
-           semtech/mu-javascript-template
+```
+docker run --link virtuoso:database \
+       -v `pwd`:/app \
+       -p 8888:80 \
+       -e NODE_ENV=development \
+       --name my-js-test \
+       semtech/mu-javascript-template
+```
 
 ### Develop in mu.semte.ch stack
 When developing inside an existing mu.semte.ch stack, it is easiest to set the development mode and mount the sources directly.  This makes it easy to setup links to the database and the dispatcher.
 
 Optionally, you can publish the microservice on a different port, so you can access it directly without the dispatcher.  In the example below, port 8888 is used to access the service directly.  We set the path to our sources directly, ensuring we can develop the microservice in its original place.
 
+```yml
     yourMicroserviceName:
       image: semtech/mu-javascript-template
       ports:
@@ -114,24 +125,28 @@ Optionally, you can publish the microservice on a different port, so you can acc
         - db:database
       volumes:
         - /absolute/path/to/your/sources/:/app/
+```
 
 ### Attach the Chrome debugger
 When running in development mode, you can attach the chrome debugger to your microservice and add breakpoints as you're used to.  The chrome debugger requires port 9229 to be forwarded, and your service to run in development mode.  After launching your service, open Google Chrome or Chromium, and visit [chrome://inspect/](chrome://inspect/).
 
 Running through docker run, you could access the service as follows:
 
-    docker run --link virtuoso:database \
-           -v `pwd`:/app \
-           -p 8888:80 \
-           -p 9229:9229 \
-           -e NODE_ENV=development \
-           --name my-js-test \
-           semtech/mu-javascript-template
+```
+docker run --link virtuoso:database \
+       -v `pwd`:/app \
+       -p 8888:80 \
+       -p 9229:9229 \
+       -e NODE_ENV=development \
+       --name my-js-test \
+       semtech/mu-javascript-template
+```
 
 Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
 
 When running inside a mu.semte.ch stack, you could mount your sources and connect to known microservices as follows:
 
+```yml
     yourMicroserviceName:
       image: semtech/mu-javascript-template
       ports:
