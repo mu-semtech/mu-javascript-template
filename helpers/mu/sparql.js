@@ -1,6 +1,11 @@
 import httpContext from 'express-http-context';
 import SC2 from 'sparql-client-2';
+import env from 'env-var';
+
 const { SparqlClient, SPARQL } = SC2;
+
+const LOG_SPARQL_QUERIES = env.get('LOG_SPARQL_QUERIES').asBool();
+const LOG_AUTH_HEADERS = env.get('LOG_AUTH_HEADERS').asBool();
 
 //==-- logic --==//
 
@@ -20,7 +25,9 @@ function newSparqlClient() {
       options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
   }
 
-  console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
+  if (LOG_AUTH_HEADERS) {
+    console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
+  }
 
   return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options).register({
     mu: 'http://mu.semte.ch/vocabularies/',
@@ -31,7 +38,9 @@ function newSparqlClient() {
 
 // executes a query (you can use the template syntax)
 function query( queryString ) {
-  console.log(queryString);
+  if (LOG_SPARQL_QUERIES) {
+    console.log(queryString);
+  }
   return newSparqlClient().query(queryString).executeRaw().then(response => {
     const temp = httpContext;
     if (httpContext.get('response') && !httpContext.get('response').headersSent) {
@@ -39,20 +48,28 @@ function query( queryString ) {
       const allowedGroups = response.headers['mu-auth-allowed-groups'];
       if (allowedGroups) {
         httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
-        console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
+        if (LOG_AUTH_HEADERS) {
+          console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
+        }
       } else {
         httpContext.get('response').removeHeader('mu-auth-allowed-groups');
-        console.log('Remove mu-auth-allowed-groups');
+        if (LOG_AUTH_HEADERS) {
+          console.log('Remove mu-auth-allowed-groups');
+        }
       }
 
       // set mu-auth-used-groups on outgoing response
       const usedGroups = response.headers['mu-auth-used-groups'];
       if (usedGroups) {
         httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
-        console.log(`Update mu-auth-used-groups to ${usedGroups}`);
+        if (LOG_AUTH_HEADERS) {
+          console.log(`Update mu-auth-used-groups to ${usedGroups}`);
+        }
       } else {
         httpContext.get('response').removeHeader('mu-auth-used-groups');
-        console.log('Remove mu-auth-used-groups');
+        if (LOG_AUTH_HEADERS) {
+          console.log('Remove mu-auth-used-groups');
+        }
       }
     }
 

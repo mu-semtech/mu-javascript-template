@@ -85,6 +85,14 @@ An example of importing the whole library:
 
 You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time. 
 
+## Logging
+
+The verbosity of logging can be configured through following environment variables:
+
+- `LOG_SPARQL_QUERIES`: Logging of executed SPARQL queries (default `true`)
+- `LOG_AUTH_HEADERS`: Logging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
+
+
 ## Developing with the template
 
 Livereload is enabled automatically when running in development mode.  You can embed the template easily in a running mu.semte.ch stack by launching it in the docker-compose.yml with the correct links.  If desired, the chrome inspecor can be attached during development, giving advanced javascript debugging features.
