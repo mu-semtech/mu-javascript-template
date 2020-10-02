@@ -95,7 +95,7 @@ You can install additional dependencies by including a `package.json` file next 
 
 ## Developing with the template
 
-Livereload is enabled automatically when running in development mode.  You can embed the template easily in a running mu.semte.ch stack by launching it in the docker-compose.yml with the correct links.  If desired, the chrome inspecor can be attached during development, giving advanced javascript debugging features.
+Livereload is enabled automatically when running in development mode.  You can embed the template easily in a running mu.semte.ch stack by launching it in the `docker-compose.yml` with the correct links.  If desired, the chrome inspector can be attached during development, giving advanced javascript debugging features.
 
 ### Live reload
 When developing, you can use the template image, mount the volume with your sources in `/app` and add a link to the database. Set the `NODE_ENV` environment variable to `development`. The service will live-reload on changes. You'll need to restart the container when you define additional dependencies in your `package.json`.
