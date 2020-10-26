@@ -1,36 +1,27 @@
-#! /bin/sh
-copyFolderAndInstall()
-{
-  #remove app folder if exists
-  rm -rf ./app;
-  #copy app folder
-  cp -r /app ./;
-  #install app dependencies
-  npm install ./app;
-  #remove package to avoid babel and imports breaking
-  #TODO: if there are nested package.json files stuff will break but I think this is true for older versions too
-  rm ./app/package.json;
-}
+if [ "$NODE_ENV" == "development" ]
+then
+    # Run live-reload development
+    exec /usr/src/app/node_modules/.bin/nodemon \
+         --watch /app \
+         --ext js,mjs,cjs,json \
+         --exec /usr/src/app/run-development.sh
+elif [ "$NODE_ENV" == "production" ]
+then
+    diff -rq /app /usr/src/app/original_source > /dev/null
+    FILES_CHANGED="$?"
 
-if [ "$NODE_ENV" == "development" ] && [ "$IMAGE_STATUS" == "template" ]
-then
-  copyFolderAndInstall;
-  #run daemon and watch mounted app folder
-  exec npm run daemon;
-elif [ "$NODE_ENV" == "production" ] && [ "$IMAGE_STATUS" == "template" ]
-then
-  copyFolderAndInstall;
-  #build production app
-  npm run build;
-  #run production app
-  exec npm run node-prod;
-elif [ "$NODE_ENV" == "development" ] && [ "$IMAGE_STATUS" == "standalone" ]
-then
-  copyFolderAndInstall
-  #run daemon and watch mounted app folder
-  exec npm run daemon;
-elif [ "$NODE_ENV" == "production" ] && [ "$IMAGE_STATUS" == "standalone" ]
-then
-  #run production app
-  exec npm run node-prod;
+    if [ ! -f /usr/src/output/app/app.js ]
+    then
+        echo "No built sources found.  If you mount new sources, please set the NODE_ENV=\"development\" environment variable."
+        sleep 5;
+        exit 1;
+    elif [ $FILES_CHANGED != "0" ]
+    then
+        echo "Built sources are not the same as sources available in /app.  If you mount new sources, please set the NODE_ENV=\"development\" environment variable."
+        sleep 5;
+        exit 1;
+    else
+        cd /usr/src/output/
+        exec node ./app/app.js
+    fi
 fi
