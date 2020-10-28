@@ -90,8 +90,9 @@ You can install additional dependencies by including a `package.json` file next 
 The verbosity of logging can be configured through following environment variables:
 
 - `LOG_SPARQL_QUERIES`: Logging of executed SPARQL queries (default `true`)
-- `LOG_AUTH_HEADERS`: Logging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
+- `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
 
+Following values are considered true: ["true", "TRUE", "1"].
 
 ## Developing with the template
 

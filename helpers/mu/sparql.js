@@ -5,7 +5,7 @@ import env from 'env-var';
 const { SparqlClient, SPARQL } = SC2;
 
 const LOG_SPARQL_QUERIES = env.get('LOG_SPARQL_QUERIES').asBool();
-const LOG_AUTH_HEADERS = env.get('LOG_AUTH_HEADERS').asBool();
+const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
 
 //==-- logic --==//
 
@@ -25,7 +25,7 @@ function newSparqlClient() {
       options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
   }
 
-  if (LOG_AUTH_HEADERS) {
+  if (DEBUG_AUTH_HEADERS) {
     console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
   }
 
@@ -48,12 +48,12 @@ function query( queryString ) {
       const allowedGroups = response.headers['mu-auth-allowed-groups'];
       if (allowedGroups) {
         httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
-        if (LOG_AUTH_HEADERS) {
+        if (DEBUG_AUTH_HEADERS) {
           console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
         }
       } else {
         httpContext.get('response').removeHeader('mu-auth-allowed-groups');
-        if (LOG_AUTH_HEADERS) {
+        if (DEBUG_AUTH_HEADERS) {
           console.log('Remove mu-auth-allowed-groups');
         }
       }
@@ -62,12 +62,12 @@ function query( queryString ) {
       const usedGroups = response.headers['mu-auth-used-groups'];
       if (usedGroups) {
         httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
-        if (LOG_AUTH_HEADERS) {
+        if (DEBUG_AUTH_HEADERS) {
           console.log(`Update mu-auth-used-groups to ${usedGroups}`);
         }
       } else {
         httpContext.get('response').removeHeader('mu-auth-used-groups');
-        if (LOG_AUTH_HEADERS) {
+        if (DEBUG_AUTH_HEADERS) {
           console.log('Remove mu-auth-used-groups');
         }
       }
