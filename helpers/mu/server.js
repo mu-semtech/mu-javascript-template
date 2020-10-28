@@ -4,8 +4,13 @@ import bodyParser from 'body-parser';
 
 var app = express();
 
+var bodySizeLimit = process.env.MAX_BODY_SIZE || '100kb';
+
 // parse JSONAPI content type
-app.use(bodyParser.json( { type: function(req) { return /^application\/vnd\.api\+json/.test(req.get('content-type')); } } ));
+app.use(bodyParser.json({
+  type: function(req) { return /^application\/vnd\.api\+json/.test(req.get('content-type')); },
+  limit: bodySizeLimit
+}));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // set JSONAPI content type
