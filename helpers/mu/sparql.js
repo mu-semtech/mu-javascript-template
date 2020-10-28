@@ -4,7 +4,8 @@ import env from 'env-var';
 
 const { SparqlClient, SPARQL } = SC2;
 
-const LOG_SPARQL_QUERIES = env.get('LOG_SPARQL_QUERIES').asBool();
+const LOG_SPARQL_QUERIES = process.env.LOG_SPARQL_QUERIES != undefined ? env.get('LOG_SPARQL_QUERIES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
+const LOG_SPARQL_UPDATES = process.env.LOG_SPARQL_UPDATES != undefined ? env.get('LOG_SPARQL_UPDATES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
 
 //==-- logic --==//
@@ -41,6 +42,18 @@ function query( queryString ) {
   if (LOG_SPARQL_QUERIES) {
     console.log(queryString);
   }
+  return executeQuery(queryString);
+};
+
+// executes an update query
+function update( queryString ) {
+  if (LOG_SPARQL_UPDATES) {
+    console.log(queryString);
+  }
+  return executeQuery(queryString);
+};
+
+function executeQuery( queryString ) {
   return newSparqlClient().query(queryString).executeRaw().then(response => {
     const temp = httpContext;
     if (httpContext.get('response') && !httpContext.get('response').headersSent) {
@@ -84,10 +97,7 @@ function query( queryString ) {
 
     return maybeParseJSON(response.body);
   });
-};
-
-// executes an update query
-const update = query;
+}
 
 function sparqlEscapeString( value ){
   return '"""' + value.replace(/[\\"]/g, function(match) { return '\\' + match; }) + '"""';
