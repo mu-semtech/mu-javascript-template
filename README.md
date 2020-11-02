@@ -43,7 +43,7 @@ app.use(errorHandler);
 ```
 
 Check [Express' Getting Started guide](https://expressjs.com/en/starter/basic-routing.html) to learn how to build a REST API in Express.
-    
+
 ## Requirements
 
   - **database link**: You need a link to the `database` which exposes a SPARQL endpoint on `http://database:8890/sparql`.  In line with other microservices.
@@ -91,7 +91,24 @@ mu.app.get('/', function( req, res ) {
 
 ## Dependencies
 
-You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time. 
+You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time.
+
+## Configuration
+The following environment variables can be configured:
+
+  - `NODE_ENV` (default: `production`): either `"development"` or `"production"`. The environment to start the application in. The application live reloads on changes in `"development"` mode.
+  - `MAX_BODY_SIZE` (default: `100kb`): max size of the request body. See [ExpressJS documentation](https://expressjs.com/en/resources/middleware/body-parser.html#limit).
+
+## Logging
+
+The verbosity of logging can be configured through following environment variables:
+
+- `LOG_SPARQL_ALL`: Logging of all executed SPARQL queries, read as well as update (default `true`)
+- `LOG_SPARQL_QUERIES`: Logging of executed SPARQL read queries (default: `undefined`). Overrules `LOG_SPARQL_ALL`.
+- `LOG_SPARQL_UPDATES`: Logging of executed SPARQL update queries (default `undefined`). Overrules `LOG_SPARQL_ALL`.
+- `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
+
+Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
 
 ## Developing with the template
 
