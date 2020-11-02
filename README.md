@@ -93,6 +93,17 @@ mu.app.get('/', function( req, res ) {
 
 You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time. 
 
+## Logging
+
+The verbosity of logging can be configured through following environment variables:
+
+- `LOG_SPARQL_ALL`: Logging of all executed SPARQL queries, read as well as update (default `true`)
+- `LOG_SPARQL_QUERIES`: Logging of executed SPARQL read queries (default: `undefined`). Overrules `LOG_SPARQL_ALL`.
+- `LOG_SPARQL_UPDATES`: Logging of executed SPARQL update queries (default `undefined`). Overrules `LOG_SPARQL_ALL`.
+- `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
+
+Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
+
 ## Developing with the template
 
 Livereload is enabled automatically when running in development mode.  You can embed the template easily in a running mu.semte.ch stack by launching it in the `docker-compose.yml` with the correct links.  If desired, the chrome inspector can be attached during development, giving advanced javascript debugging features.

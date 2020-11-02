@@ -9,6 +9,9 @@ ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
 ENV NODE_ENV 'production'
 ENV IMAGE_STATUS 'template'
 
+ENV LOG_SPARQL_ALL 'true'
+ENV DEBUG_AUTH_HEADERS 'true'
+
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 COPY ./scripts /app/scripts
