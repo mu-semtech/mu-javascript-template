@@ -5,13 +5,13 @@ module.exports = function(api) {
     "presets": [
       ["@babel/preset-env",{
         "targets": {
-          "node": 12
+          "node": 14
         }
       }]
     ],
     "plugins": [
-      ["@babel/plugin-proposal-decorators", { "legacy": true }],
-      ["@babel/plugin-proposal-class-properties", { "loose" : true }],
+      ["@babel/plugin-proposal-decorators", { legacy: true }],
+      ["@babel/plugin-proposal-class-properties"],
       ["module-resolver", {
         "alias": {
           "mu": "/usr/src/output/helpers/mu/index.js"
