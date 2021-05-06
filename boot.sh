@@ -7,7 +7,7 @@ then
          --exec /usr/src/app/run-development.sh
 elif [ "$NODE_ENV" == "production" ]
 then
-    diff -rq /app /usr/src/app/original_source > /dev/null
+    diff -rq /app /app.original > /dev/null
     FILES_CHANGED="$?"
 
     if [ ! -f /usr/src/output/app/app.js ]

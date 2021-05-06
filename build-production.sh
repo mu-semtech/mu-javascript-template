@@ -8,9 +8,9 @@
 
 # Copy sources from /app to where they can be built
 cd /usr/src/app
-rm -rf ./app ./original_source
+rm -rf ./app /app.original
 cp -r /app ./
-cp -r /app ./original_source
+cp -r /app /app.original
 
 # Install custom packages if need be
 if [ -f ./app/package.json ]
