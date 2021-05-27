@@ -181,8 +181,8 @@ Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the s
 ## Running tests [BETA]
 The javascript template provides [mocha]() as a testing framework. Create a `test` folder in your application root and nest any tests under that folder. 
 You can run tests by setting the `NODE_ENV` to "test":
-```
-```
+
+```bash
 docker run
        --rm
        -v `pwd`:/app \
