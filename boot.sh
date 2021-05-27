@@ -3,8 +3,11 @@ then
     # Run live-reload development
     exec /usr/src/app/node_modules/.bin/nodemon \
          --watch /app \
-         --ext js,mjs,cjs,json \
+         --ext js,mjs,cjs,json,hbs \
          --exec /usr/src/app/run-development.sh
+elif [ "$NODE_ENV" == "test" ]
+then
+    exec /usr/src/app/run-test.sh
 elif [ "$NODE_ENV" == "production" ]
 then
     diff -rq /app /app.original > /dev/null
