@@ -26,4 +26,4 @@ mkdir -p /usr/src/output/node_modules
 cp -R /usr/src/app/node_modules /usr/src/output/
 
 ## Build microservice sources
-/usr/src/app/node_modules/.bin/babel /usr/src/app/ --ignore node_modules --copy-files --out-dir /usr/src/output
+/usr/src/app/node_modules/.bin/babel /usr/src/app/ --ignore node_modules --copy-files --no-copy-ignored --out-dir /usr/src/output
