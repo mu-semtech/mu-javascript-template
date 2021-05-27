@@ -179,7 +179,7 @@ When running inside a mu.semte.ch stack, you could mount your sources and connec
 Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
 
 ## Running tests [BETA]
-The javascript template provides [mocha]() as a testing framework. Create a `test` folder in your application root and nest any tests under that folder. 
+The javascript template provides [mocha](https://mochajs.org/#getting-started) as a testing framework. Create a `test` folder in your application root and nest any tests under that folder. 
 You can run tests by setting the `NODE_ENV` to "test":
 
 ```bash
