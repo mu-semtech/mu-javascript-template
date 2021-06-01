@@ -11,4 +11,4 @@ jq -s '.[0] * .[1]' /usr/src/app/package.json  /app/package.json > /usr/src/outp
 # do things
 cd /usr/src/output
 npm install
-npm test
+exec npm test
