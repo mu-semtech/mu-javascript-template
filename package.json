@@ -7,7 +7,7 @@
     "url": "git+https://github.com/mu-semtech/mu-javascript-template.git"
   },
   "scripts": {
-    "test": "mocha --require @babel/register"
+    "test": "mocha --require @babel/register --exit"
   },
   "keywords": [
     "mu-semtech"
