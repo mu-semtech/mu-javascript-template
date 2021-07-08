@@ -126,6 +126,24 @@ docker run --link virtuoso:database \
        semtech/mu-javascript-template
 ```
 
+#### On Windows:
+You might notice that code reloading doesn't work when you mount your code from a Windows host machine.
+
+It turns out nodemon --watch won't work if your code resides on Windows, but --legacy-watch should.
+It's less efficient and more error-prone than --watch, but at least it works.
+
+Set the `DEV_OS` environment variable to `windows` so `boot.sh` will use --legacy-watch, and you should have live-reload.
+
+```
+docker run --link virtuoso:database \
+       -v `pwd`:/app \
+       -p 8888:80 \
+       -e NODE_ENV=development \
+       -e DEV_OS=windows \
+       --name my-js-test \
+       semtech/mu-javascript-template
+```
+
 ### Develop in mu.semte.ch stack
 When developing inside an existing mu.semte.ch stack, it is easiest to set the development mode and mount the sources directly.  This makes it easy to setup links to the database and the dispatcher.
 
