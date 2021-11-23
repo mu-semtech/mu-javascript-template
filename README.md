@@ -60,6 +60,7 @@ The following importable variables are available:
   - `sparql`: [Template tag](https://www.npmjs.com/package/sparql-client-2#using-the-sparql-template-tag) to create queries with interpolated values
   - `sparqlEscapeString(value) => string`: Function to escape a string in SPARQL
   - `sparqlEscapeUri(value) => string`: Function to escape a URI in SPARQL
+  - `sparqlEscapeDecimal(value) => string`: Function to escape a JS integer as an `xsd:decimal` in SPARQL
   - `sparqlEscapeInt(value) => string`: Function to escape an integer in SPARQL
   - `sparqlEscapeFloat(value) => string`: Function to escape a float in SPARQL
   - `sparqlEscapeDate(value) => string`: Function to escape a date in SPARQL. The given value is passed to the `Date` constructor.

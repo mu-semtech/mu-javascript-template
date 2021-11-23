@@ -107,6 +107,10 @@ function sparqlEscapeUri( value ){
   return '<' + value.replace(/[\\"']/g, function(match) { return '\\' + match; }) + '>';
 };
 
+function sparqlEscapeDecimal( value ){
+  return '"' + Number.parseInt(value) + '"^^xsd:decimal';
+};
+
 function sparqlEscapeInt( value ){
   return '"' + Number.parseInt(value) + '"^^xsd:integer';
 };
@@ -135,6 +139,8 @@ function sparqlEscape( value, type ){
     return sparqlEscapeUri(value);
   case 'bool':
     return sparqlEscapeBool(value);
+  case 'decimal':
+    return sparqlEscapeDecimal(value);
   case 'int':
     return sparqlEscapeInt(value);
   case 'float':
@@ -176,6 +182,7 @@ export {
   sparqlEscape,
   sparqlEscapeString,
   sparqlEscapeUri,
+  sparqlEscapeDecimal,
   sparqlEscapeInt,
   sparqlEscapeFloat,
   sparqlEscapeDate,
