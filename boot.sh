@@ -3,6 +3,7 @@ then
     # Run live-reload development
     exec /usr/src/app/node_modules/.bin/nodemon \
          --watch /app \
+         --watch /config \
          --ext js,mjs,cjs,json \
          --exec /usr/src/app/run-development.sh
 elif [ "$NODE_ENV" == "production" ]
