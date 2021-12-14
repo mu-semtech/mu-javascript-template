@@ -10,7 +10,9 @@
 cd /usr/src/app
 rm -rf ./app /app.original
 cp -r /app ./
+mkdir -p /config; mkdir -p ./app/config; cp -rf /config/* ./app/config/ 2> /dev/null
 cp -r /app /app.original
+cp -r /config /config.original
 
 # Install custom packages if need be
 if [ -f ./app/package.json ]
