@@ -1,6 +1,6 @@
 {
   "name": "mu-javascript-template",
-  "version": "1.5.0-beta.2",
+  "version": "1.5.0-beta.3",
   "description": "Template for mu services written in JavaScript",
   "repository": {
     "type": "git",
