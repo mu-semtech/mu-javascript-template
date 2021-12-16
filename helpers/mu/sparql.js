@@ -104,7 +104,7 @@ function sparqlEscapeString( value ){
 };
 
 function sparqlEscapeUri( value ){
-  return '<' + value.replace(/[\\"']/g, function(match) { return '\\' + match; }) + '>';
+  return '<' + value.replace(/[\\"<>]/g, function(match) { return '\\' + match; }) + '>';
 };
 
 function sparqlEscapeInt( value ){
