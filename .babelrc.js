@@ -3,11 +3,14 @@ module.exports = function(api) {
 
   return {
     "presets": [
-      ["@babel/preset-env",{
+      ["@babel/preset-env",
+       {
         "targets": {
           "node": 14
         }
-      }]
+       }
+      ],
+      "@babel/preset-typescript"
     ],
     "plugins": [
       ["@babel/plugin-proposal-decorators", { legacy: true }],
@@ -17,6 +20,9 @@ module.exports = function(api) {
           "mu": "/usr/src/output/helpers/mu/index.js"
         }
       }]
+    ],
+    "ignore": [
+      "./app/node_modules"
     ]
   };
 };

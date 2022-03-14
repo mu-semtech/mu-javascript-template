@@ -44,6 +44,39 @@ cp -R /usr/src/app /usr/src/output
 # Put back the package.json for a next run
 cp /tmp/package.json ./app/package.json
 
+# Version logging
+echo "Using version 20220314155209";
+
+# Transpile everything
+
+## target folder
+cd /usr/src/output/
+rm -Rf intermediate-transpilation built
+mkdir intermediate-transpilation built
+
+## coffeescript
+/usr/src/app/node_modules/.bin/coffee -M -m --compile --output ./intermediate-transpilation ./app
+cd ./intermediate-transpilation
+for map in **/*.map
+do
+    # based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
+    echo "Copying map $map"
+    echo "Making directory ${map%/*} and copying to ../built/$map"
+    mkdir -p "../built/${map%/*}"
+    cp -p -- "$map" "../built/$map"
+done
+cd ..
+
+## typescript
+cp -R ./app/* intermediate-transpilation
+/usr/src/app/node_modules/.bin/babel \
+  ./intermediate-transpilation/ \
+  --out-dir ./built/ \
+  --extensions ".ts,.js"
+
+cp -R ./app/node_modules ./built/
+
 # Start babel dev server
-cd /usr/src/output
-/usr/src/app/node_modules/.bin/babel-node --inspect=0.0.0.0:9229 ./app/app.js
+/usr/src/app/node_modules/.bin/babel-node \
+    --inspect="0.0.0.0:9229" \
+    ./built/app.js

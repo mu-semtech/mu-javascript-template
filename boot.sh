@@ -4,7 +4,7 @@ then
     exec /usr/src/app/node_modules/.bin/nodemon \
          --watch /app \
          --watch /config \
-         --ext js,mjs,cjs,json \
+         --ext js,coffee,ts,mjs,cjs,json \
          --exec /usr/src/app/run-development.sh
 elif [ "$NODE_ENV" == "production" ]
 then
