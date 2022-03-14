@@ -60,10 +60,9 @@ cd ./intermediate-transpilation
 for map in **/*.map
 do
     # based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
-    echo "Copying map $map"
-    echo "Making directory ${map%/*} and copying to ../built/$map"
-    mkdir -p "../built/${map%/*}"
-    cp -p -- "$map" "../built/$map"
+    echo "Making directory ${map%/*} and copying to ../app/$map"
+    mkdir -p "../app/${map%/*}"
+    cp -p -- "$map" "../app/$map"
 done
 cd ..
 
@@ -71,12 +70,12 @@ cd ..
 cp -R ./app/* intermediate-transpilation
 /usr/src/app/node_modules/.bin/babel \
   ./intermediate-transpilation/ \
-  --out-dir ./built/ \
+  --out-dir ./app/ \
   --extensions ".ts,.js"
 
-cp -R ./app/node_modules ./built/
+# cp -R ./app/node_modules ./built/
 
 # Start babel dev server
 /usr/src/app/node_modules/.bin/babel-node \
     --inspect="0.0.0.0:9229" \
-    ./built/app.js
+    ./app/app.js

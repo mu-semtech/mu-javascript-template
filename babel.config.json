@@ -19,7 +19,7 @@
     }]
   ],
   "ignore": [
-    "./app/node_modules",
+    "./node_modules",
     "./intermediate-transpilation/node_modules"
   ]
 }
