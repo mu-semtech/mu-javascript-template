@@ -31,4 +31,5 @@ cp -R /usr/src/app/node_modules /usr/src/output/
 /usr/src/app/node_modules/.bin/babel /usr/src/app/ \
      --ignore app/node_modules,node_modules \
      --copy-files --no-copy-ignored \
-     --out-dir /usr/src/output
+     --out-dir /usr/src/output \
+     --extensions ".ts,.js"
