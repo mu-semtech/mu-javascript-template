@@ -68,6 +68,17 @@ cd ..
 
 ## typescript
 cp -R ./app/* intermediate-transpilation
+
+
+count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
+
+if [ $count != 0 ]
+then 
+cd ./intermediate-transpilation
+/usr/src/app/node_modules/.bin/tsc
+cd ..
+fi
+
 /usr/src/app/node_modules/.bin/babel \
   ./intermediate-transpilation/ \
   --out-dir ./app/ \
