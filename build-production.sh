@@ -27,6 +27,14 @@ fi
 mkdir -p /usr/src/output/node_modules
 cp -R /usr/src/app/node_modules /usr/src/output/
 
+
+count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
+
+if [ $count != 0 ]
+then 
+/usr/src/app/node_modules/.bin/tsc
+fi
+
 ## Build microservice sources
 /usr/src/app/node_modules/.bin/babel /usr/src/app/ \
      --ignore app/node_modules,node_modules \
