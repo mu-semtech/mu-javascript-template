@@ -7,8 +7,11 @@
         }
       }
     ],
-    "@babel/preset-typescript"
+    ["@babel/preset-typescript"
+    ]
+    
   ],
+  "sourceMaps": true,
   "plugins": [
     ["@babel/plugin-proposal-decorators", { legacy: true }],
     ["@babel/plugin-proposal-class-properties"],

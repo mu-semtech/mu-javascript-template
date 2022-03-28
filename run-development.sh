@@ -81,6 +81,7 @@ fi
 
 /usr/src/app/node_modules/.bin/babel \
   ./intermediate-transpilation/ \
+  --source-maps true \
   --out-dir ./app/ \
   --extensions ".ts,.js"
 
