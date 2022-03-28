@@ -21,13 +21,21 @@ then
     rm ./app/package.json
 fi
 
-# Make the build
+
+
 
 ## Copy over template node_modules
 mkdir -p /usr/src/output/node_modules
 cp -R /usr/src/app/node_modules /usr/src/output/
 
+cp -R /usr/src/app /usr/src/intermediate-transpilation
 
+
+cd /usr/src/intermediate-transpilation
+
+
+
+# typescript compiler run
 count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
 
 if [ $count != 0 ]
@@ -35,9 +43,23 @@ then
 /usr/src/app/node_modules/.bin/tsc
 fi
 
-## Build microservice sources
-/usr/src/app/node_modules/.bin/babel /usr/src/app/ \
+## coffeescript
+/usr/src/app/node_modules/.bin/coffee -M -m --compile --output ./app ./app
+# cd ./intermediate-transpilation
+# for map in **/*.map
+# do
+#     # based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
+#     echo "Making directory ${map%/*} and copying to ../app/$map"
+#     mkdir -p "../app/${map%/*}"
+#     cp -p -- "$map" "../app/$map"
+# done
+# cd ..
+
+
+# Build microservice sources from js and ts
+/usr/src/app/node_modules/.bin/babel . \
      --ignore app/node_modules,node_modules \
      --copy-files --no-copy-ignored \
      --out-dir /usr/src/output \
      --extensions ".ts,.js"
+
