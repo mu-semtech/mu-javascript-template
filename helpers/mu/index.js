@@ -1,6 +1,6 @@
-import { app, errorHandler } from './server';
-import sparql from './sparql';
-import { v1 as uuidV1 } from 'uuid';
+import { app, errorHandler } from "./server.js";
+import sparql from "./sparql.js";
+import { v1 as uuidV1 } from "uuid";
 
 // generates a uuid
 const uuid = uuidV1;
@@ -20,20 +20,20 @@ const mu = {
   sparqlEscapeDateTime: sparql.sparqlEscapeDateTime,
   sparqlEscapeBool: sparql.sparqlEscapeBool,
   uuid,
-  errorHandler
+  errorHandler,
 };
 
 const SPARQL = mu.SPARQL,
-      query = mu.query,
-      update = mu.update,
-      sparqlEscape = mu.sparqlEscape,
-      sparqlEscapeString = mu.sparqlEscapeString,
-      sparqlEscapeUri = mu.sparqlEscapeUri,
-      sparqlEscapeInt = mu.sparqlEscapeInt,
-      sparqlEscapeFloat = mu.sparqlEscapeFloat,
-      sparqlEscapeDate = mu.sparqlEscapeDate,
-      sparqlEscapeDateTime = mu.sparqlEscapeDateTime,
-      sparqlEscapeBool = mu.sparqlEscapeBool;
+  query = mu.query,
+  update = mu.update,
+  sparqlEscape = mu.sparqlEscape,
+  sparqlEscapeString = mu.sparqlEscapeString,
+  sparqlEscapeUri = mu.sparqlEscapeUri,
+  sparqlEscapeInt = mu.sparqlEscapeInt,
+  sparqlEscapeFloat = mu.sparqlEscapeFloat,
+  sparqlEscapeDate = mu.sparqlEscapeDate,
+  sparqlEscapeDateTime = mu.sparqlEscapeDateTime,
+  sparqlEscapeBool = mu.sparqlEscapeBool;
 
 export {
   app,
@@ -50,7 +50,7 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool,
   uuid,
-  errorHandler
+  errorHandler,
 };
 
 export default mu;
