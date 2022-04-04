@@ -44,50 +44,83 @@ cp -R /usr/src/app /usr/src/output
 # Put back the package.json for a next run
 cp /tmp/package.json ./app/package.json
 
-# Version logging
-echo "Using version 20220314155209";
-
 # Transpile everything
 
 ## target folder
 cd /usr/src/output/
-rm -Rf intermediate-transpilation built
-mkdir intermediate-transpilation built
+rm -Rf coffeescript-transpilation typescript-transpilation built
+mkdir coffeescript-transpilation typescript-transpilation built
 
 ## coffeescript
-/usr/src/app/node_modules/.bin/coffee -M -m --compile --output ./intermediate-transpilation ./app
-cd ./intermediate-transpilation
-for map in **/*.map
+cp -R ./app/* ./built
+/usr/src/app/node_modules/.bin/coffee -M -m --compile -t --output ./coffeescript-transpilation ./built
+
+cd ./coffeescript-transpilation
+for file in **/*
 do
     # based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
-    echo "Making directory ${map%/*} and copying to ../app/$map"
-    mkdir -p "../app/${map%/*}"
-    cp -p -- "$map" "../app/$map"
+    echo "Making directory ${file%/*} and copying to ../app/$file"
+    mkdir -p "../app/${file%/*}"
+    cp -p -- "$file" "../app/$file"
 done
 cd ..
 
 ## typescript
-cp -R ./app/* intermediate-transpilation
 
+echo "copying"
 
-count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
+cp -R ./app/* typescript-transpilation
 
-if [ $count != 0 ]
-then 
-cd ./intermediate-transpilation
-/usr/src/app/node_modules/.bin/tsc
-cd ..
-fi
+# count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
+
+# if [ $count != 0 ]
+# then
+#     echo "Running tsc"
+#     cd ./typescript-transpilation
+#     /usr/src/app/node_modules/.bin/tsc --sourcemap
+#     cd ..
+# fi
+
+echo "Babel 1"
+
+rm -Rf built
+mv typescript-transpilation built
+mkdir typescript-transpilation
 
 /usr/src/app/node_modules/.bin/babel \
-  ./intermediate-transpilation/ \
+  ./built/ \
+  --out-dir ./typescript-transpilation/ \
   --source-maps true \
-  --out-dir ./app/ \
   --extensions ".ts,.js"
 
-# cp -R ./app/node_modules ./built/
+rm -Rf built
+mv typescript-transpilation built
+
+cd ./coffeescript-transpilation
+for file in **/*
+do
+    # based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
+    echo "Making directory ${file%/*} and copying to ../built/$file (again)"
+    mkdir -p "../built/${file%/*}"
+    cp -p -- "$file" "../built/$file"
+done
+cd ..
+
+echo "Babel 2"
+mkdir built-mu
+/usr/src/app/node_modules/.bin/babel \
+  /usr/src/output/helpers/mu/ \
+  --source-maps true \
+  --out-dir ./built-mu \
+  --extensions ".js"
+
+cp -R ./app/node_modules ./built/
+cp -R ./built-mu ./built/node_modules/mu
+
+echo "Node"
 
 # Start babel dev server
+cd built
 /usr/src/app/node_modules/.bin/babel-node \
     --inspect="0.0.0.0:9229" \
-    ./app/app.js
+    ./app.js
