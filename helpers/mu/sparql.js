@@ -108,7 +108,7 @@ function sparqlEscapeUri( value ){
 };
 
 function sparqlEscapeDecimal( value ){
-  return '"' + Number.parseInt(value) + '"^^xsd:decimal';
+  return '"' + Number.parseFloat(value) + '"^^xsd:decimal';
 };
 
 function sparqlEscapeInt( value ){
