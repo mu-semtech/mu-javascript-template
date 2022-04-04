@@ -22,8 +22,9 @@ mv ./app/node_modules /tmp/node_modules
 rm -rf ./app
 mkdir ./app
 mv /tmp/node_modules ./app/
-# Copy app folder (including node_modules so host node_modules win)
+# Copy app folder and config folder (including node_modules so host node_modules win)
 cp -rf /app ./
+mkdir -p /config/; mkdir -p ./app/config/; cp -rf /config/* ./app/config/;
 
 # Install dependencies on first boot
 if [ $CHANGE_IN_PACKAGE_JSON != "0" ] && [ -f ./app/package.json ]
