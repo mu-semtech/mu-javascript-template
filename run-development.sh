@@ -11,11 +11,11 @@
 # Move to right folder
 cd /usr/src/app/
 
-##############
-# Node modules
-##############
+######################
+# Install dependencies
+######################
 
-## Check if package existed and did not change since previous build
+## Check if package existed and did not change since previous build (/usr/src/app/app/ is copied later in this script, at first run from the template itself it doesn't exist but that's fine for comparison)
 cmp -s /app/package.json /usr/src/app/app/package.json
 CHANGE_IN_PACKAGE_JSON="$?"
 
@@ -41,9 +41,9 @@ fi
 cp ./app/package.json /tmp/package.json
 rm -f ./app/package.json
 
-## Copy to common /usr/src/output folder
-rm -Rf /usr/src/output
-cp -R /usr/src/app /usr/src/output
+## Copy to common /usr/src/processing folder
+rm -Rf /usr/src/processing
+cp -R /usr/src/app /usr/src/processing
 
 ## Put back the package.json for a next run
 cp /tmp/package.json ./app/package.json
@@ -54,32 +54,47 @@ cp /tmp/package.json ./app/package.json
 ###############
 
 ## Target folder
-cd /usr/src/output/
-rm -Rf coffeescript-transpilation typescript-transpilation built
-mkdir coffeescript-transpilation typescript-transpilation built
+cd /usr/src/processing/ # the default place to start from
 
 ## CoffeeScript
 ##
 ## Coffeescript is transpiled ready for nodejs.  This is then moved into
 ## app so we have the javascript available which other preprocessors may
 ## expect to exist.
-cp -R ./app/* ./built
-/usr/src/app/node_modules/.bin/coffee -M -m --compile -t --output ./coffeescript-transpilation ./built
+##
+## In order to generate the sourcemaps correctly, it seems we have to be
+## next to the folder where we want the sources to land, but in order to
+## transpile correctly we also need the node_modules for babel and the
+## babelrc file.  We temporarily move those around.
 
-cd ./coffeescript-transpilation
-for file in **/*
-do
-    ## based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
-    mkdir -p "../app/${file%/*}"
-    cp -p -- "$file" "../app/$file"
-done
-cd ..
+cd /usr/src
+
+# prepare the build folders
+mkdir /usr/src/build /usr/src/build.coffee
+cp -R /usr/src/processing/app/* /usr/src/build/
+cp /usr/src/processing/babel.config.json /usr/src/
+cp -R /usr/src/processing/node_modules/ /usr/src/
+
+# make the build and move to coffeescript-transpilation
+/usr/src/app/node_modules/.bin/coffee -M -m --compile -t --output ./build.coffee/ ./build
+mv build.coffee/ /usr/src/processing/coffeescript-transpilation
+
+# clean up
+rm -Rf /usr/src/build /usr/src/node_modules/
+rm /usr/src/babel.config.json
+cd /usr/src/processing/
+
 
 ## TypeScript and ES6
 ##
 ## Transpiles TypeScript and ES6 to something nodejs wants to run.
+mkdir typescript-transpilation build
+cp -R ./app/* build
 
-cp -R ./app/* typescript-transpilation
+cd coffeescript-transpilation
+find . -type d -exec mkdir -p ../build/{} \;
+find . -type f -exec cp "{}" ../build/{} \;
+cd ..
 
 # count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
 
@@ -91,50 +106,59 @@ cp -R ./app/* typescript-transpilation
 #     cd ..
 # fi
 
-rm -Rf built
-mv typescript-transpilation built
-mkdir typescript-transpilation
-
 /usr/src/app/node_modules/.bin/babel \
-  ./built/ \
+  ./build/ \
   --out-dir ./typescript-transpilation/ \
   --source-maps true \
   --extensions ".ts,.js"
 
-rm -Rf built
-mv typescript-transpilation built
+rm -Rf ./build
+mv typescript-transpilation /usr/src/build
 
 # We move the coffeescript files again because the previous step will
 # have built the sources coffeescript generated, but these sources were
 # already node compliant.  We could make coffeescript emit ES6 and
 # transpile them to nodejs in this step, but that breaks SourceMaps.
-cd ./coffeescript-transpilation
-for file in **/*
-do
-    # based on https://unix.stackexchange.com/questions/33486/how-to-copy-only-matching-files-preserving-subdirectories#33498
-    echo "Making directory ${file%/*} and copying to ../built/$file (again)"
-    mkdir -p "../built/${file%/*}"
-    cp -p -- "$file" "../built/$file"
-done
+cd coffeescript-transpilation
+find . -type d -exec mkdir -p /usr/src/build/{} \;
+find . -type f -exec cp "{}" /usr/src/build/{} \;
 cd ..
 
-## Compile mu helpers
-mkdir built-mu
+
+##############
+# Node modules
+##############
+
+## template modules
+cp -R /usr/src/processing/node_modules /usr/src/build/
+
+## app modules
+if [ -d /usr/src/processing/app/node_modules ]
+then
+    cd /usr/src/processing/app/
+    find node_modules/ -type d -exec mkdir -p /usr/src/build/{} \;
+    find node_modules/ -type f -exec cp "{}" /usr/src/build/{} \;
+fi
+
+## mu helpers
+cd /usr/src/processing/
+mkdir /usr/src/processing/built-mu
 /usr/src/app/node_modules/.bin/babel \
-  /usr/src/output/helpers/mu/ \
+  /usr/src/processing/helpers/mu/ \
   --source-maps true \
-  --out-dir ./built-mu \
+  --out-dir /usr/src/processing/built-mu \
   --extensions ".js"
 
-cp -R ./app/node_modules ./built/
-cp -R ./built-mu ./built/node_modules/mu
+cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
+
+# tail -f /dev/null
 
 
 ##############
 # Start server
 ##############
 
-cd built
+cd /usr/src/build/
 /usr/src/app/node_modules/.bin/babel-node \
     --inspect="0.0.0.0:9229" \
     ./app.js
