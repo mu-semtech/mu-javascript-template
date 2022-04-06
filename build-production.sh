@@ -15,8 +15,6 @@ mkdir -p /config /config.original
 
 if [[ "$(ls -A /app/config/ 2> /dev/null)" ]]
 then
-    # mkdir -p ./app/config/
-    # cp -rf /config/* ./app/config/
     cp -r /app/config/* /config.original/
     cp -r /app/config/* /config/
 fi
