@@ -6,9 +6,16 @@
 #### Expects sources to be in /usr/src/app/ with the app in
 #### /usr/src/app/app/ and stores the resulting build in /usr/src/build
 
+# Clean starting state
+rm -Rf /usr/src/processing /usr/src/build
 
-## Target folder
-cd /usr/src/processing/ # the default place to start from
+# Copy template (/usr/src/app/) and app (/usr/src/app/app/) sources
+# without package.json, which we want to skip as it would conflict
+# building sources.
+
+cp -R /usr/src/app /usr/src/processing
+rm -f /usr/src/processing/app/package.json
+
 
 ## CoffeeScript
 ##
@@ -21,7 +28,7 @@ cd /usr/src/processing/ # the default place to start from
 ## transpile correctly we also need the node_modules for babel and the
 ## babelrc file.  We temporarily move those around.
 
-cd /usr/src
+cd /usr/src/
 
 # prepare the build folders
 mkdir /usr/src/build /usr/src/build.coffee
@@ -36,12 +43,12 @@ mv build.coffee/ /usr/src/processing/coffeescript-transpilation
 # clean up
 rm -Rf /usr/src/build /usr/src/node_modules/
 rm /usr/src/babel.config.json
-cd /usr/src/processing/
-
 
 ## TypeScript and ES6
 ##
 ## Transpiles TypeScript and ES6 to something nodejs wants to run.
+cd /usr/src/processing/
+
 mkdir typescript-transpilation build
 cp -R ./app/* build
 
@@ -78,3 +85,40 @@ find . -type d -exec mkdir -p /usr/src/build/{} \;
 find . -type f -exec cp "{}" /usr/src/build/{} \;
 cd ..
 
+
+##############
+# Node modules
+##############
+cd /usr/src/processing/
+
+## template modules
+cp -R /usr/src/processing/node_modules /usr/src/build/
+
+## app modules
+if [ -d /usr/src/processing/app/node_modules ]
+then
+    cd /usr/src/processing/app/
+    find node_modules/ -type d -exec mkdir -p /usr/src/build/{} \;
+    find node_modules/ -type f -exec cp "{}" /usr/src/build/{} \;
+fi
+
+## mu helpers
+cd /usr/src/processing/
+
+mkdir /usr/src/processing/built-mu
+/usr/src/app/node_modules/.bin/babel \
+  /usr/src/processing/helpers/mu/ \
+  --source-maps true \
+  --out-dir /usr/src/processing/built-mu \
+  --extensions ".js"
+
+cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
+
+
+
+## Clean temporary folders
+##
+## We have created garbage, let's remove it
+cd /usr/src/
+
+rm -Rf /usr/src/processing

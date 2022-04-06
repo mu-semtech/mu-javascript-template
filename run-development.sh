@@ -21,7 +21,7 @@ cd /usr/src/app/
 cmp -s /app/package.json /usr/src/app/app/package.json
 CHANGE_IN_PACKAGE_JSON="$?"
 
-## Copy node_modules to temporary location so we can reuse them
+## Copy node_modules to temporary location so we can reuse them, this occurs when the mountend sources have a node_modules and/or on restart
 rm -Rf /tmp/node_modules
 mv ./app/node_modules /tmp/node_modules
 ## Remove app folder if exists
@@ -36,19 +36,10 @@ mkdir -p /config/; mkdir -p ./app/config/; cp -rf /config/* ./app/config/;
 if [ $CHANGE_IN_PACKAGE_JSON != "0" ] && [ -f ./app/package.json ]
 then
     echo "Running npm install"
-    npm install ./app
+    cd /usr/src/app/app/
+    npm install
+    cd /usr/src/app/
 fi
-
-## Remove package to avoid babel and imports breaking (temporary move)
-cp ./app/package.json /tmp/package.json
-rm -f ./app/package.json
-
-## Copy to common /usr/src/processing folder
-rm -Rf /usr/src/processing
-cp -R /usr/src/app /usr/src/processing
-
-## Put back the package.json for a next run
-cp /tmp/package.json ./app/package.json
 
 
 
@@ -57,36 +48,6 @@ cp /tmp/package.json ./app/package.json
 ###############
 
 ./transpile-sources.sh
-
-cd /usr/src/processing
-
-
-
-##############
-# Node modules
-##############
-
-## template modules
-cp -R /usr/src/processing/node_modules /usr/src/build/
-
-## app modules
-if [ -d /usr/src/processing/app/node_modules ]
-then
-    cd /usr/src/processing/app/
-    find node_modules/ -type d -exec mkdir -p /usr/src/build/{} \;
-    find node_modules/ -type f -exec cp "{}" /usr/src/build/{} \;
-fi
-
-## mu helpers
-cd /usr/src/processing/
-mkdir /usr/src/processing/built-mu
-/usr/src/app/node_modules/.bin/babel \
-  /usr/src/processing/helpers/mu/ \
-  --source-maps true \
-  --out-dir /usr/src/processing/built-mu \
-  --extensions ".js"
-
-cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
 
 
 
