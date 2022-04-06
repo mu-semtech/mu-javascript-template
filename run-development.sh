@@ -11,39 +11,63 @@
 # Move to right folder
 cd /usr/src/app/
 
-# Check if package existed and did not change since previous build
+
+
+######################
+# Install dependencies
+######################
+
+## Check if package existed and did not change since previous build (/usr/src/app/app/ is copied later in this script, at first run from the template itself it doesn't exist but that's fine for comparison)
 cmp -s /app/package.json /usr/src/app/app/package.json
 CHANGE_IN_PACKAGE_JSON="$?"
 
-# Copy node_modules to temporary location so we can reuse them
+## Copy node_modules to temporary location so we can reuse them, this occurs when the mountend sources have a node_modules and/or on restart
 rm -Rf /tmp/node_modules
-mv ./app/node_modules /tmp/node_modules
-# Remove app folder if exists
+if [ -d /usr/src/app/app/node_modules/ ]
+then
+    mv ./app/node_modules /tmp/node_modules
+fi
+## Remove app folder if exists
 rm -rf ./app
 mkdir ./app
-mv /tmp/node_modules ./app/
-# Copy app folder and config folder (including node_modules so host node_modules win)
-cp -rf /app ./
-mkdir -p /config/; mkdir -p ./app/config/; cp -rf /config/* ./app/config/;
+if [ -d /tmp/node_modules/ ]
+then
+    mv /tmp/node_modules ./app/;
+fi
 
-# Install dependencies on first boot
+## Copy app folder and config folder (including node_modules so host node_modules win)
+cp -rf /app ./
+
+if [[ "$(ls -A /config/ 2> /dev/null)" ]]
+then
+    mkdir -p ./app/config/
+    cp -rf /config/* ./app/config/
+fi
+
+## Install dependencies on first boot
 if [ $CHANGE_IN_PACKAGE_JSON != "0" ] && [ -f ./app/package.json ]
 then
     echo "Running npm install"
-    npm install ./app
+    cd /usr/src/app/app/
+    npm install
+    cd /usr/src/app/
 fi
 
-# Remove package to avoid babel and imports breaking (temporary move)
-cp ./app/package.json /tmp/package.json
-rm -f ./app/package.json
 
-# Copy to common /usr/src/output folder
-rm -Rf /usr/src/output
-cp -R /usr/src/app /usr/src/output
 
-# Put back the package.json for a next run
-cp /tmp/package.json ./app/package.json
+###############
+# Transpilation
+###############
 
-# Start babel dev server
-cd /usr/src/output
-/usr/src/app/node_modules/.bin/babel-node --inspect=0.0.0.0:9229 ./app/app.js
+./transpile-sources.sh
+
+
+
+##############
+# Start server
+##############
+
+cd /usr/src/build/
+/usr/src/app/node_modules/.bin/babel-node \
+    --inspect="0.0.0.0:9229" \
+    ./app.js

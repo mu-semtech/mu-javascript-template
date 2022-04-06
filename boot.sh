@@ -4,7 +4,7 @@ then
     exec /usr/src/app/node_modules/.bin/nodemon \
          --watch /app \
          --watch /config \
-         --ext js,mjs,cjs,json \
+         --ext js,coffee,ts,mjs,cjs,json \
          --exec /usr/src/app/run-development.sh
 elif [ "$NODE_ENV" == "production" ]
 then
@@ -13,7 +13,7 @@ then
     diff -rq /config /config.original > /dev/null
     CONFIG_FILES_CHANGED="$?"
 
-    if [ ! -f /usr/src/output/app/app.js ]
+    if [ ! -f /usr/src/build/app.js ]
     then
         echo "No built sources found.  If you mount new sources, please set the NODE_ENV=\"development\" environment variable."
         sleep 5;
@@ -27,17 +27,29 @@ then
     then
         echo "Rebuilding sources to include /config."
 
-        cp -Rf /config/* /usr/src/app/app/config/
+        # move new configuration into app for transpilation
+        if [[ "$(ls -A /config 2> /dev/null)" ]]
+        then
+            cp -Rf /config/* /usr/src/app/app/config/
+        fi
 
-        /usr/src/app/node_modules/.bin/babel /usr/src/app/ \
-             --ignore app/node_modules,node_modules \
-             --copy-files --no-copy-ignored \
-             --out-dir /usr/src/output
+        # make a backup of the used configuration so we can detect changes
+        rm -Rf /config.original
+        mkdir /config.original
+        if [[ "$(ls -A /config 2> /dev/null)" ]]
+        then
+            cp -Rf /config/* /config.original
+        fi
 
-        cd /usr/src/output/
-        exec node ./app/app.js
+        # transpile sources
+        cd /usr/src/app/
+        ./transpile-sources.sh
+
+        # boot transpiled sources
+        cd /usr/src/build/
+        exec node ./app.js
     else
-        cd /usr/src/output/
-        exec node ./app/app.js
+        cd /usr/src/build/
+        exec node ./app.js
     fi
 fi
