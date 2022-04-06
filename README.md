@@ -89,16 +89,34 @@ mu.app.get('/', function( req, res ) {
   res.send('Hello using full import');
 } );
 ```
+## Transpiled languages
+The template has second-class support for transpiling TypeScript and CoffeeScript.  These are considered second-class and support may be removed in a minor release but not in a patch release.
+
+Overwriting files through the config folder may require you to stick to the original format.  There are currently no guarantees on this.
+
+### Coffeescript
+Any file extending to .coffee will be transpiled from coffeescript to javascript file.  Sourcemaps are included for debugging.
+
+### TypeScript
+Any file extending in .ts will be transpiled to a javascript file.  Sources are currently not typechecked though this is subject to change.  Sourcemaps are included for debugging.
 
 ## Dependencies
 
 You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time.
 
 ## Configuration
+### Environment variables
 The following environment variables can be configured:
 
   - `NODE_ENV` (default: `production`): either `"development"` or `"production"`. The environment to start the application in. The application live reloads on changes in `"development"` mode.
   - `MAX_BODY_SIZE` (default: `100kb`): max size of the request body. See [ExpressJS documentation](https://expressjs.com/en/resources/middleware/body-parser.html#limit).
+
+### Mounting `/config`
+You may let users extend the microservice with code.
+
+When you import content from `./config/some-file`, the sources can be provided by the end user in `/config/some-file`.
+
+You may provide default values for each of these files. The sources provided by the app are merged with the sources provided by the microservice, with the app's configuration taking precedence.
 
 ## Logging
 
