@@ -24,16 +24,16 @@ const mu = {
 };
 
 const SPARQL = mu.SPARQL,
-  query = mu.query,
-  update = mu.update,
-  sparqlEscape = mu.sparqlEscape,
-  sparqlEscapeString = mu.sparqlEscapeString,
-  sparqlEscapeUri = mu.sparqlEscapeUri,
-  sparqlEscapeInt = mu.sparqlEscapeInt,
-  sparqlEscapeFloat = mu.sparqlEscapeFloat,
-  sparqlEscapeDate = mu.sparqlEscapeDate,
-  sparqlEscapeDateTime = mu.sparqlEscapeDateTime,
-  sparqlEscapeBool = mu.sparqlEscapeBool;
+      query = mu.query,
+      update = mu.update,
+      sparqlEscape = mu.sparqlEscape,
+      sparqlEscapeString = mu.sparqlEscapeString,
+      sparqlEscapeUri = mu.sparqlEscapeUri,
+      sparqlEscapeInt = mu.sparqlEscapeInt,
+      sparqlEscapeFloat = mu.sparqlEscapeFloat,
+      sparqlEscapeDate = mu.sparqlEscapeDate,
+      sparqlEscapeDateTime = mu.sparqlEscapeDateTime,
+      sparqlEscapeBool = mu.sparqlEscapeBool;
 
 export {
   app,
@@ -50,7 +50,7 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool,
   uuid,
-  errorHandler,
+  errorHandler
 };
 
 export default mu;
