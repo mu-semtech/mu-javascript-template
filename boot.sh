@@ -30,6 +30,16 @@ then
         # move new configuration into app for transpilation
         if [[ "$(ls -A /config 2> /dev/null)" ]]
         then
+            # remove old files with all relevant extensions
+            for FILE in $(/config/**/*.{js,ts,coffee} 2>/dev/null)
+            do
+                DIR_NAME=`dirname $FILE`
+                FILE_NAME=${FILE##*/} # only keep part after last '/'
+                FILE_NAME_NO_EXT=${FILE_NAME%.*} # remove everything after last '.' (= file extension)
+
+                rm /usr/src/app/app/$DIR_NAME/$FILE_NAME{.js,.coffee,.ts} 2>/dev/null
+            done
+
             cp -Rf /config/* /usr/src/app/app/config/
         fi
 
