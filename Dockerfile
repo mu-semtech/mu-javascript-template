@@ -1,4 +1,4 @@
-FROM node:14.16.1-alpine
+FROM node:16.16-alpine
 
 LABEL maintainer="madnificent@gmail.com"
 
