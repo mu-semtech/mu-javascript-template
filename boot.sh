@@ -30,6 +30,7 @@ then
         # move new configuration into app for transpilation
         if [[ "$(ls -A /config 2> /dev/null)" ]]
         then
+            mkdir -p /usr/src/app/app/config/
             cp -Rf /config/* /usr/src/app/app/config/
         fi
 
