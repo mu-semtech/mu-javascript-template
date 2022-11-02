@@ -1,6 +1,6 @@
 {
   "name": "mu-javascript-template",
-  "version": "1.5.0-beta.4",
+  "version": "1.6.0",
   "description": "Template for mu services written in JavaScript",
   "type": "module",
   "repository": {
@@ -19,7 +19,7 @@
     "@babel/preset-env": "^7.14.1",
     "@babel/preset-typescript": "^7.16.7",
     "babel-plugin-module-resolver": "4.1.0",
-    "body-parser": "~1.19.0",
+    "body-parser": "~1.20.0",
     "coffeescript": "^2.6.1",
     "env-var": "^7.0.0",
     "express": "^4.17.1",

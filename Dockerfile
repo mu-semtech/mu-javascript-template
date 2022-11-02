@@ -1,4 +1,4 @@
-FROM node:14.16.1-alpine
+FROM node:16.16-alpine
 
 LABEL maintainer="madnificent@gmail.com"
 
@@ -27,8 +27,8 @@ ONBUILD ADD . /app/
 ONBUILD RUN /usr/src/app/build-production.sh
 
 ONBUILD RUN if [ -f /app/on-build.sh ]; \
-   then \
-   echo "Running custom on-build.sh of child" \
-   && chmod +x /app/on-build.sh \
-   && /bin/bash /app/on-build.sh ;\
-   fi
+     then \
+        echo "Running custom on-build.sh of child" \
+        && chmod +x /app/on-build.sh \
+        && /bin/bash /app/on-build.sh ;\
+     fi
