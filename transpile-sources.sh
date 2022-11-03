@@ -105,6 +105,10 @@ fi
 ## mu helpers
 cd /usr/src/processing/
 
+## Need the babel config for building mu-package as well
+cp /usr/src/app/package.json /usr/src/processing/helpers/mu/
+cp /usr/src/app/babel.config.json /usr/src/processing/helpers/mu/
+
 mkdir /usr/src/processing/built-mu
 /usr/src/app/node_modules/.bin/babel \
   /usr/src/processing/helpers/mu/ \
@@ -114,7 +118,11 @@ mkdir /usr/src/processing/built-mu
 
 cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
 
+## Put the package.json file in the mu package to make it a proper looking package (also for specifics like `"type": "module"`)
+cp /usr/src/app/package.json /usr/src/build/node_modules/mu/
 
+## Finish by putting the package.json file in the final build to make it a proper module
+cp /usr/src/app/package.json /usr/src/build
 
 ## Clean temporary folders
 ##

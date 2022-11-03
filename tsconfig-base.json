@@ -1,6 +1,6 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
-    "display": "Node 14",
+    "display": "Node 16",
   
     "compilerOptions": {
       "lib": ["es2020"],
@@ -8,14 +8,11 @@
       "target": "es2020",
       "allowJs": true,
       "noEmit": true,
-  
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      // Ensure that .d.ts files are created by tsc, but not .js files
       "declaration": true,
-      // Ensure that Babel can safely transpile files in the TypeScript project
       "isolatedModules": true
     }
   }
