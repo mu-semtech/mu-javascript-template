@@ -19,6 +19,8 @@ COPY . /usr/src/app
 RUN chmod +x /usr/src/app/run-development.sh
 RUN chmod +x /usr/src/app/build-production.sh
 
+EXPOSE 80
+
 CMD sh boot.sh
 
 # This stuff only runs when building an image from the template

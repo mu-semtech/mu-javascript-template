@@ -1,0 +1,99 @@
+---
+kind: pipeline
+type: docker
+name: push-latest
+steps:
+- name: submodules
+  image: alpine/git
+  commands:
+  - git submodule update --init --recursive
+- name: build-and-push
+  image: plugins/docker
+  settings:
+    repo: ${DRONE_REPO_NAMESPACE/mu-semtech/semtech}/${DRONE_REPO_NAME%-service}
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+trigger:
+  branch:
+  - master
+  event:
+    exclude:
+    - pull_request
+---
+kind: pipeline
+type: docker
+name: push-feature-build
+steps:
+- name: submodules
+  image: alpine/git
+  commands:
+  - git submodule update --init --recursive
+- name: push-feature-build
+  image: plugins/docker
+  settings:
+    repo: ${DRONE_REPO_NAMESPACE/mu-semtech/semtech}/${DRONE_REPO_NAME%-service}
+    tags: ${DRONE_BRANCH/\//-}
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    purge: true
+trigger:
+  branch:
+    - "*/*"
+  event:
+    exclude:
+      - pull_request
+---
+kind: pipeline
+type: docker
+name: push-release
+steps:
+- name: submodules
+  image: alpine/git
+  commands:
+  - git submodule update --init --recursive
+- name: build-and-push-tag
+  image: plugins/docker
+  settings:
+    repo: ${DRONE_REPO_NAMESPACE/mu-semtech/semtech}/${DRONE_REPO_NAME%-service}
+    tags: ${DRONE_TAG##v} # strips v from the tag
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+trigger:
+  event:
+  - tag
+---
+kind: pipeline
+type: docker
+name: dry-run
+steps:
+- name: submodules
+  image: alpine/git
+  commands:
+  - git submodule update --init --recursive
+- name: dry-run
+  image: plugins/docker
+  settings:
+    repo: ${DRONE_REPO_NAMESPACE/mu-semtech/semtech}/${DRONE_REPO_NAME%-service}
+    dry_run: true
+trigger:
+  event:
+  - pull_request
+---
+kind: secret
+name: docker_username
+data: kurKh/EctlKfrAViJSn3voT4duP9aBdrip7OQV7ZuS5HYPTVxMxy
+---
+kind: secret
+name: docker_password
+data: og9cL7Gfx5E0qWJs0PeDaqIH6fr3Z/aK1YmVlmsh2B8OC2f8kyZFMiGeLDp/dcLloZ2OX7HLFy3euhFR4O4Z7w==
+---
+kind: signature
+hmac: adce33d1d58f886a57a5877695d367e5c6b3347045281b61e5a18f49cf960595
+
+...

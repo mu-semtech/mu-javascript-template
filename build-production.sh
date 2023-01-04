@@ -10,20 +10,24 @@
 cd /usr/src/app
 rm -rf ./app /app.original
 cp -r /app ./
+
+mkdir -p /config /config.original
+
+if [[ "$(ls -A /app/config/ 2> /dev/null)" ]]
+then
+    cp -r /app/config/* /config.original/
+    cp -r /app/config/* /config/
+fi
+
 cp -r /app /app.original
 
 # Install custom packages if need be
 if [ -f ./app/package.json ]
 then
-    npm install ./app
-    rm ./app/package.json
+    echo "Running npm install"
+    cd /usr/src/app/app/
+    npm install
+    cd /usr/src/app/
 fi
 
-# Make the build
-
-## Copy over template node_modules
-mkdir -p /usr/src/output/node_modules
-cp -R /usr/src/app/node_modules /usr/src/output/
-
-## Build microservice sources
-/usr/src/app/node_modules/.bin/babel /usr/src/app/ --ignore node_modules --out-dir /usr/src/output
+./transpile-sources.sh
