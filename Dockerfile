@@ -11,8 +11,6 @@ ENV NODE_ENV 'production'
 ENV HOST '0.0.0.0'
 ENV PORT '80'
 
-ENV NODE_ENV 'production'
-
 ENV LOG_SPARQL_ALL 'true'
 ENV DEBUG_AUTH_HEADERS 'true'
 
