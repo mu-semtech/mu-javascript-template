@@ -196,3 +196,20 @@ When running inside a mu.semte.ch stack, you could mount your sources and connec
         - /absolute/path/to/your/sources/:/app/
 ```
 Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
+
+## Handling Delta's
+If you are building a reactive service that should execute certain logic based on changes in the database, you want to hook it up to the [delta-notifier](https://github.com/mu-semtech/delta-notifier/). Some extra steps need to be taken to properly handle delta's, specifically the route handling delta's will need to use a specific bodyParser. 
+
+The default bodyParser provided by the template will only accept `application/vnd.api+json` and the delta-notifier is sending `application/json` content. Aside from that the body of a delta message may be very large, often several megabytes. By specifying the bodyParser on the route accepting delta messages you can easily modify it when required.
+
+An example
+```js 
+// app.js
+import bodyParser from 'body-parser';
+// ...
+
+app.post("/delta-updates", bodyParser.json({limit: '50mb'}), async function(req, res) {
+//...
+}
+```
+
