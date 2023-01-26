@@ -110,6 +110,9 @@ The following environment variables can be configured:
 
   - `NODE_ENV` (default: `production`): either `"development"` or `"production"`. The environment to start the application in. The application live reloads on changes in `"development"` mode.
   - `MAX_BODY_SIZE` (default: `100kb`): max size of the request body. See [ExpressJS documentation](https://expressjs.com/en/resources/middleware/body-parser.html#limit).
+  - `HOST` (default: `0.0.0.0`): The hostname you want the service to bind to.
+  - `PORT` (default: `80`): The port you want the service to bind to
+
 
 ### Mounting `/config`
 You may let users extend the microservice with code.
