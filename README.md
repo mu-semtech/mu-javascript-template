@@ -246,6 +246,9 @@ The following environment variables can be configured:
 
   - `NODE_ENV` (default: `production`): either `"development"` or `"production"`. The environment to start the application in. The application live reloads on changes in `"development"` mode.
   - `MAX_BODY_SIZE` (default: `100kb`): max size of the request body. See [ExpressJS documentation](https://expressjs.com/en/resources/middleware/body-parser.html#limit).
+  - `HOST` (default: `0.0.0.0`): The hostname you want the service to bind to.
+  - `PORT` (default: `80`): The port you want the service to bind to
+
 
 #### Mounting `/config`
 You may let users extend the microservice with code.
@@ -264,3 +267,20 @@ The verbosity of logging can be configured through following environment variabl
 - `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
 
 Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
+
+### Handling Delta's
+If you are building a reactive service that should execute certain logic based on changes in the database, you want to hook it up to the [delta-notifier](https://github.com/mu-semtech/delta-notifier/). Some extra steps need to be taken to properly handle delta's, specifically the route handling delta's will need to use a specific bodyParser. 
+
+The default bodyParser provided by the template will only accept `application/vnd.api+json` and the delta-notifier is sending `application/json` content. Aside from that the body of a delta message may be very large, often several megabytes. By specifying the bodyParser on the route accepting delta messages you can easily modify it when required.
+
+An example
+```js 
+// app.js
+import bodyParser from 'body-parser';
+// ...
+
+app.post("/delta-updates", bodyParser.json({limit: '50mb'}), async function(req, res) {
+//...
+}
+```
+
