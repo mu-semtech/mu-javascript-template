@@ -8,6 +8,9 @@ ENV MU_SPARQL_ENDPOINT 'http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
 ENV NODE_ENV 'production'
 
+ENV HOST '0.0.0.0'
+ENV PORT '80'
+
 ENV LOG_SPARQL_ALL 'true'
 ENV DEBUG_AUTH_HEADERS 'true'
 
@@ -18,6 +21,8 @@ RUN npm config set unsafe-perm true && npm install
 COPY . /usr/src/app
 RUN chmod +x /usr/src/app/run-development.sh
 RUN chmod +x /usr/src/app/build-production.sh
+
+EXPOSE ${PORT}
 
 CMD sh boot.sh
 
