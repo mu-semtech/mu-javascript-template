@@ -24,7 +24,7 @@ RUN chmod +x /usr/src/app/build-production.sh
 
 EXPOSE ${PORT}
 
-CMD sh boot.sh
+CMD ["/usr/src/app/boot.sh"]
 
 # This stuff only runs when building an image from the template
 ONBUILD RUN rm -Rf /app/scripts

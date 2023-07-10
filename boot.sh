@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 if [ "$NODE_ENV" == "development" ]
 then
     # Run live-reload development
