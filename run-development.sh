@@ -21,22 +21,7 @@ cd /usr/src/app/
 cmp -s /app/package.json /usr/src/app/app/package.json
 CHANGE_IN_PACKAGE_JSON="$?"
 
-## Copy node_modules to temporary location so we can reuse them, this occurs when the mountend sources have a node_modules and/or on restart
-rm -Rf /tmp/node_modules
-if [ -d /usr/src/app/app/node_modules/ ]
-then
-    mv ./app/node_modules /tmp/node_modules
-fi
-## Remove app folder if exists
-rm -rf ./app
-mkdir ./app
-if [ -d /tmp/node_modules/ ]
-then
-    mv /tmp/node_modules ./app/;
-fi
-
-## Copy app folder and config folder (including node_modules so host node_modules win)
-cp -rf /app ./
+rsync --delete -a --exclude=node_modules /app/ app/
 
 if [[ "$(ls -A /config/ 2> /dev/null)" ]]
 then
@@ -53,15 +38,11 @@ then
     cd /usr/src/app/
 fi
 
-
-
 ###############
 # Transpilation
 ###############
 
 ./transpile-sources.sh
-
-
 
 ##############
 # Start server

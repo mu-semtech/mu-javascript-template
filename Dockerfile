@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 LABEL maintainer="madnificent@gmail.com"
 
-RUN apk update && apk upgrade && apk add --no-cache bash git openssh
+RUN apk update && apk upgrade && apk add --no-cache bash git openssh rsync
 
 ENV MU_SPARQL_ENDPOINT 'http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
