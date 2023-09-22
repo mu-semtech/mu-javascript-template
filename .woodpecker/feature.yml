@@ -3,7 +3,7 @@ steps:
     image: woodpeckerci/plugin-docker-buildx
     settings:
       repo: ${CI_REPO/mu-semtech/semtech}
-      tags: ${CI_COMMIT_SOURCE_BRANCH/\//-}
+      tags: ${CI_COMMIT_BRANCH/\//-}
     secrets: [ docker_username, docker_password ]
 when:
   branch: feature/*
