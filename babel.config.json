@@ -10,9 +10,7 @@
     ["@babel/preset-typescript"]
   ],
   "plugins": [
-    ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/plugin-proposal-class-properties"],
-    ["@babel/plugin-proposal-private-methods"]
+    ["@babel/plugin-proposal-decorators", { "legacy": true }]
   ],
   "ignore": [
     "./node_modules",
