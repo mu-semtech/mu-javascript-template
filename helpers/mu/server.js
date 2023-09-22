@@ -36,22 +36,33 @@ const errorHandler = function(err, req, res, next) {
   });
 };
 
+
+// start server
+const server = app.listen( port, hostname, function() {
+  console.log(`Starting server on ${hostname}:${port} in ${app.get('env')} mode`);
+});
+
 // faster stopping
-let exitHandler = function() {
-  return process.exit();
+let exitHandler = function(server) {
+  console.debug("Preparing to shut down");
+  server.close( () => {
+    console.debug("Shut down complete");
+  });
 };
 
-process.on('SIGTERM', exitHandler );
-process.on('SIGINT', exitHandler );
-
+/**
+ * Sets a new handler for shutting down the server.
+ *
+ * @arg functor Function taking one argument (the result of app.listen
+ * when starting the server) which should gracefully stop the server.
+ */
 function setExitHandler( functor ) {
   this.exitHandler = functor;
 }
 
-// start server
-app.listen( port, hostname, function() {
-  console.log(`Starting server on ${hostname}:${port} in ${app.get('env')} mode`);
-});
+process.on('SIGTERM', () => exitHandler(server) );
+process.on('SIGINT', () => exitHandler(server) );
+
 
 export default app;
 
