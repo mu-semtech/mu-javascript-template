@@ -36,6 +36,18 @@ const errorHandler = function(err, req, res, next) {
   });
 };
 
+// faster stopping
+let exitHandler = function() {
+  return process.exit();
+};
+
+process.on('SIGTERM', exitHandler );
+process.on('SIGINT', exitHandler );
+
+function setExitHandler( functor ) {
+  this.exitHandler = functor;
+}
+
 // start server
 app.listen( port, hostname, function() {
   console.log(`Starting server on ${hostname}:${port} in ${app.get('env')} mode`);
@@ -45,5 +57,6 @@ export default app;
 
 export {
   app,
-  errorHandler
+  errorHandler,
+  setExitHandler
 }

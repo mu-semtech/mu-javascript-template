@@ -67,6 +67,7 @@ The following importable variables are available:
   - `sparqlEscapeDateTime(value) => string`: Function to escape a datetime in SPARQL
   - `sparqlEscapeBool(value) => string`: Function to escape a boolean in SPARQL. The given value is evaluated to a boolean value in javascript. E.g. the string value `'0'` evaluates to `false` in javascript.
   - `sparqlEscape(value, type) => string`: Function to escape a value in SPARQL according to the given type. Type must be one of `'string'`, `'uri'`, `'int'`, `'float'`, `'date'`, `'dateTime'`, `'bool'`.
+  - `setExitHandler`: *experimental* Sets a function to be ran on exit.  The default implementation executes `process.exit` which allows for fast exiting of the service and therefore also fast restarts.
 
 You can either import specific attributes from the mu library, or import the whole mu object.
 

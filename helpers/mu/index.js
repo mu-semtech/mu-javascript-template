@@ -53,7 +53,8 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool,
   uuid,
-  errorHandler
+  errorHandler,
+  setExitHandler
 };
 
 export default mu;
