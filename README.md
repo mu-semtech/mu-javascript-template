@@ -121,7 +121,7 @@ Next, recreate the container by executing
 docker-compose up -d your-microservice-name
 ```
 
-### Accessing your microservice directly
+### Access your microservice directly
 Requires: 'Build a microservice based on mu-javascript-template' or 'Develop in a mu.semte.ch stack'
 
 If you doubt your requests are arriving at your microservice correctly, you can publish it port to access it directly. In the example below, port 8888 is used to access the service directly.
@@ -140,6 +140,25 @@ Update your service definition in `docker-compose.yml` as follows:
 Next, recreate the container by executing
 ```bash
 docker-compose up -d your-microservice-name
+```
+
+### Add a dependency to your microservice
+You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time and in development mode. There is no need to restart the container.
+
+### Handle delta's from the delta-service
+If you are building a reactive service that should execute certain logic based on changes in the database, you want to hook it up to the [delta-notifier](https://github.com/mu-semtech/delta-notifier/). Some extra steps need to be taken to properly handle delta's, specifically the route handling delta's will need to use a specific bodyParser. 
+
+The default bodyParser provided by the template will only accept `application/vnd.api+json` and the delta-notifier is sending `application/json` content. Aside from that the body of a delta message may be very large, often several megabytes. By specifying the bodyParser on the route accepting delta messages you can easily modify it when required.
+
+An example
+```javascript
+// app.js
+import bodyParser from 'body-parser';
+// ...
+
+app.post("/delta-updates", bodyParser.json({ limit: '50mb' }), function(req, res) {
+//...
+}
 ```
 
 ## Reference
@@ -226,9 +245,6 @@ Any file extending to .coffee will be transpiled from coffeescript to javascript
 #### TypeScript
 Any file extending in .ts will be transpiled to a javascript file.  Sources are currently not typechecked though this is subject to change.  Sourcemaps are included for debugging.
 
-### Dependencies
-
-You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time.
 
 ### Configuration
 #### Environment variables
@@ -237,18 +253,17 @@ The following environment variables can be configured:
   - `NODE_ENV` (default: `production`): either `"development"` or `"production"`. The environment to start the application in. The application live reloads on changes in `"development"` mode.
   - `MAX_BODY_SIZE` (default: `100kb`): max size of the request body. See [ExpressJS documentation](https://expressjs.com/en/resources/middleware/body-parser.html#limit).
   - `HOST` (default: `0.0.0.0`): The hostname you want the service to bind to.
-  - `PORT` (default: `80`): The port you want the service to bind to
+  - `PORT` (default: `80`): The port you want the service to bind to.
 
 
 #### Mounting `/config`
 You may let users extend the microservice with code.
 
-When you import content from `./config/some-file`, the sources can be provided by the end user in `/config/some-file`.
+When you import content from `./config/some-file`, the sources can be provided by the end user in `/config/some-file` (even in production mode).
 
 You may provide default values for each of these files. The sources provided by the app are merged with the sources provided by the microservice, with the app's configuration taking precedence.
 
 ### Logging
-
 The verbosity of logging can be configured through following environment variables:
 
 - `LOG_SPARQL_ALL`: Logging of all executed SPARQL queries, read as well as update (default `true`)
@@ -257,20 +272,3 @@ The verbosity of logging can be configured through following environment variabl
 - `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
 
 Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
-
-### Handling Delta's
-If you are building a reactive service that should execute certain logic based on changes in the database, you want to hook it up to the [delta-notifier](https://github.com/mu-semtech/delta-notifier/). Some extra steps need to be taken to properly handle delta's, specifically the route handling delta's will need to use a specific bodyParser. 
-
-The default bodyParser provided by the template will only accept `application/vnd.api+json` and the delta-notifier is sending `application/json` content. Aside from that the body of a delta message may be very large, often several megabytes. By specifying the bodyParser on the route accepting delta messages you can easily modify it when required.
-
-An example
-```js 
-// app.js
-import bodyParser from 'body-parser';
-// ...
-
-app.post("/delta-updates", bodyParser.json({limit: '50mb'}), async function(req, res) {
-//...
-}
-```
-
