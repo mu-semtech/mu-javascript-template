@@ -1,183 +1,146 @@
 # Mu Javascript template
 
-Template for writing mu.semte.ch services in JavaScript using [Express 4](https://expressjs.com/)
+Template for writing semantic.works services in JavaScript using [Express 4](https://expressjs.com/)
 
-## Tutorial: Building a microservice with Express
-Since microservices are one of the core components of the mu.semte.ch architecture, we pay a lot of attention to making the development of a microservice as easy and productive as possible. A template is an easy starting point to build a microservice. It provides a preconfigured framework to start with (e.g. Sinatra in the [mu-ruby-template](https://github.com/mu-semtech/mu-ruby-template)) and a lot of boilerplate code and helper methods to speed up the development.
+## Tutorials
+### Develop your first microservice
+Requires: a semantic.works stack, like mu-project.
 
-### Hello world
-The mu-javascript-template is based on [Express 4](https://expressjs.com/) – a minimalist web framework for Node.js as they describe themselves. Hence, everything you’re able to do in the Express framework, you also can do in the microservice. To get started we will first implement a simple ‘Hello World’ API endpoint.
+Create a new folder for your microservice.
 
-Open a new file ‘app.js’ and add the following lines of code:
+In the folder, create your microservice in `app.js`:
+
 ```js
 import { app } from 'mu';
 
-app.get('/', function( req, res ) {
-  res.send('Hello world!');
+app.get('/hello', function( req, res ) {
+  res.send('Hello mu-javascript-template');
 } );
 ```
 
-We’ve now defined a simple API endpoint on the path ‘/hello’. Next, we will wrap these lines of code in the mu-javascript-template.
+This service will respond with 'Hello mu-javascript-template' when receiving a GET request on '/hello'.
 
-Create a Dockerfile next to the web.rb file with the following content:
-```Dockerfile
-FROM semtech/mu-javascript-template:1.1.0
+Add the mu-javascript-template to your `docker-compose.yml` with the sources mounted directly.
+
+```yml
+version: '3.4'
+services:
+    your-microservice-name:
+      image: semtech/mu-javascript-template
+      environment:
+        NODE_ENV: "development"
+      ports:
+        - 8888:80
+      volumes:
+        - /absolute/path/to/your/sources/:/app/
 ```
 
-Congratulations! You’ve build your first javascript microservice in mu.semte.ch. If you now build this Docker image and include it in your [mu-project](https://github.com/mu-semtech/mu-project), you will have a `/hello` endpoint available in your platform. Don’t forget to add a rule to your dispatcher to make this endpoint available to the frontend application.
+Next, create the service by running
+```
+docker-compose up -d your-microservice-name
+```
 
-### Developing the microservice
-Building the Docker image each time you’ve changed some code is rather cumbersome during development. The template therefore supports development with live-reload. Start a container based on the mu-javascript-template image and mount your code in the `/app` folder:
+A `curl` call to the microservice will show you to message
+
 ```bash
-docker run --volume /path/to/your/code:/app
-            -e NODE\_ENV=development
-            -d semtech/mu-javascript-template:1.1.0
+curl http://localhost:8888/hello
+# Hello mu-javascript-template
 ```
 
-Each time you change some code, the microservice will be automatically updated.
+## How-to
+### Develop in a mu.semte.ch stack
+Requires:
+- a semantic.works stack, like mu-project
+- 'Develop your first microservice'
 
-### What’s more?
-We don’t want developer to write the same boilerplate code every time they implement a microservice in javascript. To speed up development, the template offers a lot of helper functions. You can import them in your app through the ‘mu’ module. Just add the import statement on top of your app.js file…
-```js
-import { app, query } from 'mu';
-```
-… and start using them in the request handling:
-```js
-import { app, query } from 'mu';
+When developing inside an existing mu.semte.ch stack, it is easiest to set the development mode by setting the `NODE_ENV` environment variable to `development` and mount the sources directly.  This makes it easy to setup links to the database and the dispatcher. Livereload is enabled automatically when running in development mode.
 
-app.get('/users', function(req, res) {
- const query = `
-   PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-   SELECT DISTINCT ?s WHERE { ?s a foaf:Agent }
- `;
-
-  query(query).then( function(response) {
-    // do something with the query results here
-    // and send a response using res.json()
-  });
-});
+```yml
+version: ...
+services:
+  ...
+  your-microservice-name:
+    image: semtech/mu-javascript-template
+    environment:
+      NODE_ENV: "development"
+    volumes:
+      - /absolute/path/to/your/sources/:/app/
 ```
 
-‘app’ is a reference to the Express app while ‘query’ is a helper function to send a SPARQL query to the triplestore. There are functions available to generate a UUID, to escape characters in a SPARQL query, etc. A complete list can be found in [the template’s README](#imports).
+### Build a microservice based on mu-javascript-template
+Requires:
+- a semantic.works stack, like mu-project
+- 'Develop your first microservice'
 
-### Using additional libraries
-The mu-javascript-template uses the [sparql-client-2](https://www.npmjs.com/package/sparql-client-2) library to interact with the triplestore. If you need additional libraries, just list them in a package.json file next to your app.js. It works as you would expect: just define the packages in the dependencies section of the package.json. They will be installed automatically at build time. While developing in a container as described above, you will have to restart the container for the new included packages to be installed.
-
-### Example
-There are already [some microservices available](https://github.com/search?q=topic%3Amu-service+org%3Amu-semtech&type=Repositories) that use the `mu-javascript-template`. Have a look at them to see how simple it is to build a microservice based on this template. There is for example the [export service](https://github.com/mu-semtech/export-service) to export data using custom defined SPARQL queries or [Bravoer’s advanced search service](https://github.com/bravoer/advanced-search-service) to execute advanced search queries on resources that cannot be expressed in mu-cl-resources.
-
-*This tutorial has been adapted from Erika Pauwels' mu.semte.ch article. You can view it [here](https://mu.semte.ch/2017/06/29/building-a-microservice-with-express/)*
-
-## How-To
-### Adding mu-javascript-template to your Dockerfile
-Create a new folder.  Add the following Dockerfile:
+Add a Dockerfile with the following contents:
 
 ```docker
 FROM semtech/mu-javascript-template
 LABEL maintainer="madnificent@gmail.com"
 ```
 
-Create your microservice in `app.js`:
+There are various ways to build a Docker image. For a production service we advise to setup automatic builds, but here we will build it locally. You can choose any name, but we will call ours 'say-hello-service'.
 
-```js
-import { app, query, errorHandler } from 'mu';
-
-app.get('/', function( req, res ) {
-  res.send('Hello mu-javascript-template');
-} );
-
-
-app.get('/query', function( req, res ) {
-  var myQuery = `
-    SELECT *
-    WHERE {
-      GRAPH <http://mu.semte.ch/application> {
-        ?s ?p ?o.
-      }
-    }`;
-
-  query( myQuery )
-    .then( function(response) {
-      res.send( JSON.stringify( response ) );
-    })
-    .catch( function(err) {
-      res.send( "Oops something went wrong: " + JSON.stringify( err ) );
-    });
-} );
-
-app.use(errorHandler);
+From the root of your microservice folder execute the following command:
+```bash
+docker build -t say-hello-service .
 ```
 
-Check [Express' Getting Started guide](https://expressjs.com/en/starter/basic-routing.html) to learn how to build a REST API in Express.
-
-
-### Developing with the template
-Livereload is enabled automatically when running in development mode.  You can embed the template easily in a running mu.semte.ch stack by launching it in the `docker-compose.yml` with the correct links.  If desired, the chrome inspector can be attached during development, giving advanced javascript debugging features.
-
-#### Live reload
-When developing, you can use the template image, mount the volume with your sources in `/app` and add a link to the database. Set the `NODE_ENV` environment variable to `development`. The service will live-reload on changes. You'll need to restart the container when you define additional dependencies in your `package.json`.
-
-```
-docker run --link virtuoso:database \
-       -v `pwd`:/app \
-       -p 8888:80 \
-       -e NODE_ENV=development \
-       --name my-js-test \
-       semtech/mu-javascript-template
+Add the newly built service to your application stack in `docker-compose.yml`
+```yml
+version: ...
+services:
+  ...
+  say-hello:
+    image: say-hello-service
 ```
 
-#### Develop in mu.semte.ch stack
-When developing inside an existing mu.semte.ch stack, it is easiest to set the development mode and mount the sources directly.  This makes it easy to setup links to the database and the dispatcher.
+Launch the new container in your app
+```bash
+docker-compose up -d say-hello
+```
 
-Optionally, you can publish the microservice on a different port, so you can access it directly without the dispatcher.  In the example below, port 8888 is used to access the service directly.  We set the path to our sources directly, ensuring we can develop the microservice in its original place.
+### Attach the Chrome debugger
+Requires: 'Develop in a mu.semte.ch stack'.
+
+When running in development mode, you can attach the Chrome debugger to your microservice and add breakpoints as you're used to.  The chrome debugger requires port 9229 to be forwarded, and your service to run in development mode.  After launching your service, open Google Chrome or Chromium, and visit [chrome://inspect/](chrome://inspect/). Once the service is launched, a remote target on localhost should pop up.
+
+Update your service definition in `docker-compose.yml` as follows:
 
 ```yml
-    yourMicroserviceName:
-      image: semtech/mu-javascript-template
-      ports:
-        - 8888:80
-      environment:
-        NODE_ENV: "development"
-      links:
-        - db:database
-      volumes:
-        - /absolute/path/to/your/sources/:/app/
+version: ...
+services:
+  your-microservice-name:
+    ...
+    ports:
+      - 9229:9229
 ```
 
-#### Attach the Chrome debugger
-When running in development mode, you can attach the chrome debugger to your microservice and add breakpoints as you're used to.  The chrome debugger requires port 9229 to be forwarded, and your service to run in development mode.  After launching your service, open Google Chrome or Chromium, and visit [chrome://inspect/](chrome://inspect/).
-
-Running through docker run, you could access the service as follows:
-
-```
-docker run --link virtuoso:database \
-       -v `pwd`:/app \
-       -p 8888:80 \
-       -p 9229:9229 \
-       -e NODE_ENV=development \
-       --name my-js-test \
-       semtech/mu-javascript-template
+Next, recreate the container by executing
+```bash
+docker-compose up -d your-microservice-name
 ```
 
-Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
+### Accessing your microservice directly
+Requires: 'Build a microservice based on mu-javascript-template' or 'Develop in a mu.semte.ch stack'
 
-When running inside a mu.semte.ch stack, you could mount your sources and connect to known microservices as follows:
+If you doubt your requests are arriving at your microservice correctly, you can publish it port to access it directly. In the example below, port 8888 is used to access the service directly.
+
+Note this means you will not have the headers set by the identifier and dispatcher.
+
+Update your service definition in `docker-compose.yml` as follows:
 
 ```yml
-    yourMicroserviceName:
-      image: semtech/mu-javascript-template
+    your-microservice-name:
+      ...
       ports:
         - 8888:80
-        - 9229:9229
-      environment:
-        NODE_ENV: "development"
-      links:
-        - db:database
-      volumes:
-        - /absolute/path/to/your/sources/:/app/
 ```
-Now open Chromium, and visit [chrome://inspect/](chrome://inspect/).  Once the service is launched, a remote target on localhost should pop up.
 
+Next, recreate the container by executing
+```bash
+docker-compose up -d your-microservice-name
+```
 
 ## Reference
 ### Requirements
