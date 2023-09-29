@@ -143,51 +143,78 @@ docker-compose up -d your-microservice-name
 ```
 
 ## Reference
-### Requirements
+### Framework
+The mu-javascript-template is built on ExpressJS. Check [Express' Getting Started guide](https://expressjs.com/en/starter/basic-routing.html) to learn how to build a REST API in Express.
 
-  - **database link**: You need a link to the `database` which exposes a SPARQL endpoint on `http://database:8890/sparql`.  In line with other microservices.
+The Express application can be imported from the `'mu'` package as follows:
+```javascript
+import { app } from 'mu'
+```
 
-### Imports
+Routes can be defined on the application as explained in the [Express routing guide](https://expressjs.com/en/guide/routing.html). For example:
 
-The following importable variables are available:
+```javascript
+import { app } from 'mu'
 
-  - `app`: The [Express application](https://expressjs.com/en/guide/routing.html) on which routes can be added
-  - `query(query) => Promise`: Function for sending queries to the triplestore
-  - `update(query) => Promise`: Function for sending updates to the triplestore
-  - `uuid()` => string: Generates a random UUID
-  - `errorHandler(err, req, res, next)`: [Error handling middleware function for Express](https://expressjs.com/en/guide/error-handling.html). It needs to be loaded at the end.
-  - `sparql`: [Template tag](https://www.npmjs.com/package/sparql-client-2#using-the-sparql-template-tag) to create queries with interpolated values
-  - `sparqlEscapeString(value) => string`: Function to escape a string in SPARQL
-  - `sparqlEscapeUri(value) => string`: Function to escape a URI in SPARQL
-  - `sparqlEscapeDecimal(value) => string`: Function to escape an integer or float as an `xsd:decimal` in SPARQL
-  - `sparqlEscapeInt(value) => string`: Function to escape an integer in SPARQL
-  - `sparqlEscapeFloat(value) => string`: Function to escape a float in SPARQL
-  - `sparqlEscapeDate(value) => string`: Function to escape a date in SPARQL. The given value is passed to the `Date` constructor.
-  - `sparqlEscapeDateTime(value) => string`: Function to escape a datetime in SPARQL
-  - `sparqlEscapeBool(value) => string`: Function to escape a boolean in SPARQL. The given value is evaluated to a boolean value in javascript. E.g. the string value `'0'` evaluates to `false` in javascript.
-  - `sparqlEscape(value, type) => string`: Function to escape a value in SPARQL according to the given type. Type must be one of `'string'`, `'uri'`, `'int'`, `'float'`, `'date'`, `'dateTime'`, `'bool'`.
-
-You can either import specific attributes from the mu library, or import the whole mu object.
-
-An example of importing specific variables:
-
-```js
-import { app, query } from 'mu';
-
-app.get('/', function( req, res ) {
+app.get('/hello', function( req, res ) {
   res.send('Hello mu-javascript-template');
 } );
 ```
 
-An example of importing the whole library:
+### Helpers
+The template offers some helpers. They can all be imported from the `'mu'` package like
+```
+import { app, uuid, sparqlEscapeString } from 'mu'
 
-```js
+app.get('/', function( req, res ) {
+  const id = uuid();
+  ...
+} );
+```
+
+You can also import the whole `mu` object like
+```
 import mu from 'mu';
 
 mu.app.get('/', function( req, res ) {
-  res.send('Hello using full import');
+  const id = mu.uuid();
+  ...
 } );
 ```
+
+The following helper functions are provided by the template
+  - `query(query) => Promise`: Function for sending queries to the triplestore
+  - `update(query) => Promise`: Function for sending updates to the triplestore
+  - `uuid() => string`: Generates a random UUID (e.g. to construct new resource URIs)
+
+The following SPARQL escape helpers are provided to construct safe SPARQL query strings
+  - `sparqlEscapeString(value) => string`
+  - `sparqlEscapeUri(value) => string`
+  - `sparqlEscapeDecimal(value) => string`
+  - `sparqlEscapeInt(value) => string`
+  - `sparqlEscapeFloat(value) => string`
+  - `sparqlEscapeDate(value) => string`
+  - `sparqlEscapeDateTime(value) => string`
+  - `sparqlEscapeBool(value) => string`: The given value is evaluated to a boolean value in javascript. E.g. the string value `'0'` evaluates to `false` in javascript.
+  - `sparqlEscape(value, type) => string`: Function to escape a value in SPARQL according to the given type. Type must be one of `'string'`, `'uri'`, `'int'`, `'float'`, `'date'`, `'dateTime'`, `'bool'`.
+
+### Error handling
+The template offers [an error handler](https://expressjs.com/en/guide/error-handling.html) to send error responses in a JSON:API compliant way. The handler can be imported from `'mu'` and need to be loaded at the end.
+
+```javascript
+import { app, errorHandler } from 'mu'
+
+app.get('/hello', function( req, res, next ) {
+  try {
+    ...
+  } catch (e) {
+    next(new Error('Oops, something went wrong.))
+  }
+});
+
+app.use(errorHandler)
+```
+
 ### Transpiled languages
 The template has second-class support for transpiling TypeScript and CoffeeScript.  These are considered second-class and support may be removed in a minor release but not in a patch release.
 
