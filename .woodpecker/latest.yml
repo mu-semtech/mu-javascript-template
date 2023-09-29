@@ -1,0 +1,11 @@
+steps:
+  build-latest:
+    image: woodpeckerci/plugin-docker-buildx
+    platforms: linux/amd64,linux/arm64
+    settings:
+      repo: ${CI_REPO/mu-semtech/semtech}
+      tags: latest
+    secrets: [ docker_username, docker_password ]
+when:
+  branch: master
+  event: push

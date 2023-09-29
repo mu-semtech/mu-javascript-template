@@ -1,0 +1,11 @@
+steps:
+  build-feature:
+    image: woodpeckerci/plugin-docker-buildx
+    platforms: linux/amd64,linux/arm64
+    settings:
+      repo: ${CI_REPO/mu-semtech/semtech}
+      tags: ${CI_COMMIT_BRANCH/\//-}
+    secrets: [ docker_username, docker_password ]
+when:
+  branch: feature/*
+  event: push

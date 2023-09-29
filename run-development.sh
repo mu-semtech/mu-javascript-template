@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 # We want to run from /app but don't want to touch that folder.
 #
