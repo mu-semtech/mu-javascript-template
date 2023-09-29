@@ -57,16 +57,6 @@ find . -type d -exec mkdir -p ../build/{} \;
 find . -type f -exec cp "{}" ../build/{} \;
 cd ..
 
-# count=`ls -1 tsconfig.json 2>/dev/null | wc -l`
-
-# if [ $count != 0 ]
-# then
-#     echo "Running tsc"
-#     cd ./typescript-transpilation
-#     /usr/src/app/node_modules/.bin/tsc --sourcemap
-#     cd ..
-# fi
-
 /usr/src/app/node_modules/.bin/babel \
   ./build/ \
   --out-dir ./typescript-transpilation/ \
