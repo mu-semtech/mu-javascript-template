@@ -4,6 +4,7 @@ steps:
     settings:
       repo: ${CI_REPO/mu-semtech/semtech}
       tags: latest
+      platforms: linux/amd64,linux/arm64
     secrets: [ docker_username, docker_password ]
 when:
   branch: master
