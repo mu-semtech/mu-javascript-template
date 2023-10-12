@@ -1,0 +1,11 @@
+steps:
+  build-release:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      repo: ${CI_REPO}
+      tags: "${CI_COMMIT_TAG##v}"
+      platforms: linux/amd64
+    secrets: [ docker_username, docker_password ]
+when:
+  event: tag
+  tag: v*
