@@ -61,6 +61,8 @@ cd ..
   ./build/ \
   --out-dir ./typescript-transpilation/ \
   --source-maps true \
+  --copy-files \
+  --no-copy-ignored \
   --extensions ".ts,.js"
 
 rm -Rf ./build
