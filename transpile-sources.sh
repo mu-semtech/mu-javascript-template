@@ -60,8 +60,6 @@ docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/processing
   ./build/ \
   --out-dir ./typescript-transpilation/ \
   --source-maps true \
-  --copy-files \
-  --no-copy-ignored \
   --extensions ".ts,.js"
 
 rm -Rf ./build
@@ -73,6 +71,16 @@ mv typescript-transpilation /usr/src/build
 # transpile them to nodejs in this step, but that breaks SourceMaps.
 docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/build/
 
+# We move all unhandled files (non js, ts, coffee) into the sources for
+# later use.
+
+docker-rsync \
+    --exclude "*.js" \
+    --exclude "*.ts" \
+    --exclude "*.coffee" \
+    --exclude "node_modules/" \
+    --exclude "./Dockerfile" \
+    /usr/src/processing/app/ /usr/src/build/
 
 ##############
 # Node modules
