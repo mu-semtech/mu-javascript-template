@@ -11,8 +11,22 @@ const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
 //==-- logic --==//
 
 // builds a new sparqlClient
-function newSparqlClient() {
+function newSparqlClient(userOptions) {
   let options = { requestDefaults: { headers: { } } };
+
+  if (userOptions.sudo === true) {
+    if (env.get("ALLOW_MU_AUTH_SUDO").asBool()) {
+      options.requestDefaults.headers['mu-auth-sudo'] = "true";
+    } else {
+      throw "Error, sudo request but service lacks ALLOW_MU_AUTH_SUDO header";
+    }
+  }
+
+  if (userOptions.scope) {
+    options.requestDefaults.headers['mu-auth-scope'] = userOptions.scope;
+  } else if (process.env.DEFAULT_MU_AUTH_SCOPE) {
+    options.requestDefaults.headers['mu-auth-scope'] = process.env.DEFAULT_MU_AUTH_SCOPE;
+  }
 
   if (httpContext.get('request')) {
     options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
@@ -38,24 +52,25 @@ function newSparqlClient() {
 }
 
 // executes a query (you can use the template syntax)
-function query( queryString ) {
+function query( queryString, options ) {
   if (LOG_SPARQL_QUERIES) {
     console.log(queryString);
   }
-  return executeQuery(queryString);
+  return executeQuery(queryString, options);
 };
 
 // executes an update query
-function update( queryString ) {
+function update( queryString, options ) {
   if (LOG_SPARQL_UPDATES) {
     console.log(queryString);
   }
-  return executeQuery(queryString);
+  return executeQuery(queryString, options);
 };
 
-function executeQuery( queryString ) {
-  return newSparqlClient().query(queryString).executeRaw().then(response => {
+function executeQuery( queryString, options ) {
+  return newSparqlClient(options || {}).query(queryString).executeRaw().then(response => {
     const temp = httpContext;
+
     if (httpContext.get('response') && !httpContext.get('response').headersSent) {
       // set mu-auth-allowed-groups on outgoing response
       const allowedGroups = response.headers['mu-auth-allowed-groups'];
