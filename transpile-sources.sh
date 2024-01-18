@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./helpers.sh
+
 ####
 #### BUILDS SOURCES
 ####
@@ -52,10 +54,7 @@ cd /usr/src/processing/
 mkdir typescript-transpilation build
 cp -R ./app/* build
 
-cd coffeescript-transpilation
-find . -type d -exec mkdir -p ../build/{} \;
-find . -type f -exec cp "{}" ../build/{} \;
-cd ..
+docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/processing/build/
 
 /usr/src/app/node_modules/.bin/babel \
   ./build/ \
@@ -70,10 +69,7 @@ mv typescript-transpilation /usr/src/build
 # have built the sources coffeescript generated, but these sources were
 # already node compliant.  We could make coffeescript emit ES6 and
 # transpile them to nodejs in this step, but that breaks SourceMaps.
-cd coffeescript-transpilation
-find . -type d -exec mkdir -p /usr/src/build/{} \;
-find . -type f -exec cp "{}" /usr/src/build/{} \;
-cd ..
+docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/build/
 
 
 ##############
@@ -87,9 +83,7 @@ cp -R /usr/src/processing/node_modules /usr/src/build/
 ## app modules
 if [ -d /usr/src/processing/app/node_modules ]
 then
-    cd /usr/src/processing/app/
-    find node_modules/ -type d -exec mkdir -p /usr/src/build/{} \;
-    find node_modules/ -type f -exec cp "{}" /usr/src/build/{} \;
+  docker-rsync /usr/src/processing/app/node_modules /usr/src/build/
 fi
 
 ## mu helpers

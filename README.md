@@ -272,3 +272,6 @@ The verbosity of logging can be configured through following environment variabl
 - `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
 
 Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
+
+### Custom build commands
+To execute custom bash statements during the image build (e.g. to install aditional system libraries), provide an `on-build.sh` script in the root of your service. It will be automatically picked up and executed by the Docker build.
