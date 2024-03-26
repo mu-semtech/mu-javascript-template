@@ -12,8 +12,9 @@ function docker-rsync() {
   # Used rsync options:
   # -a: archive, -H: preserve hard links, -A: preserve ACL, -W: no delta transfer
   # -X: extended attributes, -S: efficient sparse files
+  # --filter='-x security.selinux': don't try to change SELinux file attributes
   # --numeric-ids: use uuid by number instead of by name
   # --info: silent output
   # --no-compress: no compression algorithm
-  rsync -aHAWXS --numeric-ids --info= --no-compress $@
+  rsync -aHAWXS --filter='-x security.selinux' --numeric-ids --info= --no-compress $@
 }
