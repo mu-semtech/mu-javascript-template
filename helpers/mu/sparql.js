@@ -180,6 +180,7 @@ const exports = {
   sparqlEscape: sparqlEscape,
   sparqlEscapeString: sparqlEscapeString,
   sparqlEscapeUri: sparqlEscapeUri,
+  sparqlEscapeDecimal: sparqlEscapeDecimal,
   sparqlEscapeInt: sparqlEscapeInt,
   sparqlEscapeFloat: sparqlEscapeFloat,
   sparqlEscapeDate: sparqlEscapeDate,
