@@ -3,9 +3,7 @@
 service=`basename "$SERVICE_HOST_DIR"`
 
 echo "  $service:"
-echo "    image: semtech/mu-javascript-template:1.3.5"
-echo "    links:"
-echo "      - db:database"
+echo "    # image: semtech/mu-javascript-template:1.8.0"
 echo "    ports:"
 echo '      - "8888:80"'
 echo '      - "9229:9229"'
