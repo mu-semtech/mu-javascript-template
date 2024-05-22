@@ -1,4 +1,4 @@
-import { app, errorHandler } from './server';
+import { app, errorHandler, setExitHandler } from './server';
 import sparql from './sparql';
 import { v1 as uuidV1 } from 'uuid';
 
@@ -53,7 +53,8 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool,
   uuid,
-  errorHandler
+  errorHandler,
+  setExitHandler
 };
 
 export default mu;
