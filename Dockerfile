@@ -1,6 +1,6 @@
 FROM node:20-bookworm
 
-LABEL maintainer="madnificent@gmail.com"
+LABEL maintainer="team@semantic.works"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync
 
