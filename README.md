@@ -53,6 +53,7 @@ Requires:
 - a semantic.works stack, like mu-project
 - 'Develop your first microservice'
 
+
 When developing inside an existing mu.semte.ch stack, it is easiest to set the development mode by setting the `NODE_ENV` environment variable to `development` and mount the sources directly.  This makes it easy to setup links to the database and the dispatcher. Livereload is enabled automatically when running in development mode.
 
 ```yml
@@ -216,6 +217,8 @@ The following SPARQL escape helpers are provided to construct safe SPARQL query 
   - `sparqlEscapeDateTime(value) => string`
   - `sparqlEscapeBool(value) => string`: The given value is evaluated to a boolean value in javascript. E.g. the string value `'0'` evaluates to `false` in javascript.
   - `sparqlEscape(value, type) => string`: Function to escape a value in SPARQL according to the given type. Type must be one of `'string'`, `'uri'`, `'int'`, `'float'`, `'date'`, `'dateTime'`, `'bool'`.
+  - `setExitHandler`: *experimental* Sets a function to be ran on exit.  The default implementation executes `process.exit` which allows for fast exiting of the service and therefore also fast restarts.
+
 
 ### Error handling
 The template offers [an error handler](https://expressjs.com/en/guide/error-handling.html) to send error responses in a JSON:API compliant way. The handler can be imported from `'mu'` and need to be loaded at the end.
