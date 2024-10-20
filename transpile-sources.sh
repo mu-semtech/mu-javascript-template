@@ -107,8 +107,10 @@ mkdir /usr/src/processing/built-mu
   --extensions ".js"
 
 cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
+cp /usr/src/app/helpers/mu/package.json /usr/src/build/node_modules/mu/
 
-
+## Copy back package.json
+cp /app/package.json /usr/src/build/
 
 ## Clean temporary folders
 ##
