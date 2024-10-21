@@ -110,7 +110,25 @@ cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
 cp /usr/src/app/helpers/mu/package.json /usr/src/build/node_modules/mu/
 
 ## Copy back package.json
-cp /app/package.json /usr/src/build/
+if [ -f /app/package.json ]
+then
+  cp /app/package.json /usr/src/build/
+  cat /usr/src/build/package.json | jq -e ".type" > /dev/null
+  if [  $? -ne 0 ]
+  then
+    echo '[WARNING] Adding "type": "module" to your package.json.'
+    echo 'To remove this warning, add "type": "module" at the same level as "name" in your package.json'
+    sed -i 's/{/{\n  "type": "module",/' /usr/src/build/package.json
+  else
+    PACKAGE_TYPE=`cat /usr/src/build/package.json | jq -r ".type"`
+    if [[ "$PACKAGE_TYPE" -ne "module" ]]
+    then
+      echo '[WARNING] DIFFERENT TYPE THAN "module" IN package.json; CONTINUING WITH UNSPECIFIED BEHAVIOUR'
+    fi
+  fi
+else
+  echo '{ "type": "module" }' > /usr/src/build/package.json
+fi
 
 ## Clean temporary folders
 ##
