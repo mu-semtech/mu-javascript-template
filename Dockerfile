@@ -16,6 +16,7 @@ ENV DEBUG_AUTH_HEADERS 'true'
 
 WORKDIR /usr/src/app
 COPY package.json /usr/src/app/package.json
+COPY package-lock.json /usr/src/app/package-lock.json
 COPY ./scripts /app/scripts
 RUN npm install
 COPY . /usr/src/app
