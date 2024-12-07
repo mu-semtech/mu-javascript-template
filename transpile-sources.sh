@@ -58,21 +58,22 @@ docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/processing
 
 /usr/src/app/node_modules/.bin/babel \
   ./build/ \
-  --out-dir ./typescript-transpilation/ \
+  --out-dir ./dist/ \
   --source-maps true \
   --extensions ".ts,.js"
 
-rm -Rf ./build
-mv typescript-transpilation /usr/src/build
+mkdir -p /usr/src/dist
+rm -Rf /usr/src/dist/*
+mv dist/* /usr/src/dist/
 
 # We move the coffeescript files again because the previous step will
 # have built the sources coffeescript generated, but these sources were
 # already node compliant.  We could make coffeescript emit ES6 and
 # transpile them to nodejs in this step, but that breaks SourceMaps.
-docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/build/
+docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/dist/
 
-# We move all unhandled files (non js, ts, coffee) into the sources for
-# later use.
+# We move all unhandled files (non js, ts, coffee) into the sources and dist
+# for later use.
 
 docker-rsync \
     --exclude "*.js" \
@@ -82,18 +83,26 @@ docker-rsync \
     --exclude "./Dockerfile" \
     /usr/src/processing/app/ /usr/src/build/
 
+docker-rsync \
+    --exclude "*.js" \
+    --exclude "*.ts" \
+    --exclude "*.coffee" \
+    --exclude "node_modules/" \
+    --exclude "./Dockerfile" \
+    /usr/src/processing/app/ /usr/src/dist/
+
 ##############
 # Node modules
 ##############
 cd /usr/src/processing/
 
 ## template modules
-cp -R /usr/src/processing/node_modules /usr/src/build/
+cp -R /usr/src/processing/node_modules /usr/src/dist/
 
 ## app modules
 if [ -d /usr/src/processing/app/node_modules ]
 then
-  docker-rsync /usr/src/processing/app/node_modules /usr/src/build/
+  docker-rsync /usr/src/processing/app/node_modules /usr/src/dist/
 fi
 
 ## mu helpers
@@ -106,7 +115,7 @@ mkdir /usr/src/processing/built-mu
   --out-dir /usr/src/processing/built-mu \
   --extensions ".js"
 
-cp -R /usr/src/processing/built-mu /usr/src/build/node_modules/mu
+cp -R /usr/src/processing/built-mu /usr/src/dist/node_modules/mu
 
 
 
