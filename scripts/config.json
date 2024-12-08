@@ -15,6 +15,21 @@
       "mounts": {
         "service": "/data/service"
       }
+    },
+    {
+      "documentation": {
+        "command": "install",
+        "description": "installs combined node modules of service and template",
+        "arguments": []
+      },
+      "environment": {
+        "image": "semtech/mu-javascript-template:1.8.0",
+        "interactive": false,
+        "script": "install/run.sh"
+      },
+      "mounts": {
+        "service": "/data/service"
+      }
     }
   ]
 }
