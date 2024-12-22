@@ -19,9 +19,13 @@ cd /usr/src/app/
 # Install dependencies
 ######################
 
-## Check if package.json existed and did not change since previous build (/usr/src/app/app/ is copied later in this script, at first run from the template itself it doesn't exist but that's fine for comparison)
-cmp -s /app/package.json /usr/src/app/app/package.json
+## Check if package.json existed and did not change since previous build (at first run from the template itself it doesn't exist but that's fine for comparison)
+cmp -s /app/package.json /usr/src/service-package-old.json
 CHANGE_IN_PACKAGE_JSON="$?"
+if [ -f /app/package.json ]
+then
+    cp /app/package.json /usr/src/service-package-old.json
+fi
 
 ## Ensure we _sync_ the sources from the hosted app and _copy_ the node_modules.
 ##
@@ -44,10 +48,8 @@ fi
 ## Install dependencies on first boot
 if [ $CHANGE_IN_PACKAGE_JSON != "0" ] && [ -f ./app/package.json ]
 then
-    echo "Running npm install"
-    cd /usr/src/app/app/
-    npm install
-    cd /usr/src/app/
+    echo "Installing dependencies"
+    ./install-dependencies.sh
 fi
 
 

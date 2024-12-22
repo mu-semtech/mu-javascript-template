@@ -96,28 +96,8 @@ docker-rsync \
 ##############
 cd /usr/src/processing/
 
-## template modules
-cp -R /usr/src/processing/node_modules /usr/src/dist/
-
-## app modules
-if [ -d /usr/src/processing/app/node_modules ]
-then
-  docker-rsync /usr/src/processing/app/node_modules /usr/src/dist/
-fi
-
-## mu helpers
-cd /usr/src/processing/
-
-mkdir /usr/src/processing/built-mu
-/usr/src/app/node_modules/.bin/babel \
-  /usr/src/processing/helpers/mu/ \
-  --source-maps true \
-  --out-dir /usr/src/processing/built-mu \
-  --extensions ".js"
-
-cp -R /usr/src/processing/built-mu /usr/src/dist/node_modules/mu
-
-
+## merged template and app modules with mu module
+docker-rsync /usr/src/app/app/node_modules /usr/src/dist/
 
 ## Clean temporary folders
 ##
