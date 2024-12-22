@@ -23,7 +23,7 @@
         "arguments": []
       },
       "environment": {
-        "image": "semtech/mu-javascript-template:1.8.0",
+        "image": "semtech/mu-javascript-template:2.0.0",
         "interactive": false,
         "script": "install/run.sh"
       },
