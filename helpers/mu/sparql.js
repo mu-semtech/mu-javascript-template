@@ -1,8 +1,9 @@
 import httpContext from 'express-http-context';
 import SC2 from 'sparql-client-2';
 import env from 'env-var';
+import SPARQL from './sparql-tag';
 
-const { SparqlClient, SPARQL } = SC2;
+const { SparqlClient } = SC2;
 
 const LOG_SPARQL_QUERIES = process.env.LOG_SPARQL_QUERIES != undefined ? env.get('LOG_SPARQL_QUERIES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const LOG_SPARQL_UPDATES = process.env.LOG_SPARQL_UPDATES != undefined ? env.get('LOG_SPARQL_UPDATES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
