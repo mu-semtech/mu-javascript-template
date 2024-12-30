@@ -86,6 +86,7 @@ async function executeQuery(queryString, extraHeaders = {}, connectionOptions = 
         headers,
       });
     }
+    updateResponseHeaders(response);
     if (response.ok) {
       return await maybeJSON(response);
     } else {
@@ -109,6 +110,39 @@ async function executeQuery(queryString, extraHeaders = {}, connectionOptions = 
       console.log(`Failed Query:
                   ${queryString}`);
       throw ex;
+    }
+  }
+}
+
+function updateResponseHeaders(response){
+  // update the outgoing response headers with the headers received from the SPARQL endpoint
+  if (httpContext.get('response') && !httpContext.get('response').headersSent) {
+    // set mu-auth-allowed-groups on outgoing response
+    const allowedGroups = response.headers.get('mu-auth-allowed-groups');
+    if (allowedGroups) {
+      httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
+      if (DEBUG_AUTH_HEADERS) {
+        console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
+      }
+    } else {
+      httpContext.get('response').removeHeader('mu-auth-allowed-groups');
+      if (DEBUG_AUTH_HEADERS) {
+        console.log('Remove mu-auth-allowed-groups');
+      }
+    }
+
+    // set mu-auth-used-groups on outgoing response
+    const usedGroups = response.headers.get('mu-auth-used-groups');
+    if (usedGroups) {
+      httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
+      if (DEBUG_AUTH_HEADERS) {
+        console.log(`Update mu-auth-used-groups to ${usedGroups}`);
+      }
+    } else {
+      httpContext.get('response').removeHeader('mu-auth-used-groups');
+      if (DEBUG_AUTH_HEADERS) {
+        console.log('Remove mu-auth-used-groups');
+      }
     }
   }
 }
