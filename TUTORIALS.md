@@ -56,7 +56,7 @@ app.get('/users', function(req, res) {
 
 ‘app’ is a reference to the Express app while ‘query’ is a helper function to send a SPARQL query to the triplestore. There are functions available to generate a UUID, to escape characters in a SPARQL query, etc. A complete list can be found in [the template’s README](README.md#helpers).
 
-The mu-javascript-template uses the [sparql-client-2](https://www.npmjs.com/package/sparql-client-2) library to interact with the triplestore. Check this library for the response structure of the `query` helper.
+The mu-javascript-template uses http requests to query the sparql endpoint according to the SPARQL protocol via POST with URL-encoded parameters. The response will be formatted according to the [SPARQL Query results JSON format](https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/).
 
 ### Using additional libraries
 If you need additional libraries, just list them in a package.json file next to your app.js. It works as you would expect: just define the packages in the dependencies section of the package.json. They will be installed automatically at build time. While developing in a container as described above, you will have to restart the container for the new included packages to be installed.
