@@ -19,12 +19,14 @@ cd /usr/src/app/
 # Install dependencies
 ######################
 
-## Check if package.json existed and did not change since previous build (at first run from the template itself it doesn't exist but that's fine for comparison)
-cmp -s /app/package.json /usr/src/service-package-old.json
+## Check if package.json existed and did not change since previous build (at
+## first run from the template itself it doesn't exist but that's fine for
+## comparison)
+cmp -s /app/package.json /tmp/last-build-service-package.json
 CHANGE_IN_PACKAGE_JSON="$?"
 if [ -f /app/package.json ]
 then
-    cp /app/package.json /usr/src/service-package-old.json
+    cp /app/package.json /tmp/last-build-service-package.json
 fi
 
 ## Ensure we _sync_ the sources from the hosted app and _copy_ the node_modules.
