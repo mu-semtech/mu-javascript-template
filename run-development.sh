@@ -34,6 +34,11 @@ fi
 ## We don't want to do --delete on the node_modules because this allows us
 ## to depend on the node_modules installed in an earlier update cycle as well as
 ## taking node_modules from the hosted app into account.
+##
+## Although we can always override the mu package, we may install the
+## node_modules in the template, or the node_modules may be offered in part or
+## in full.  Hence we should only add the node_modules of the mounted code and
+## not remove anything.
 docker-rsync --delete --exclude node_modules /app/ /usr/src/app/app/
 if [ -d /app/node_modules/ ]
 then
