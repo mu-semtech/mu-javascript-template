@@ -59,7 +59,12 @@ function query( queryString, options ) {
   return executeQuery(queryString, options);
 };
 
-// executes an update query
+/**
+ * Executes an update query
+ *
+ * @param { string } queryString String containing SPARQL query for the backend.
+ * @param { object? } options Options to be sent to 
+ */
 function update( queryString, options ) {
   if (LOG_SPARQL_UPDATES) {
     console.log(queryString);

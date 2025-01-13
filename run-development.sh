@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o xtrace
 
 source ./helpers.sh
 

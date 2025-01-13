@@ -8,4 +8,5 @@ cd /usr/src/app/app/
 
 npm install
 
+mkdir -p /usr/src/app/app/node_modules/
 cp -R /usr/src/app/helpers/mu /usr/src/app/app/node_modules/mu

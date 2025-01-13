@@ -9,7 +9,8 @@ function mergePackageJson() {
       fs.readFileSync("/app/package.json", "utf8")
     );
 
-    // QUESTION: What if there is a package.json but the dependencies are undefined (just consuming the versions)
+    servicePackage.dependencies = servicePackage.dependencies || {};
+
     warnAboutVersionDifferences(templatePackage, servicePackage);
 
     servicePackage.dependencies = {
