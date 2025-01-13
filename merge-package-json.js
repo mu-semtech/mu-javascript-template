@@ -1,6 +1,4 @@
 const fs = require("fs");
-const OVERRIDE_TEMPLATE_DEPENDENCIES =
-  process.env.OVERRIDE_TEMPLATE_DEPENDENCIES || false;
 
 // combines package.jsons and writes them to /tmp/package.json
 function mergePackageJson() {
@@ -14,17 +12,10 @@ function mergePackageJson() {
     // QUESTION: What if there is a package.json but the dependencies are undefined (just consuming the versions)
     warnAboutVersionDifferences(templatePackage, servicePackage);
 
-    if (OVERRIDE_TEMPLATE_DEPENDENCIES) {
-      servicePackage.dependencies = {
-        ...templatePackage.dependencies,
-        ...servicePackage.dependencies,
-      };
-    } else {
-      servicePackage.dependencies = {
-        ...servicePackage.dependencies,
-        ...templatePackage.dependencies,
-      };
-    }
+    servicePackage.dependencies = {
+      ...servicePackage.dependencies,
+      ...templatePackage.dependencies,
+    };
 
     fs.writeFileSync(
       "/tmp/package.json",
@@ -45,7 +36,7 @@ function warnAboutVersionDifferences(templatePackage, servicePackage) {
       servicePackage.dependencies[dep] &&
       templatePackage.dependencies[dep] !== servicePackage.dependencies[dep]
     ) {
-      const winner = OVERRIDE_TEMPLATE_DEPENDENCIES ? "service" : "template";
+      const winner = "template";
       // QUESTION: Can we cope with compatible definitions?
       console.warn(
         `Warning: Dependency ${dep} has different versions in template and service package.json. Using ${winner} version.`
