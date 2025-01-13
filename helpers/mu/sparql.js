@@ -1,102 +1,189 @@
 import httpContext from 'express-http-context';
-import SC2 from 'sparql-client-2';
 import env from 'env-var';
-
-const { SparqlClient, SPARQL } = SC2;
+import SPARQL from './sparql-tag';
+import DigestFetch from "digest-fetch";
 
 const LOG_SPARQL_QUERIES = process.env.LOG_SPARQL_QUERIES != undefined ? env.get('LOG_SPARQL_QUERIES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const LOG_SPARQL_UPDATES = process.env.LOG_SPARQL_UPDATES != undefined ? env.get('LOG_SPARQL_UPDATES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
+const MU_SPARQL_ENDPOINT = env.get('MU_SPARQL_ENDPOINT').default('http://database:8890/sparql').asString();
+const RETRY = env.get('MU_QUERY_RETRY').default('false').asBool();
+const RETRY_MAX_ATTEMPTS = env.get('MU_QUERY_RETRY_MAX_ATTEMPTS').default('5').asInt();
+const RETRY_FOR_HTTP_STATUS_CODES = env.get('MU_QUERY_RETRY_FOR_HTTP_STATUS_CODES').default('').asArray();
+const RETRY_FOR_CONNECTION_ERRORS = env.get('MU_QUERY_RETRY_FOR_CONNECTION_ERRORS').default('ECONNRESET,ETIMEDOUT,EAI_AGAIN').asArray();
+const RETRY_TIMEOUT_INCREMENT_FACTOR = env.get('MU_QUERY_RETRY_TIMEOUT_INCREMENT_FACTOR').default('0.1').asFloat();
 
 //==-- logic --==//
 
-// builds a new sparqlClient
-function newSparqlClient() {
-  let options = { requestDefaults: { headers: { } } };
-
-  if (httpContext.get('request')) {
-    options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
-    options.requestDefaults.headers['mu-call-id'] = httpContext.get('request').get('mu-call-id');
-    options.requestDefaults.headers['mu-auth-allowed-groups'] = httpContext.get('request').get('mu-auth-allowed-groups'); // groups of incoming request
-  }
-
-  if (httpContext.get('response')) {
-    const allowedGroups = httpContext.get('response').get('mu-auth-allowed-groups'); // groups returned by a previous SPARQL query
-    if (allowedGroups)
-      options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
-  }
-
-  if (DEBUG_AUTH_HEADERS) {
-    console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
-  }
-
-  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options).register({
-    mu: 'http://mu.semte.ch/vocabularies/',
-    muCore: 'http://mu.semte.ch/vocabularies/core/',
-    muExt: 'http://mu.semte.ch/vocabularies/ext/'
-  });
-}
-
 // executes a query (you can use the template syntax)
-function query( queryString ) {
+function query( queryString, extraHeaders = {}, connectionOptions = {} ) {
   if (LOG_SPARQL_QUERIES) {
     console.log(queryString);
   }
-  return executeQuery(queryString);
+  return executeQuery(queryString, extraHeaders, connectionOptions);
 };
 
 // executes an update query
-function update( queryString ) {
+function update(queryString, extraHeaders = {}, connectionOptions = {}) {
   if (LOG_SPARQL_UPDATES) {
     console.log(queryString);
   }
   return executeQuery(queryString);
 };
 
-function executeQuery( queryString ) {
-  return newSparqlClient().query(queryString).executeRaw().then(response => {
-    const temp = httpContext;
-    if (httpContext.get('response') && !httpContext.get('response').headersSent) {
-      // set mu-auth-allowed-groups on outgoing response
-      const allowedGroups = response.headers['mu-auth-allowed-groups'];
-      if (allowedGroups) {
-        httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
-        if (DEBUG_AUTH_HEADERS) {
-          console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
-        }
-      } else {
-        httpContext.get('response').removeHeader('mu-auth-allowed-groups');
-        if (DEBUG_AUTH_HEADERS) {
-          console.log('Remove mu-auth-allowed-groups');
-        }
-      }
 
-      // set mu-auth-used-groups on outgoing response
-      const usedGroups = response.headers['mu-auth-used-groups'];
-      if (usedGroups) {
-        httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
-        if (DEBUG_AUTH_HEADERS) {
-          console.log(`Update mu-auth-used-groups to ${usedGroups}`);
-        }
-      } else {
-        httpContext.get('response').removeHeader('mu-auth-used-groups');
-        if (DEBUG_AUTH_HEADERS) {
-          console.log('Remove mu-auth-used-groups');
-        }
+function defaultHeaders() {
+  const headers = new Headers();
+  headers.set("content-type", "application/x-www-form-urlencoded");
+  headers.set("Accept", "application/sparql-results+json");
+  if (httpContext.get("request")) {
+    headers.set(
+      "mu-session-id",
+      httpContext.get("request").get("mu-session-id")
+    );
+    headers.set("mu-call-id", httpContext.get("request").get("mu-call-id"));
+  }
+  return headers;
+}
+
+async function executeQuery(queryString, extraHeaders = {}, connectionOptions = {}, attempt = 0)
+{
+  const sparqlEndpoint = connectionOptions.sparqlEndpoint ?? MU_SPARQL_ENDPOINT;
+  const headers = defaultHeaders();
+  for (const key of Object.keys(extraHeaders)) {
+    headers.append(key, extraHeaders[key]);
+  }
+  if (DEBUG_AUTH_HEADERS) {
+    const stringifiedHeaders = Array.from(headers.entries())
+      .filter(([key]) => key.startsWith("mu-"))
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("\n");
+    console.log(`Headers set on SPARQL client: ${stringifiedHeaders}`);
+  }
+
+  try {
+    // note that URLSearchParams is used because it correctly encodes for form-urlencoded
+    const formData = new URLSearchParams();
+    formData.set("query", queryString);
+    headers.append("Content-Length", formData.toString().length.toString());
+
+    let response;
+    if (connectionOptions.authUser && connectionOptions.authPassword) {
+      const client = new DigestFetch(
+        connectionOptions.authUser,
+        connectionOptions.authPassword,
+        { basic: connectionOptions.authType === "basic" }
+      );
+      response = await client.fetch(sparqlEndpoint, {
+        method: "POST",
+        body: formData.toString(),
+        headers,
+      });
+    } else {
+      response = await fetch(sparqlEndpoint, {
+        method: "POST",
+        body: formData.toString(),
+        headers,
+      });
+    }
+    updateResponseHeaders(response);
+    if (response.ok) {
+      return await maybeJSON(response);
+    } else {
+      throw new Error(`HTTP Error Response: ${response.status} ${response.statusText}`);
+    }
+  } catch (ex) {
+    if (mayRetry(ex, attempt, connectionOptions)) {
+      attempt += 1;
+
+      const sleepTime = nextAttemptTimeout(attempt);
+      console.log(`Sleeping ${sleepTime} ms before next attempt`);
+      await new Promise((r) => setTimeout(r, sleepTime));
+
+      return await executeRawQuery(
+        queryString,
+        extraHeaders,
+        connectionOptions,
+        attempt
+      );
+    } else {
+      console.log(`Failed Query:
+                  ${queryString}`);
+      throw ex;
+    }
+  }
+}
+
+function updateResponseHeaders(response){
+  // update the outgoing response headers with the headers received from the SPARQL endpoint
+  if (httpContext.get('response') && !httpContext.get('response').headersSent) {
+    // set mu-auth-allowed-groups on outgoing response
+    const allowedGroups = response.headers.get('mu-auth-allowed-groups');
+    if (allowedGroups) {
+      httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
+      if (DEBUG_AUTH_HEADERS) {
+        console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
+      }
+    } else {
+      httpContext.get('response').removeHeader('mu-auth-allowed-groups');
+      if (DEBUG_AUTH_HEADERS) {
+        console.log('Remove mu-auth-allowed-groups');
       }
     }
 
-    function maybeParseJSON(body) {
-      // Catch invalid JSON
-      try {
-        return JSON.parse(body);
-      } catch (ex) {
-        return null;
+    // set mu-auth-used-groups on outgoing response
+    const usedGroups = response.headers.get('mu-auth-used-groups');
+    if (usedGroups) {
+      httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
+      if (DEBUG_AUTH_HEADERS) {
+        console.log(`Update mu-auth-used-groups to ${usedGroups}`);
+      }
+    } else {
+      httpContext.get('response').removeHeader('mu-auth-used-groups');
+      if (DEBUG_AUTH_HEADERS) {
+        console.log('Remove mu-auth-used-groups');
       }
     }
+  }
+}
 
-    return maybeParseJSON(response.body);
-  });
+async function maybeJSON(response) {
+  try {
+    return await response.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function mayRetry(
+  error,
+  attempt,
+  connectionOptions = {}
+) {
+  console.log(
+    `Checking retry allowed for error: ${error} and attempt: ${attempt}`
+  );
+
+  let mayRetry = false;
+
+  if (!(RETRY || connectionOptions.mayRetry)) {
+    mayRetry = false;
+  } else if (attempt < RETRY_MAX_ATTEMPTS) {
+    if (error.code && RETRY_FOR_CONNECTION_ERRORS.includes(error.code)) {
+      mayRetry = true;
+    } else if ( error.httpStatus && RETRY_FOR_HTTP_STATUS_CODES.includes(`${error.httpStatus}`) ) {
+      mayRetry = true;
+    }
+  }
+
+  console.log(`Retry allowed? ${mayRetry}`);
+
+  return mayRetry;
+}
+
+function nextAttemptTimeout(attempt) {
+  // expected to be milliseconds
+  return Math.round(RETRY_TIMEOUT_INCREMENT_FACTOR * Math.exp(attempt + 10));
 }
 
 function sparqlEscapeString( value ){
@@ -157,7 +244,6 @@ function sparqlEscape( value, type ){
 
 //==-- exports --==//
 const exports = {
-  newSparqlClient: newSparqlClient,
   SPARQL: SPARQL,
   sparql: SPARQL,
   query: query,
@@ -174,7 +260,6 @@ const exports = {
 export default exports;
 
 export {
-  newSparqlClient,
   SPARQL as SPARQL,
   SPARQL as sparql,
   query,
