@@ -12,4 +12,7 @@ cd /usr/src/app
 NODE_ENV=development ./install-dependencies.sh
 
 docker-rsync /usr/src/app/app/node_modules/ /data/service/node_modules
-cp /usr/src/app/app/package-lock.json /data/service/package-lock.json
+if [ -f /usr/src/app/app/package-lock.json ]
+then
+   cp /usr/src/app/app/package-lock.json /data/service/package-lock.json
+fi
