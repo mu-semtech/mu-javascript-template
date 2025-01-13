@@ -3,7 +3,7 @@ const OVERRIDE_TEMPLATE_DEPENDENCIES =
   process.env.OVERRIDE_TEMPLATE_DEPENDENCIES || false;
 
 // combines package.jsons and writes them to /tmp/package.json
-function mergePackageJsons() {
+function mergePackageJson() {
   const templatePackage = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
   if (!fs.existsSync("/app/package.json")) {
@@ -54,4 +54,4 @@ function warnAboutVersionDifferences(templatePackage, servicePackage) {
   });
 }
 
-mergePackageJsons();
+mergePackageJson();

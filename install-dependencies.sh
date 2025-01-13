@@ -2,7 +2,7 @@
 source ./helpers.sh
 
 cd /usr/src/app/
-node ./mergepackagejsons.js
+node ./merge-package-json.js
 mv /tmp/package.json /usr/src/app/app/package.json
 cd /usr/src/app/app/
 
