@@ -67,15 +67,6 @@ fi
 ##############
 
 cd /usr/src/dist/
-if [ "$NO_BABEL_NODE" == "true" ]
-then
-    echo "running without babel-node"
-    node \
-        --inspect="0.0.0.0:9229" \
-        ./app.js
-else
-    /usr/src/app/node_modules/.bin/babel-node \
-        --enable-source-maps \
-        --inspect="0.0.0.0:9229" \
-        ./app.js
-fi
+node \
+    --inspect="0.0.0.0:9229" \
+    ./app.js
