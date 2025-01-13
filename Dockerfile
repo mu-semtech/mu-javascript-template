@@ -2,7 +2,7 @@ FROM node:20-bookworm
 
 LABEL maintainer="team@semantic.works"
 
-RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync
+RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync jq
 
 ENV MU_SPARQL_ENDPOINT='http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH='http://mu.semte.ch/application'

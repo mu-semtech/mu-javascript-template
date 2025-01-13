@@ -1,0 +1,9 @@
+{
+  "name": "mu",
+  "version": "0.0.1",
+  "description": "Framework layer functions for mu-javascript-template.",
+  "main": "index.js",
+  "type": "module",
+  "author": "Semantic Works",
+  "license": "MIT"
+}

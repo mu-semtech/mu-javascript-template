@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o xtrace
 source ./helpers.sh
 
 cd /usr/src/app/
@@ -26,4 +27,22 @@ else
     --extensions ".js"
 
   cp -R /usr/src/processing/built-mu /usr/src/app/app/node_modules/mu
+  cp /usr/src/app/helpers/mu/package.json /usr/src/processing/built-mu/
+
+  ## Ensure package.json has module
+  # cp /app/package.json /usr/src/build/ # already copied above
+  cat /usr/src/app/app/package.json | jq -e ".type" > /dev/null
+  if [  $? -ne 0 ]
+  then
+      echo '[WARNING] Adding "type": "module" to your package.json.'
+      echo 'To remove this warning, add "type": "module" at the same level as "name" in your package.json'
+      sed -i 's/{/{\n  "type": "module",/' /usr/src/app/app/package.json
+  else
+      PACKAGE_TYPE=`cat /usr/src/app/app/package.json | jq -r ".type"`
+      if [[ "$PACKAGE_TYPE" -ne "module" ]]
+      then
+          echo '[WARNING] DIFFERENT TYPE THAN "module" IN package.json; CONTINUING WITH UNSPECIFIED BEHAVIOUR'
+      fi
+  fi
 fi
+
