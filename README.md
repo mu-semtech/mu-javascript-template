@@ -227,7 +227,7 @@ app.get('/hello', function( req, res, next ) {
   try {
     ...
   } catch (e) {
-    next(new Error('Oops, something went wrong.))
+    next(new Error('Oops, something went wrong.'))
   }
 });
 
