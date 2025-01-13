@@ -6,10 +6,6 @@ node ./merge-package-json.js
 mv /tmp/merged-package.json /usr/src/app/app/package.json
 cd /usr/src/app/app/
 
-if [ "$1" == "-clean" ]
-then
-  rm -rf package-lock.json node_modules
-fi
 npm install
 
 # if processing exists we can take the built mu module out of it directly, we built it in an earlier step
