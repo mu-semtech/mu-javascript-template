@@ -202,8 +202,8 @@ mu.app.get('/', function( req, res ) {
 ```
 
 The following helper functions are provided by the template
-  - `query(query) => Promise`: Function for sending queries to the triplestore
-  - `update(query) => Promise`: Function for sending updates to the triplestore
+  - `query(query, options) => Promise`: Function for sending queries to the triplestore.  Options is an object which may include `sudo` and `scope` keys.
+  - `update(query, options) => Promise`: Function for sending updates to the triplestore.  Options is an object which may include `sudo` and `scope` keys.
   - `uuid() => string`: Generates a random UUID (e.g. to construct new resource URIs)
 
 The following SPARQL escape helpers are provided to construct safe SPARQL query strings
@@ -227,7 +227,7 @@ app.get('/hello', function( req, res, next ) {
   try {
     ...
   } catch (e) {
-    next(new Error('Oops, something went wrong.))
+    next(new Error('Oops, something went wrong.'))
   }
 });
 
@@ -254,6 +254,8 @@ The following environment variables can be configured:
   - `MAX_BODY_SIZE` (default: `100kb`): max size of the request body. See [ExpressJS documentation](https://expressjs.com/en/resources/middleware/body-parser.html#limit).
   - `HOST` (default: `0.0.0.0`): The hostname you want the service to bind to.
   - `PORT` (default: `80`): The port you want the service to bind to.
+  - `ALLOW_MU_AUTH_SUDO`: Allow sudo queries when the service requests it.
+  - `DEFAULT_MU_AUTH_SCOPE`: Default mu-auth-scope to use for calls.
 
 
 #### Mounting `/config`
