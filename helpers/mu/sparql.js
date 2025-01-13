@@ -138,10 +138,23 @@ function sparqlEscapeDate( value ){
   return '"' + new Date(value).toISOString().substring(0, 10) + '"^^xsd:date'; // only keep 'YYYY-MM-DD' portion of the string
 };
 
+/**
+ * Escape date string or date object into an xsd:dateTime for use in a SPARQL string.
+ *
+ * @param { Date | string | number } value Date representation
+ * (understood by `new Date`) to convert.
+ * @return { string } Date representation for SPARQL query.
+ */
 function sparqlEscapeDateTime( value ){
   return '"' + new Date(value).toISOString() + '"^^xsd:dateTime';
 };
 
+/**
+ * Escape boolean-like value into xsd:boolean for use in a SPARQL string.
+ *
+ * @param { any } value Boolean-like value, anything javascript finds truethy is true.
+ * @return { string } Boolean representation for SPARQL query.
+ */
 function sparqlEscapeBool( value ){
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
 };
