@@ -23,7 +23,7 @@
         "arguments": []
       },
       "environment": {
-        "image": "local-js-template",
+        "image": "semtech/mu-javascript-template:feature-dev-experience-tryouts",
         "interactive": false,
         "script": "install/run.sh"
       },
