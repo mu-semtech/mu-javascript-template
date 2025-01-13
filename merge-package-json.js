@@ -1,4 +1,4 @@
-const fs = require("fs");
+import fs from 'fs';
 
 // combines package.jsons and writes them to /tmp/merged-package.json
 function mergePackageJson() {
@@ -11,12 +11,12 @@ function mergePackageJson() {
 
     servicePackage.dependencies = servicePackage.dependencies || {};
 
-    warnAboutVersionDifferences(templatePackage, servicePackage);
-
     servicePackage.dependencies = {
       ...servicePackage.dependencies,
       ...templatePackage.dependencies,
     };
+
+    warnAboutVersionDifferences(templatePackage, servicePackage);
 
     fs.writeFileSync(
       "/tmp/merged-package.json",

@@ -4,10 +4,9 @@ source ./helpers.sh
 
 cd /usr/src/app/
 node ./merge-package-json.js
+cp /tmp/merged-package.json{,-bu}
 mv /tmp/merged-package.json /usr/src/app/app/package.json
 cd /usr/src/app/app/
-
-npm install
 
 mkdir -p /usr/src/app/app/node_modules/
 # if processing exists we can take the built mu module out of it directly, we built it in an earlier step
@@ -16,10 +15,10 @@ then
   cp -R /usr/src/processing/built-mu /usr/src/app/app/node_modules/mu
 # else we need to create processing npm install and build it again
 else
+  npm install
   mkdir -p /usr/src/processing/built-mu
   cd /usr/src/processing/
   docker-rsync /usr/src/app/. .
-  npm install
   /usr/src/app/node_modules/.bin/babel \
     /usr/src/app/helpers/mu/ \
     --source-maps true \
@@ -36,7 +35,7 @@ else
   then
       echo '[WARNING] Adding "type": "module" to your package.json.'
       echo 'To remove this warning, add "type": "module" at the same level as "name" in your package.json'
-      sed -i 's/{/{\n  "type": "module",/' /usr/src/app/app/package.json
+      sed -i '0,/{/s/{/{\n  "type": "module",/' /usr/src/app/app/package.json
   else
       PACKAGE_TYPE=`cat /usr/src/app/app/package.json | jq -r ".type"`
       if [[ "$PACKAGE_TYPE" -ne "module" ]]
@@ -45,4 +44,3 @@ else
       fi
   fi
 fi
-

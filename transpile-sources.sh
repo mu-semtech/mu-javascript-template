@@ -98,10 +98,11 @@ cd /usr/src/processing/
 
 ## merged template and app modules with mu module
 docker-rsync /usr/src/app/app/node_modules /usr/src/dist/
+docker-rsync /usr/src/app/app/package.json /usr/src/dist/package.json
 
 ## Clean temporary folders
 ##
 ## We have created garbage, let's remove it
 cd /usr/src/
 
-rm -Rf /usr/src/processing
+# rm -Rf /usr/src/processing

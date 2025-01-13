@@ -54,11 +54,11 @@ then
 fi
 
 ## Install dependencies on first boot
-if [ $CHANGE_IN_PACKAGE_JSON != "0" ] && [ -f ./app/package.json ]
-then
+# if [ $CHANGE_IN_PACKAGE_JSON != "0" ] && [ -f ./app/package.json ]
+# then
     echo "Installing dependencies"
     ./install-dependencies.sh
-fi
+# fi
 
 
 
@@ -68,7 +68,7 @@ fi
 
 ./transpile-sources.sh
 
-
+cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 
 ##############
 # Start server
