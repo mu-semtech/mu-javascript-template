@@ -4,7 +4,7 @@
     {
       "documentation": {
         "command": "dev-script",
-        "description": "Outputs a development script for this service",
+        "description": "Outputs a development script to use in docker-compose",
         "arguments": []
       },
       "environment": {
@@ -18,14 +18,14 @@
     },
     {
       "documentation": {
-        "command": "install",
-        "description": "installs combined node modules of service and template",
+        "command": "setup-ide",
+        "description": "Installs combined node modules of service and template",
         "arguments": []
       },
       "environment": {
         "image": "semtech/mu-javascript-template:feature-dev-experience-tryouts",
         "interactive": false,
-        "script": "install/run.sh"
+        "script": "setup-ide/run.sh"
       },
       "mounts": {
         "service": "/data/service"
