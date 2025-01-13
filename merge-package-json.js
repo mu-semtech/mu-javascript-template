@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-// combines package.jsons and writes them to /tmp/package.json
+// combines package.jsons and writes them to /tmp/merged-package.json
 function mergePackageJson() {
   const templatePackage = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
@@ -18,13 +18,13 @@ function mergePackageJson() {
     };
 
     fs.writeFileSync(
-      "/tmp/package.json",
+      "/tmp/merged-package.json",
       JSON.stringify(servicePackage, null, 2)
     );
   } else {
     // just use the template package.json
     fs.writeFileSync(
-      "/tmp/package.json",
+      "/tmp/merged-package.json",
       JSON.stringify(templatePackage, null, 2)
     );
   }

@@ -3,7 +3,7 @@ source ./helpers.sh
 
 cd /usr/src/app/
 node ./merge-package-json.js
-mv /tmp/package.json /usr/src/app/app/package.json
+mv /tmp/merged-package.json /usr/src/app/app/package.json
 cd /usr/src/app/app/
 
 if [ "$1" == "-clean" ]
