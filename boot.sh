@@ -14,7 +14,7 @@ then
     diff -rq /config /config.original > /dev/null
     CONFIG_FILES_CHANGED="$?"
 
-    if [ ! -f /usr/src/build/app.js ]
+    if [ ! -f /usr/src/dist/app.js ]
     then
         echo "No built sources found.  If you mount new sources, please set the NODE_ENV=\"development\" environment variable."
         sleep 5;
@@ -47,10 +47,10 @@ then
         ./transpile-sources.sh
 
         # boot transpiled sources
-        cd /usr/src/build/
+        cd /usr/src/dist/
         exec node ./app.js
     else
-        cd /usr/src/build/
+        cd /usr/src/dist/
         exec node ./app.js
     fi
 fi
