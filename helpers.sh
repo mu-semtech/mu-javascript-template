@@ -15,5 +15,5 @@ function docker-rsync() {
   # --numeric-ids: use uuid by number instead of by name
   # --info: silent output
   # --no-compress: no compression algorithm
-  rsync -aHAWXS --numeric-ids --info= --no-compress $@
+  rsync -aHAWXS --numeric-ids --info= --no-compress "$@"
 }
