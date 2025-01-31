@@ -1,5 +1,4 @@
 #!/bin/bash
-
 source ./helpers.sh
 
 ####
@@ -51,20 +50,22 @@ rm /usr/src/babel.config.json
 ## Transpiles TypeScript and ES6 to something nodejs wants to run.
 cd /usr/src/processing/
 
-mkdir typescript-transpilation build
-cp -R ./app/* build
+mkdir build dist
+cp -R /usr/src/processing/app/* /usr/src/processing/build
 
 docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/processing/build/
 
+# We don't need the --config-file option but this helps discovery
 /usr/src/app/node_modules/.bin/babel \
   ./build/ \
   --out-dir ./dist/ \
   --source-maps true \
+  --config-file "/usr/src/app/babel.config.json" \
   --extensions ".ts,.js"
 
 mkdir -p /usr/src/dist
 rm -Rf /usr/src/dist/*
-mv dist/* /usr/src/dist/
+mv /usr/src/processing/dist/* /usr/src/dist/
 
 # We move the coffeescript files again because the previous step will
 # have built the sources coffeescript generated, but these sources were
@@ -72,24 +73,21 @@ mv dist/* /usr/src/dist/
 # transpile them to nodejs in this step, but that breaks SourceMaps.
 docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/dist/
 
-# We move all unhandled files (non js, ts, coffee) into the sources and dist
-# for later use.
-
+# We move all unhandled files (non js, ts, coffee) into dist from where they'll run
 docker-rsync \
-    --exclude "*.js" \
-    --exclude "*.ts" \
-    --exclude "*.coffee" \
+    --exclude '*.js' \
+    --exclude '*.ts' \
+    --exclude '*.coffee' \
+    --exclude 'node_modules/' \
+    --exclude './Dockerfile' \
+    /usr/src/processing/app/ /usr/src/dist/
+
+# Move the original sources so the original paths of the sourcemaps resolve (these are relative paths from
+# /usr/src/dist/ to ../build/
+docker-rsync \
     --exclude "node_modules/" \
     --exclude "./Dockerfile" \
     /usr/src/processing/app/ /usr/src/build/
-
-docker-rsync \
-    --exclude "*.js" \
-    --exclude "*.ts" \
-    --exclude "*.coffee" \
-    --exclude "node_modules/" \
-    --exclude "./Dockerfile" \
-    /usr/src/processing/app/ /usr/src/dist/
 
 ##############
 # Node modules
@@ -101,8 +99,6 @@ docker-rsync /usr/src/app/app/node_modules /usr/src/dist/
 docker-rsync /usr/src/app/app/package.json /usr/src/dist/package.json
 
 ## Clean temporary folders
-##
-## We have created garbage, let's remove it
-cd /usr/src/
+rm -Rf /usr/src/processing
 
-# rm -Rf /usr/src/processing
+cd /usr/src/
