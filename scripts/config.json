@@ -28,7 +28,7 @@
         "script": "setup-ide/run.sh"
       },
       "mounts": {
-        "service": "/data/service"
+        "service": "/app"
       }
     }
   ]

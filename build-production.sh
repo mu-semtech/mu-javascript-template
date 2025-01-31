@@ -22,6 +22,7 @@ fi
 cp -r /app /app.original
 
 # Install custom packages if need be
-./install-dependencies.sh
+./prepare-package-json.sh
+./npm-install-dependencies.sh production
 
 ./transpile-sources.sh
