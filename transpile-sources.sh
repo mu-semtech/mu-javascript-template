@@ -5,22 +5,22 @@ source ./helpers.sh
 #### BUILDS SOURCES
 ####
 #### Expects sources to be in /usr/src/app/ with the app in
-#### /usr/src/app/app/ and stores the resulting build in /usr/src/build
+#### /usr/src/app/app/ and stores the resulting build in /usr/src/dist
 
 cd /usr/src/
 
 # Clean starting state
-rm -Rf /usr/src/build
+rm -Rf /usr/src/dist
 
 # Prepare the build folder
-mkdir /usr/src/build
-cd /usr/src/build
+mkdir /usr/src/dist
+cd /usr/src/dist
 
 # Copy template (/usr/src/app/) and app (/usr/src/app/app/) sources
 # without package.json, which we want to skip as it would conflict
 # building sources.
-cp -R /usr/src/app/app/* /usr/src/build/
-rm -f /usr/src/build/package.json
+cp -R /usr/src/app/app/* /usr/src/dist/
+rm -f /usr/src/dist/package.json
 
 ## CoffeeScript
 ##
@@ -30,16 +30,16 @@ rm -f /usr/src/build/package.json
 ##
 ## In order to transpile correctly we need the node_modules for babel and the
 ## babelrc file.  We temporarily move those around.
-cp /usr/src/app/babel.config.json /usr/src/build/
-cp -R /usr/src/app/node_modules/ /usr/src/build/
+cp /usr/src/app/babel.config.json /usr/src/dist/
+cp -R /usr/src/app/node_modules/ /usr/src/dist/
 
 # make the build and move to coffeescript-transpilation `-m` for external sourcemaps `-M` for inlined maps.  Hence -m -M
 # will generate both.
 /usr/src/app/node_modules/.bin/coffee -M --compile -t .
 
 # clean up
-rm -Rf /usr/src/build/node_modules
-rm /usr/src/build/babel.config.json
+rm -Rf /usr/src/dist/node_modules
+rm /usr/src/dist/babel.config.json
 
 ## TypeScript and ES6
 ##
@@ -59,7 +59,7 @@ rm /usr/src/build/babel.config.json
 ##############
 
 ## merged template and app modules with mu module
-docker-rsync /usr/src/app/app/node_modules /usr/src/build/
-docker-rsync /usr/src/app/app/package.json /usr/src/build/package.json
+docker-rsync /usr/src/app/app/node_modules /usr/src/dist/
+docker-rsync /usr/src/app/app/package.json /usr/src/dist/package.json
 
 cd /usr/src/

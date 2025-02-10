@@ -72,13 +72,13 @@ fi
 
 ./transpile-sources.sh
 
-cp /usr/src/app/helpers/mu/package.json /usr/src/build/node_modules/mu/
+cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 
 ##############
 # Start server
 ##############
 
-cd /usr/src/build/
+cd /usr/src/dist/
 node \
     --inspect="0.0.0.0:9229" \
     ./app.js

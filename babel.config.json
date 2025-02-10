@@ -16,6 +16,6 @@
   ],
   "ignore": [
     "./node_modules",
-    "/usr/src/processing/build/node_modules"
+    "/usr/src/dist/node_modules"
   ]
 }
