@@ -37,9 +37,9 @@ cp -R /usr/src/processing/app/* /usr/src/build/
 cp /usr/src/processing/babel.config.json /usr/src/
 cp -R /usr/src/processing/node_modules/ /usr/src/
 
-# make the build and move to coffeescript-transpilation `-M` for external sourcemaps `-m` for inlined maps.  Hence -m -M
+# make the build and move to coffeescript-transpilation `-m` for external sourcemaps `-M` for inlined maps.  Hence -m -M
 # will generate both.
-/usr/src/app/node_modules/.bin/coffee -m --compile -t --output ./build.coffee/ ./build
+/usr/src/app/node_modules/.bin/coffee -M --compile -t --output ./build.coffee/ ./build
 mv build.coffee/ /usr/src/processing/coffeescript-transpilation
 
 # clean up
