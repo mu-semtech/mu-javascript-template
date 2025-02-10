@@ -223,4 +223,3 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool
 };
-

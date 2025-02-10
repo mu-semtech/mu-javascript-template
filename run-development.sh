@@ -1,6 +1,4 @@
 #!/bin/bash
-set -o xtrace
-
 source ./helpers.sh
 
 # We want to run from /app but don't want to touch that folder.
@@ -40,7 +38,7 @@ fi
 ## node_modules in the template, or the node_modules may be offered in part or
 ## in full.  Hence we should only add the node_modules of the mounted code and
 ## not remove anything.
-# QUESTION: this is related to installing dependencies, should this become part of npm-install-dependencies or should this be part of a copy-sources script.
+# TODO: this is related to installing dependencies, should this become part of npm-install-dependencies or should this be part of a copy-sources script.
 docker-rsync --delete --exclude node_modules /app/ /usr/src/app/app/
 if [ -d /app/node_modules/ ]
 then
@@ -63,7 +61,7 @@ then
     touch /tmp/dependencies-installed-once-for-dev
 else
     # TODO: We overwrote the merged package.json when copying from the template, we could drop this if
-    # prepare-package-json checks /app/package.json instead of /usr/src/app/app/package.json
+    # don't overwrite the merged package.json on reload.
     ./prepare-package-json.sh
 fi
 

@@ -1,12 +1,8 @@
 #!/bin/bash
-set -o xtrace # TODO: remove tracing code
-
 cd /usr/src/app/
 node ./merge-package-json.js
 mv /tmp/merged-package.json /usr/src/app/app/package.json
 cd /usr/src/app/app/
-
-mkdir -p /usr/src/app/app/node_modules/ # TODO: do we need this, will the npm install next not ensure we have this?
 
 ## Ensure package.json has module
 cat /usr/src/app/app/package.json | jq -e ".type" > /dev/null

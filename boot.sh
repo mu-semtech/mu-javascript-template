@@ -1,5 +1,4 @@
 #!/bin/bash
-set -o xtrace
 if [ "$NODE_ENV" == "development" ]
 then
     # Run live-reload development
