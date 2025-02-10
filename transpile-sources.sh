@@ -37,8 +37,9 @@ cp -R /usr/src/processing/app/* /usr/src/build/
 cp /usr/src/processing/babel.config.json /usr/src/
 cp -R /usr/src/processing/node_modules/ /usr/src/
 
-# make the build and move to coffeescript-transpilation
-/usr/src/app/node_modules/.bin/coffee -M -m --compile -t --output ./build.coffee/ ./build
+# make the build and move to coffeescript-transpilation `-M` for external sourcemaps `-m` for inlined maps.  Hence -m -M
+# will generate both.
+/usr/src/app/node_modules/.bin/coffee -m --compile -t --output ./build.coffee/ ./build
 mv build.coffee/ /usr/src/processing/coffeescript-transpilation
 
 # clean up
@@ -56,10 +57,13 @@ cp -R /usr/src/processing/app/* /usr/src/processing/build
 docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/processing/build/
 
 # We don't need the --config-file option but this helps discovery
+#
+# --source-maps both would give both separate sourcemaps and inline sourcemaps but makes Chromium unhappy.  Set to
+# inline to only get inline sourcemaps and make Chromium happy.  Set to true to get external sourcemaps.
 /usr/src/app/node_modules/.bin/babel \
   ./build/ \
   --out-dir ./dist/ \
-  --source-maps true \
+  --source-maps inline \
   --config-file "/usr/src/app/babel.config.json" \
   --extensions ".ts,.js"
 
