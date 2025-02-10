@@ -32,66 +32,36 @@ rm -f /usr/src/processing/app/package.json
 cd /usr/src/
 
 # prepare the build folders
-mkdir /usr/src/build /usr/src/build.coffee
+mkdir /usr/src/build
 cp -R /usr/src/processing/app/* /usr/src/build/
-cp /usr/src/processing/babel.config.json /usr/src/
-cp -R /usr/src/processing/node_modules/ /usr/src/
+cp /usr/src/processing/babel.config.json /usr/src/build/
+cp -R /usr/src/processing/node_modules/ /usr/src/build/
 
 # make the build and move to coffeescript-transpilation `-m` for external sourcemaps `-M` for inlined maps.  Hence -m -M
 # will generate both.
-/usr/src/app/node_modules/.bin/coffee -M --compile -t --output ./build.coffee/ ./build
-mv build.coffee/ /usr/src/processing/coffeescript-transpilation
+cd /usr/src/build
+/usr/src/app/node_modules/.bin/coffee -M --compile -t .
+cd /usr/src
 
 # clean up
-rm -Rf /usr/src/build /usr/src/node_modules/
-rm /usr/src/babel.config.json
+rm -Rf /usr/src/build/node_modules
+rm /usr/src/build/babel.config.json
 
 ## TypeScript and ES6
 ##
 ## Transpiles TypeScript and ES6 to something nodejs wants to run.
-cd /usr/src/processing/
-
-mkdir build dist
-cp -R /usr/src/processing/app/* /usr/src/processing/build
-
-docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/processing/build/
+cd /usr/src/build
 
 # We don't need the --config-file option but this helps discovery
 #
 # --source-maps both would give both separate sourcemaps and inline sourcemaps but makes Chromium unhappy.  Set to
 # inline to only get inline sourcemaps and make Chromium happy.  Set to true to get external sourcemaps.
 /usr/src/app/node_modules/.bin/babel \
-  ./build/ \
-  --out-dir ./dist/ \
+  ./ \
+  --out-dir ./ \
   --source-maps inline \
   --config-file "/usr/src/app/babel.config.json" \
   --extensions ".ts,.js"
-
-mkdir -p /usr/src/dist
-rm -Rf /usr/src/dist/*
-mv /usr/src/processing/dist/* /usr/src/dist/
-
-# We move the coffeescript files again because the previous step will
-# have built the sources coffeescript generated, but these sources were
-# already node compliant.  We could make coffeescript emit ES6 and
-# transpile them to nodejs in this step, but that breaks SourceMaps.
-docker-rsync /usr/src/processing/coffeescript-transpilation/ /usr/src/dist/
-
-# We move all unhandled files (non js, ts, coffee) into dist from where they'll run
-docker-rsync \
-    --exclude '*.js' \
-    --exclude '*.ts' \
-    --exclude '*.coffee' \
-    --exclude 'node_modules/' \
-    --exclude './Dockerfile' \
-    /usr/src/processing/app/ /usr/src/dist/
-
-# Move the original sources so the original paths of the sourcemaps resolve (these are relative paths from
-# /usr/src/dist/ to ../build/
-docker-rsync \
-    --exclude "node_modules/" \
-    --exclude "./Dockerfile" \
-    /usr/src/processing/app/ /usr/src/build/
 
 ##############
 # Node modules
@@ -99,10 +69,7 @@ docker-rsync \
 cd /usr/src/processing/
 
 ## merged template and app modules with mu module
-docker-rsync /usr/src/app/app/node_modules /usr/src/dist/
-docker-rsync /usr/src/app/app/package.json /usr/src/dist/package.json
-
-## Clean temporary folders
-rm -Rf /usr/src/processing
+docker-rsync /usr/src/app/app/node_modules /usr/src/build/
+docker-rsync /usr/src/app/app/package.json /usr/src/build/package.json
 
 cd /usr/src/
