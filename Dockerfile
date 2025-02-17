@@ -20,6 +20,7 @@ COPY ./scripts /app/scripts
 RUN npm install
 COPY . /usr/src/app
 RUN chmod +x /usr/src/app/run-development.sh
+RUN chmod +x /usr/src/app/run-production.sh
 RUN chmod +x /usr/src/app/build-production.sh
 
 EXPOSE ${PORT}
