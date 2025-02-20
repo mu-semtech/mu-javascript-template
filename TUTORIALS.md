@@ -54,10 +54,12 @@ app.get('/users', function(req, res) {
 });
 ```
 
-‘app’ is a reference to the Express app while ‘query’ is a helper function to send a SPARQL query to the triplestore. There are functions available to generate a UUID, to escape characters in a SPARQL query, etc. A complete list can be found in [the template’s README](#imports).
+‘app’ is a reference to the Express app while ‘query’ is a helper function to send a SPARQL query to the triplestore. There are functions available to generate a UUID, to escape characters in a SPARQL query, etc. A complete list can be found in [the template’s README](README.md#helpers).
+
+The mu-javascript-template uses the [sparql-client-2](https://www.npmjs.com/package/sparql-client-2) library to interact with the triplestore. Check this library for the response structure of the `query` helper.
 
 ### Using additional libraries
-The mu-javascript-template uses the [sparql-client-2](https://www.npmjs.com/package/sparql-client-2) library to interact with the triplestore. If you need additional libraries, just list them in a package.json file next to your app.js. It works as you would expect: just define the packages in the dependencies section of the package.json. They will be installed automatically at build time. While developing in a container as described above, you will have to restart the container for the new included packages to be installed.
+If you need additional libraries, just list them in a package.json file next to your app.js. It works as you would expect: just define the packages in the dependencies section of the package.json. They will be installed automatically at build time. While developing in a container as described above, you will have to restart the container for the new included packages to be installed.
 
 ### Example
 There are already [some microservices available](https://github.com/search?q=topic%3Amu-service+org%3Amu-semtech&type=Repositories) that use the `mu-javascript-template`. Have a look at them to see how simple it is to build a microservice based on this template. There is for example the [export service](https://github.com/mu-semtech/export-service) to export data using custom defined SPARQL queries or [Bravoer’s advanced search service](https://github.com/bravoer/advanced-search-service) to execute advanced search queries on resources that cannot be expressed in mu-cl-resources.

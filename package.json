@@ -1,7 +1,8 @@
 {
   "name": "mu-javascript-template",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Template for mu services written in JavaScript",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mu-semtech/mu-javascript-template.git"
@@ -10,9 +11,9 @@
     "mu-semtech"
   ],
   "dependencies": {
+    "babel-plugin-add-import-extension": "^1.6.0",
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
-    "@babel/node": "^7.20.7",
     "@babel/plugin-proposal-decorators": "^7.22.15",
     "@babel/preset-env": "^7.22.10",
     "@babel/preset-typescript": "^7.18.6",

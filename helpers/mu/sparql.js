@@ -11,8 +11,22 @@ const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
 //==-- logic --==//
 
 // builds a new sparqlClient
-function newSparqlClient() {
+function newSparqlClient(userOptions) {
   let options = { requestDefaults: { headers: { } } };
+
+  if (userOptions.sudo === true) {
+    if (env.get("ALLOW_MU_AUTH_SUDO").asBool()) {
+      options.requestDefaults.headers['mu-auth-sudo'] = "true";
+    } else {
+      throw "Error, sudo request but service lacks ALLOW_MU_AUTH_SUDO header";
+    }
+  }
+
+  if (userOptions.scope) {
+    options.requestDefaults.headers['mu-auth-scope'] = userOptions.scope;
+  } else if (process.env.DEFAULT_MU_AUTH_SCOPE) {
+    options.requestDefaults.headers['mu-auth-scope'] = process.env.DEFAULT_MU_AUTH_SCOPE;
+  }
 
   if (httpContext.get('request')) {
     options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
@@ -38,24 +52,30 @@ function newSparqlClient() {
 }
 
 // executes a query (you can use the template syntax)
-function query( queryString ) {
+function query( queryString, options ) {
   if (LOG_SPARQL_QUERIES) {
     console.log(queryString);
   }
-  return executeQuery(queryString);
+  return executeQuery(queryString, options);
 };
 
-// executes an update query
-function update( queryString ) {
+/**
+ * Executes an update query
+ *
+ * @param { string } queryString String containing SPARQL query for the backend.
+ * @param { object? } options Options to be sent to 
+ */
+function update( queryString, options ) {
   if (LOG_SPARQL_UPDATES) {
     console.log(queryString);
   }
-  return executeQuery(queryString);
+  return executeQuery(queryString, options);
 };
 
-function executeQuery( queryString ) {
-  return newSparqlClient().query(queryString).executeRaw().then(response => {
+function executeQuery( queryString, options ) {
+  return newSparqlClient(options || {}).query(queryString).executeRaw().then(response => {
     const temp = httpContext;
+
     if (httpContext.get('response') && !httpContext.get('response').headersSent) {
       // set mu-auth-allowed-groups on outgoing response
       const allowedGroups = response.headers['mu-auth-allowed-groups'];
@@ -123,10 +143,23 @@ function sparqlEscapeDate( value ){
   return '"' + new Date(value).toISOString().substring(0, 10) + '"^^xsd:date'; // only keep 'YYYY-MM-DD' portion of the string
 };
 
+/**
+ * Escape date string or date object into an xsd:dateTime for use in a SPARQL string.
+ *
+ * @param { Date | string | number } value Date representation
+ * (understood by `new Date`) to convert.
+ * @return { string } Date representation for SPARQL query.
+ */
 function sparqlEscapeDateTime( value ){
   return '"' + new Date(value).toISOString() + '"^^xsd:dateTime';
 };
 
+/**
+ * Escape boolean-like value into xsd:boolean for use in a SPARQL string.
+ *
+ * @param { any } value Boolean-like value, anything javascript finds truethy is true.
+ * @return { string } Boolean representation for SPARQL query.
+ */
 function sparqlEscapeBool( value ){
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
 };
@@ -165,6 +198,7 @@ const exports = {
   sparqlEscape: sparqlEscape,
   sparqlEscapeString: sparqlEscapeString,
   sparqlEscapeUri: sparqlEscapeUri,
+  sparqlEscapeDecimal: sparqlEscapeDecimal,
   sparqlEscapeInt: sparqlEscapeInt,
   sparqlEscapeFloat: sparqlEscapeFloat,
   sparqlEscapeDate: sparqlEscapeDate,
@@ -189,4 +223,3 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool
 };
-

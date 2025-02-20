@@ -1,18 +1,18 @@
-FROM node:18-bookworm
+FROM node:20-bookworm
 
-LABEL maintainer="madnificent@gmail.com"
+LABEL maintainer="team@semantic.works"
 
-RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client
+RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync jq
 
-ENV MU_SPARQL_ENDPOINT 'http://database:8890/sparql'
-ENV MU_APPLICATION_GRAPH 'http://mu.semte.ch/application'
-ENV NODE_ENV 'production'
+ENV MU_SPARQL_ENDPOINT='http://database:8890/sparql'
+ENV MU_APPLICATION_GRAPH='http://mu.semte.ch/application'
+ENV NODE_ENV='production'
 
-ENV HOST '0.0.0.0'
-ENV PORT '80'
+ENV HOST='0.0.0.0'
+ENV PORT='80'
 
-ENV LOG_SPARQL_ALL 'true'
-ENV DEBUG_AUTH_HEADERS 'true'
+ENV LOG_SPARQL_ALL='true'
+ENV DEBUG_AUTH_HEADERS='true'
 
 WORKDIR /usr/src/app
 COPY package.json /usr/src/app/package.json
@@ -20,11 +20,12 @@ COPY ./scripts /app/scripts
 RUN npm install
 COPY . /usr/src/app
 RUN chmod +x /usr/src/app/run-development.sh
+RUN chmod +x /usr/src/app/run-production.sh
 RUN chmod +x /usr/src/app/build-production.sh
 
 EXPOSE ${PORT}
 
-CMD ["/usr/src/app/boot.sh"]
+CMD ["bash", "boot.sh"]
 
 # This stuff only runs when building an image from the template
 ONBUILD RUN rm -Rf /app/scripts

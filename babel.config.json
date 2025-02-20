@@ -4,16 +4,18 @@
       {
         "targets": {
           "node": 18
-        }
+        },
+        "modules": false
       }
     ],
     ["@babel/preset-typescript"]
   ],
   "plugins": [
-    ["@babel/plugin-proposal-decorators", { "version": "2023-05" }]
+    ["@babel/plugin-proposal-decorators", { "version": "2023-05" }],
+    ["babel-plugin-add-import-extension"]
   ],
   "ignore": [
     "./node_modules",
-    "/usr/src/processing/build/node_modules"
+    "/usr/src/dist/node_modules"
   ]
 }

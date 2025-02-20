@@ -22,12 +22,7 @@ fi
 cp -r /app /app.original
 
 # Install custom packages if need be
-if [ -f ./app/package.json ]
-then
-    echo "Running npm install"
-    cd /usr/src/app/app/
-    npm install
-    cd /usr/src/app/
-fi
+./prepare-package-json.sh
+./npm-install-dependencies.sh production
 
 ./transpile-sources.sh
