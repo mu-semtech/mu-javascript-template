@@ -2,14 +2,8 @@
 cd /usr/src/app/app/
 if [ -f "/usr/src/app/app/package.json" ]
 then
-    if [[ "$1" == "production" ]] && [ -f "/usr/src/app/app/package-lock.json" ]
-    then
-        echo "Installing dependencies in ci mode"
-        npm ci
-    else
-        echo "Installing dependencies from package.json"
-        npm install
-    fi
+    echo "Installing dependencies from package.json"
+    npm install
 fi
 
 mkdir -p /usr/src/app/app/node_modules/
