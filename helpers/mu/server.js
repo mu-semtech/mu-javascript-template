@@ -36,11 +36,6 @@ const errorHandler = function(err, req, res, next) {
   });
 };
 
-// start server
-app.listen( port, hostname, function() {
-  console.log(`Starting server on ${hostname}:${port} in ${app.get('env')} mode`);
-});
-
 export default app;
 
 export {

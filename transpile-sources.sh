@@ -79,3 +79,10 @@ popd > /dev/null
 ## merged template and app modules with mu module
 docker-rsync --delete /usr/src/app/app/node_modules /usr/src/dist/
 docker-rsync /usr/src/app/app/package.json /usr/src/dist/package.json
+
+
+#########################
+# Add server start script
+#########################
+ls /usr/src/app/
+cat /usr/src/app/helpers/mu/start-server.js >> /usr/src/dist/app.js
