@@ -1,4 +1,5 @@
-var { app } = await import("mu");
+import { app } from "mu";
+import "./app.js";
 var port = process.env.PORT || "80";
 var hostname = process.env.HOST || "0.0.0.0";
 // start server

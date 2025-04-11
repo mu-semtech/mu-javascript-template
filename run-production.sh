@@ -39,8 +39,8 @@ then
 
     # boot transpiled sources
     cd /usr/src/dist/
-    exec node ./app.js
+    exec node ./start-server.js
 else
     cd /usr/src/dist/
-    exec node ./app.js
+    exec node ./start-server.js
 fi
