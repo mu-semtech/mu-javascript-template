@@ -84,4 +84,4 @@ docker-rsync /usr/src/app/app/package.json /usr/src/dist/package.json
 #########################
 # Add server start script
 #########################
-cp /usr/src/app/start-server.js /usr/src/dist/start-server.js 
+cp /usr/src/app/start-server.js /usr/src/dist/start-server.js
