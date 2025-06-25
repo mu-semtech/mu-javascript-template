@@ -4,8 +4,6 @@ import bodyParser from 'body-parser';
 
 var app = express();
 
-var port = process.env.PORT || '80';
-var hostname = process.env.HOST || '0.0.0.0';
 var bodySizeLimit = process.env.MAX_BODY_SIZE || '100kb';
 
 // parse JSONAPI content type
