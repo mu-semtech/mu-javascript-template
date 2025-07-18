@@ -23,7 +23,7 @@
         "arguments": []
       },
       "environment": {
-        "image": "semtech/mu-javascript-template:feature-dev-experience-tryouts",
+        "image": "semtech/mu-javascript-template:feature-seperate-server-start",
         "interactive": false,
         "script": "setup-ide/run.sh"
       },
