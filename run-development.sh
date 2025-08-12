@@ -1,4 +1,16 @@
 #!/bin/bash
+sleep 0.1
+SERVICE_STATUS=$(cat /tmp/service-status.lock)
+if [ "$SERVICE_STATUS" == "exit_after_compile" ]
+then
+  echo "More changed files detected during compilation. Continuing compilation and scheduling another compile run."
+  exit 0
+fi
+
+trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; elif [ $SERVICE_STATUS == "running" ]; then exit 0; fi }' SIGUSR2 > /dev/null 2>&1
+
+echo "compiling" > /tmp/service-status.lock
+
 source ./helpers.sh
 
 # We want to run from /app but don't want to touch that folder.
@@ -21,12 +33,27 @@ cd /usr/src/app/
 ## Check if package.json existed and did not change since previous build (at
 ## first run from the template itself it doesn't exist but that's fine for
 ## comparison)
+if [ ! -f /tmp/dependencies-installed-once-for-dev ]
+then
+    IS_FIRST_RUN=true
+else
+    IS_FIRST_RUN=false
+fi
+
 cmp -s /app/package.json /tmp/last-build-service-package.json
-CHANGE_IN_PACKAGE_JSON="$?"
+if [ "$?" == "1" ] && [ $IS_FIRST_RUN == false ]
+then
+  PACKAGE_JSON_CHANGED=true
+else
+  PACKAGE_JSON_CHANGED=false
+fi
+
 if [ -f /app/package.json ]
 then
     cp /app/package.json /tmp/last-build-service-package.json
 fi
+
+HAS_PACKAGE_LOCK=([ -f /app/package-lock.json ])
 
 ## Ensure we _sync_ the sources from the hosted app and _copy_ the node_modules.
 ##
@@ -40,10 +67,6 @@ fi
 ## not remove anything.
 # TODO: this is related to installing dependencies, should this become part of npm-install-dependencies or should this be part of a copy-sources script.
 docker-rsync --delete --exclude node_modules /app/ /usr/src/app/app/
-if [ -d /app/node_modules/ ]
-then
-    docker-rsync /app/node_modules /usr/src/app/app/
-fi
 
 ## Copy config folder
 if [[ "$(ls -A /config/ 2> /dev/null)" ]]
@@ -52,19 +75,25 @@ then
     cp -rf /config/* ./app/config/
 fi
 
-## Install dependencies on first boot
-if [ $CHANGE_IN_PACKAGE_JSON != "0" ] || [ ! -f /tmp/dependencies-installed-once-for-dev ]
+# Determine npm command and install dependencies
+if [ -f /app/package.json ]
 then
-    echo "Installing dependencies"
-    ./prepare-package-json.sh
-    ./npm-install-dependencies.sh
-    touch /tmp/dependencies-installed-once-for-dev
-else
-    # TODO: We overwrote the merged package.json when copying from the template, we could drop this if
-    # don't overwrite the merged package.json on reload.
-    ./prepare-package-json.sh
+  if $IS_FIRST_RUN
+  then
+    if $HAS_PACKAGE_LOCK
+    then
+      npm_install_command=ci
+    else
+      npm_install_command=install
+    fi
+  elif $PACKAGE_JSON_CHANGED
+  then
+    npm_install_command=install
+  fi
 fi
-
+./npm-install-dependencies.sh development $npm_install_command
+./validate-package-json.sh
+touch /tmp/dependencies-installed-once-for-dev
 
 ###############
 # Transpilation
@@ -77,8 +106,16 @@ cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 ##############
 # Start server
 ##############
-
-cd /usr/src/dist/
-node \
+SERVICE_STATUS=$(cat /tmp/service-status.lock)
+if [ "$SERVICE_STATUS" == "exit_after_compile" ]
+then
+  echo "" > /tmp/service-status.lock
+  touch /tmp/service-restart
+  exit 0
+else
+  echo "running" > /tmp/service-status.lock
+  cd /usr/src/dist/
+  node \
     --inspect="0.0.0.0:9229" \
     ./start-server.js
+fi

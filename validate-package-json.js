@@ -1,7 +1,6 @@
 import fs from 'fs';
 
-// combines package.jsons and writes them to /tmp/merged-package.json
-function mergePackageJson() {
+function verifyMergedPackageJson() {
   const templatePackage = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
   if (fs.existsSync("/app/package.json")) {
@@ -17,17 +16,6 @@ function mergePackageJson() {
     };
 
     warnAboutVersionDifferences(templatePackage, servicePackage);
-
-    fs.writeFileSync(
-      "/tmp/merged-package.json",
-      JSON.stringify(servicePackage, null, 2)
-    );
-  } else {
-    // just use the template package.json
-    fs.writeFileSync(
-      "/tmp/merged-package.json",
-      JSON.stringify(templatePackage, null, 2)
-    );
   }
 }
 
@@ -46,4 +34,4 @@ function warnAboutVersionDifferences(templatePackage, servicePackage) {
   });
 }
 
-mergePackageJson();
+verifyMergedPackageJson();

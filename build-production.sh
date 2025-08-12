@@ -22,7 +22,17 @@ fi
 cp -r /app /app.original
 
 # Install custom packages if need be
-./prepare-package-json.sh
-./npm-install-dependencies.sh production
+# Determine npm command and install dependencies
+if [ -f /app/package.json ]
+then
+  if [ -f /app/package-lock.json ]
+  then
+    npm_install_command=ci
+  else
+    npm_install_command=install
+  fi
+fi
+./npm-install-dependencies.sh production $npm_install_command
+./validate-package-json.sh
 
 ./transpile-sources.sh
