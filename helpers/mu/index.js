@@ -1,4 +1,4 @@
-import { app, errorHandler } from './server.js';
+import { app, errorHandler, setExitHandler, getExitHandler } from './server.js';
 import sparql from './sparql.js';
 import { v1 as uuidV1 } from 'uuid';
 
@@ -21,7 +21,9 @@ const mu = {
   sparqlEscapeDateTime: sparql.sparqlEscapeDateTime,
   sparqlEscapeBool: sparql.sparqlEscapeBool,
   uuid,
-  errorHandler
+  errorHandler,
+  getExitHandler,
+  setExitHandler
 };
 
 const SPARQL = mu.SPARQL,
@@ -53,7 +55,9 @@ export {
   sparqlEscapeDateTime,
   sparqlEscapeBool,
   uuid,
-  errorHandler
+  errorHandler,
+  setExitHandler,
+  getExitHandler
 };
 
 export default mu;

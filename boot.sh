@@ -12,5 +12,5 @@ then
          --exec /usr/src/app/run-development.sh
 elif [ "$NODE_ENV" == "production" ]
 then
-    /usr/src/app/run-production.sh
+    exec /usr/src/app/run-production.sh
 fi

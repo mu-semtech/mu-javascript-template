@@ -34,9 +34,33 @@ const errorHandler = function(err, req, res, next) {
   });
 };
 
+// managing server cleanup
+let exitHandler = function(server) {
+  console.debug("Shutting down server");
+  server.close( () => {
+    console.debug("Shut down complete");
+  });
+};
+
+const getExitHandler = function() {
+  return exitHandler;
+}
+
+/**
+ * Sets a new handler for shutting down the server.
+ *
+ * @arg functor Function taking one argument (the result of app.listen
+ * when starting the server) which should gracefully stop the server.
+ */
+function setExitHandler(functor) {
+  exitHandler = functor;
+}
+
 export default app;
 
 export {
   app,
-  errorHandler
+  errorHandler,
+  setExitHandler,
+  getExitHandler
 }
