@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "scripts": [
     {
       "documentation": {
@@ -8,7 +8,6 @@
         "arguments": []
       },
       "environment": {
-        "image": "ubuntu",
         "interactive": false,
         "script": "dev-script/run.sh"
       },
@@ -23,7 +22,6 @@
         "arguments": []
       },
       "environment": {
-        "image": "semtech/mu-javascript-template:feature-dev-experience-tryouts",
         "interactive": false,
         "script": "setup-ide/run.sh"
       },

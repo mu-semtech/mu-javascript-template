@@ -4,8 +4,6 @@ import bodyParser from 'body-parser';
 
 var app = express();
 
-var port = process.env.PORT || '80';
-var hostname = process.env.HOST || '0.0.0.0';
 var bodySizeLimit = process.env.MAX_BODY_SIZE || '100kb';
 
 // parse JSONAPI content type
@@ -35,11 +33,6 @@ const errorHandler = function(err, req, res, next) {
     errors: [ {title: err.message} ]
   });
 };
-
-// start server
-app.listen( port, hostname, function() {
-  console.log(`Starting server on ${hostname}:${port} in ${app.get('env')} mode`);
-});
 
 export default app;
 

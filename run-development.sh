@@ -81,4 +81,4 @@ cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 cd /usr/src/dist/
 node \
     --inspect="0.0.0.0:9229" \
-    ./app.js
+    ./start-server.js
