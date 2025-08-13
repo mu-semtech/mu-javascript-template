@@ -55,7 +55,8 @@ fi
 
 HAS_PACKAGE_LOCK=([ -f /app/package-lock.json ])
 
-## Ensure we _sync_ the sources from the hosted app and _copy_ the node_modules.
+## Ensure we _sync_ the sources from the hosted app withouth the node_modules.
+## These are handled at a later stage when dependencies are installed.
 ##
 ## We don't want to do --delete on the node_modules because this allows us
 ## to depend on the node_modules installed in an earlier update cycle as well as
@@ -65,7 +66,6 @@ HAS_PACKAGE_LOCK=([ -f /app/package-lock.json ])
 ## node_modules in the template, or the node_modules may be offered in part or
 ## in full.  Hence we should only add the node_modules of the mounted code and
 ## not remove anything.
-# TODO: this is related to installing dependencies, should this become part of npm-install-dependencies or should this be part of a copy-sources script.
 docker-rsync --delete --exclude node_modules /app/ /usr/src/app/app/
 
 ## Copy config folder
