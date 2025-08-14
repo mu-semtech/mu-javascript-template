@@ -6,11 +6,13 @@
 # so we can warn at runtime in case developers accidentally mount
 # sources without setting the development environment variable.
 
+source ./helpers.sh
+
 # Copy sources from /app to where they can be built
 cd /usr/src/app
 rm -rf ./app /app.original
-cp -r /app ./
 
+docker-rsync --delete --exclude node_modules /app/ /usr/src/app/app/
 mkdir -p /config /config.original
 
 if [[ "$(ls -A /app/config/ 2> /dev/null)" ]]
