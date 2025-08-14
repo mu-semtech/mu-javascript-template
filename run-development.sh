@@ -1,13 +1,13 @@
 #!/bin/bash
-sleep 0.1
+
 SERVICE_STATUS=$(cat /tmp/service-status.lock)
 if [ "$SERVICE_STATUS" == "exit_after_compile" ]
 then
-  echo "More changed files detected during compilation. Continuing compilation and scheduling another compile run."
-  exit 0
+    echo "More changed files detected during compilation. Continuing compilation and scheduling another compile run."
+    exit 0
 fi
 
-trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; elif [ $SERVICE_STATUS == "running" ]; then exit 0; fi }' SIGUSR2 > /dev/null 2>&1
+trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; elif [ $SERVICE_STATUS == "running" ]; then echo "Received USR2 whilst running"; kill -s SIGUSR2 $$; fi }' SIGUSR2 > /dev/null 2>&1 # TODO: do we need to forward SIGUSR2?
 
 echo "compiling" > /tmp/service-status.lock
 
@@ -43,9 +43,9 @@ fi
 cmp -s /app/package.json /tmp/last-build-service-package.json
 if [ "$?" == "1" ] && [ $IS_FIRST_RUN == false ]
 then
-  PACKAGE_JSON_CHANGED=true
+    PACKAGE_JSON_CHANGED=true
 else
-  PACKAGE_JSON_CHANGED=false
+    PACKAGE_JSON_CHANGED=false
 fi
 
 if [ -f /app/package.json ]
@@ -78,18 +78,18 @@ fi
 # Determine npm command and install dependencies
 if [ -f /app/package.json ]
 then
-  if $IS_FIRST_RUN
-  then
-    if $HAS_PACKAGE_LOCK
+    if $IS_FIRST_RUN
     then
-      npm_install_command=ci
-    else
-      npm_install_command=install
+        if $HAS_PACKAGE_LOCK
+        then
+            npm_install_command=ci
+        else
+            npm_install_command=install
+        fi
+    elif $PACKAGE_JSON_CHANGED
+    then
+        npm_install_command=install
     fi
-  elif $PACKAGE_JSON_CHANGED
-  then
-    npm_install_command=install
-  fi
 fi
 ./npm-install-dependencies.sh development $npm_install_command
 ./validate-package-json.sh
@@ -109,13 +109,28 @@ cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 SERVICE_STATUS=$(cat /tmp/service-status.lock)
 if [ "$SERVICE_STATUS" == "exit_after_compile" ]
 then
-  echo "" > /tmp/service-status.lock
-  touch /tmp/service-restart
-  exit 0
+    echo "" > /tmp/service-status.lock
+    touch /tmp/service-restart
+    # echo "STATUS IS EXIT AFTER COMPILE" # TODO: remove debug info
+    exit 0
 else
-  echo "running" > /tmp/service-status.lock
-  cd /usr/src/dist/
-  node \
-    --inspect="0.0.0.0:9229" \
-    ./start-server.js
+    echo "running" > /tmp/service-status.lock
+    cd /usr/src/dist/
+    # echo "STARTING NODE PROCESS" # TODO: remove debug info
+    node \
+        --inspect="0.0.0.0:9229" \
+        ./start-server.js &
+    NODE_PID=$!
+    trap 'kill -s SIGUSR2 $NODE_PID' SIGUSR2 # SIGINT and SIGTERM are not necessary here now
+    # echo "NODE PROCESS $NODE_PID" # TODO: remove debug info
+    while ps -p $NODE_PID > /dev/null
+    do
+        # echo "WAITING FOR PID $NODE_PID STATE CHANGE" # TODO: remove debug info
+        wait $NODE_PID
+    done
+    sleep 0.5 # extra time to free up sockets
+
+    # echo "SERVER $NODE_PID STOPPED, exiting" # TODO: remove debug info
+    exit 0
 fi
+

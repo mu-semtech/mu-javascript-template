@@ -5,7 +5,6 @@ var port = process.env.PORT || '80';
 var hostname = process.env.HOST || '0.0.0.0';
 
 // start server
-console.log('yes, it changed');
 const server = app.listen(port, hostname, function () {
   console.log(`Starting server on ${hostname}:${port} in ${app.get('env')} mode`);
 });
@@ -14,10 +13,15 @@ const server = app.listen(port, hostname, function () {
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received');
   await exitHandler(server);
-  process.exit(0);
+  // process.exit(0);
 });
 process.on('SIGINT', async () => {
   console.log('SIGINT received');
+  await exitHandler(server);
+  // process.exit(0);
+});
+process.on('SIGUSR2', async () => {
+  console.log('SIGUSR2 received');
   await exitHandler(server);
   process.exit(0);
 });

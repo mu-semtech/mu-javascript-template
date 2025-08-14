@@ -23,7 +23,6 @@
     "env-var": "^7.0.0",
     "express": "^4.17.1",
     "express-http-context": "~1.2.4",
-    "nodemon": "^3.1.10",
     "sparql-client-2": "https://github.com/erikap/node-sparql-client.git",
     "typescript": "^4.6.2",
     "uuid": "^9.0.0"
