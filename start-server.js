@@ -1,4 +1,4 @@
-import { app, getExitHandler } from 'mu';
+import { app, exitHandler } from 'mu';
 import './app.js'; // load the user's app
 
 var port = process.env.PORT || '80';
@@ -10,9 +10,15 @@ const server = app.listen(port, hostname, function () {
 });
 
 // faster stopping
-process.on('SIGTERM', () => {
-  getExitHandler()(server)
+process.on('SIGTERM', async () => {
+  await exitHandler(server);
+  process.exit(0);
 });
-process.on('SIGINT', () => {
-  getExitHandler()(server);
+process.on('SIGINT', async () => {
+  await exitHandler(server);
+  process.exit(0);
+});
+process.on('SIGUSR2', async () => {
+  await exitHandler(server);
+  process.exit(0);
 });

@@ -3,6 +3,7 @@ FROM node:20-bookworm
 LABEL maintainer="team@semantic.works"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync jq
+RUN cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-x86_64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-x86_64-unknown-linux-gnu.deb
 
 ENV MU_SPARQL_ENDPOINT='http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH='http://mu.semte.ch/application'

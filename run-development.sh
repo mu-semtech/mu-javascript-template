@@ -1,13 +1,16 @@
 #!/bin/bash
-sleep 0.1
 SERVICE_STATUS=$(cat /tmp/service-status.lock)
 if [ "$SERVICE_STATUS" == "exit_after_compile" ]
 then
-  echo "More changed files detected during compilation. Continuing compilation and scheduling another compile run."
-  exit 0
+    echo "More changed files detected during compilation. Continuing compilation and scheduling another compile run."
+    exit 0
 fi
 
-trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; elif [ $SERVICE_STATUS == "running" ]; then exit 0; fi }' SIGUSR2 > /dev/null 2>&1
+# watchexec may send SIGUSR2 during compilation when more files have changed.
+# This requires to finish the compilation so no files are lingering about, but
+# stop the script before starting node.  watchexec will then start the script
+# again.
+trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; fi }' SIGUSR2 > /dev/null 2>&1
 
 echo "compiling" > /tmp/service-status.lock
 
@@ -23,7 +26,6 @@ source ./helpers.sh
 
 # Move to right folder
 cd /usr/src/app/
-
 
 
 ######################
@@ -43,9 +45,9 @@ fi
 cmp -s /app/package.json /tmp/last-build-service-package.json
 if [ "$?" == "1" ] && [ $IS_FIRST_RUN == false ]
 then
-  PACKAGE_JSON_CHANGED=true
+    PACKAGE_JSON_CHANGED=true
 else
-  PACKAGE_JSON_CHANGED=false
+    PACKAGE_JSON_CHANGED=false
 fi
 
 if [ -f /app/package.json ]
@@ -78,22 +80,23 @@ fi
 # Determine npm command and install dependencies
 if [ -f /app/package.json ]
 then
-  if $IS_FIRST_RUN
-  then
-    if $HAS_PACKAGE_LOCK
+    if $IS_FIRST_RUN
     then
-      npm_install_command=ci
-    else
-      npm_install_command=install
+        if $HAS_PACKAGE_LOCK
+        then
+            npm_install_command=ci
+        else
+            npm_install_command=install
+        fi
+    elif $PACKAGE_JSON_CHANGED
+    then
+        npm_install_command=install
     fi
-  elif $PACKAGE_JSON_CHANGED
-  then
-    npm_install_command=install
-  fi
 fi
 ./npm-install-dependencies.sh development $npm_install_command
 ./validate-package-json.sh
 touch /tmp/dependencies-installed-once-for-dev
+
 
 ###############
 # Transpilation
@@ -103,19 +106,30 @@ touch /tmp/dependencies-installed-once-for-dev
 
 cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 
+
 ##############
 # Start server
 ##############
 SERVICE_STATUS=$(cat /tmp/service-status.lock)
 if [ "$SERVICE_STATUS" == "exit_after_compile" ]
 then
-  echo "" > /tmp/service-status.lock
-  touch /tmp/service-restart
-  exit 0
+    echo "" > /tmp/service-status.lock
+    exit 0
 else
-  echo "running" > /tmp/service-status.lock
-  cd /usr/src/dist/
-  node \
-    --inspect="0.0.0.0:9229" \
-    ./start-server.js
+    echo "running" > /tmp/service-status.lock
+    cd /usr/src/dist/
+    node \
+        --inspect="0.0.0.0:9229" \
+        ./start-server.js &
+    NODE_PID=$!
+    trap 'kill -s SIGUSR2 $NODE_PID' SIGUSR2 # SIGINT and SIGTERM are not necessary here now
+
+    # TODO: Is this ps + while verification step is still necessary?  The
+    # process appeared not to fully exit after `wait`.
+    while ps -p $NODE_PID > /dev/null
+    do
+        wait $NODE_PID
+    done
+    echo "" > /tmp/service-status.lock
+    exit 0
 fi

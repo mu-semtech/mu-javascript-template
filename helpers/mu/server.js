@@ -34,17 +34,33 @@ const errorHandler = function(err, req, res, next) {
   });
 };
 
+/** @type { (() => Promise<void>)[] } */
+const beforeExitCallbacks = [];
+
+/**
+ * Define an async callback function to run on server shutdown
+ * @param { () => Promise<void> } callback Callback function to execute
+ */
+function beforeExit(callback) {
+  beforeExitCallbacks.push(callback);
+}
+
 // managing server cleanup
-let exitHandler = function(server) {
+let exitHandler = async function(server) {
   console.debug("Shutting down server");
-  server.close( () => {
-    console.debug("Shut down complete");
+  if (beforeExitCallbacks.length) {
+    console.debug("Executing before exit callbacks");
+    for (let callback of beforeExitCallbacks) {
+      await callback(server);
+    }
+  }
+  await new Promise((acc) => {
+    server.close( () => {
+      console.debug("Shut down complete");
+      acc();
+    });
   });
 };
-
-const getExitHandler = function() {
-  return exitHandler;
-}
 
 /**
  * Sets a new handler for shutting down the server.
@@ -61,6 +77,7 @@ export default app;
 export {
   app,
   errorHandler,
+  beforeExit,
   setExitHandler,
-  getExitHandler
+  exitHandler
 }
