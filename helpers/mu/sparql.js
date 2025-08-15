@@ -44,11 +44,7 @@ function newSparqlClient(userOptions) {
     console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
   }
 
-  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options).register({
-    mu: 'http://mu.semte.ch/vocabularies/',
-    muCore: 'http://mu.semte.ch/vocabularies/core/',
-    muExt: 'http://mu.semte.ch/vocabularies/ext/'
-  });
+  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options);
 }
 
 /**
