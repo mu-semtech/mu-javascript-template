@@ -1,5 +1,6 @@
 #!/bin/bash
 echo "NOTE: running your service in development will auto-update node_modules and package-lock.json"
+source /usr/src/app/helpers.sh
 
 # this script runs from a clean slate, the app hasn't ran yet so /usr/src/app/app is empty
 docker-rsync /app /usr/src/app/app
