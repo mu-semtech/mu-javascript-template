@@ -51,7 +51,21 @@ function newSparqlClient(userOptions) {
   });
 }
 
-// executes a query (you can use the template syntax)
+/**
+ * @typedef {Object} QueryOptions
+ * @property {boolean?} sudo Execute the query as sudo
+ * @property {string?} scope URI of the scope with whith the query is executed.  Use the environment variable `DEFAULT_MU_AUTH_SCOPE` if possible.
+ */
+
+/**
+ * Execute a sparql QUERY.  Intended for use with QUERY and ASK.
+ *
+ * See environment variables for logging: `LOG_SPARQL_ALL`, `LOG_SPARQL_QUERIES`, `DEBUG_AUTH_HEADERS`
+ *
+ * @param { string } queryString SPARQL query as a string.
+ * @param { QueryOptions? } options Operational changes to the SPARQL query.
+ * @return { Promise<object?> } The response is returned as a parsed JSON object, or null if the response could not be parsed as JSON.
+ */
 function query( queryString, options ) {
   if (LOG_SPARQL_QUERIES) {
     console.log(queryString);
@@ -60,10 +74,14 @@ function query( queryString, options ) {
 };
 
 /**
- * Executes an update query
+ * Execute a sparql QUERY.
+ * Intended for use with `DELETE {} INSERT {} WHERE {}`, `INSERT DATA` and `DELETE DATA`.
  *
- * @param { string } queryString String containing SPARQL query for the backend.
- * @param { object? } options Options to be sent to 
+ * See environment variables for logging: `LOG_SPARQL_ALL`, `LOG_SPARQL_UPDATES`, `DEBUG_AUTH_HEADERS`
+ *
+ * @param { string } queryString SPARQL query as a string.
+ * @param { QueryOptions? } options Operational changes to the SPARQL query.
+ * @return { Promise<object?> } The response is returned as a parsed JSON object, or null if the response could not be parsed as JSON.
  */
 function update( queryString, options ) {
   if (LOG_SPARQL_UPDATES) {
@@ -119,35 +137,74 @@ function executeQuery( queryString, options ) {
   });
 }
 
+/**
+ * Escapes a string for use in SPARQL.
+ *
+ * Wraps the string in quotes and escapes necessary characters.
+ *
+ * @param {string} value String to be escaped.
+ * @return {string} Escaped string for use in SPARQL.
+ */
 function sparqlEscapeString( value ){
   return '"""' + value.replace(/[\\"]/g, function(match) { return '\\' + match; }) + '"""';
 };
 
+/**
+ * Escapes a URI for use in SPARQL.
+ *
+ * Wraps the URI in < and > and escapes necessary characters.
+ *
+ * @param {string} value URI string to be escaped.
+ * @return {string} Escaped URI string for use in SPARQL.
+ */
 function sparqlEscapeUri( value ){
   return '<' + value.replace(/[\\"<>]/g, function(match) { return '\\' + match; }) + '>';
 };
 
+/**
+ * Escapes a float for use in SPARQL as xsd:decimal.
+ *
+ * @param {string|number} value Number string or value to be escaped.
+ * @return {string} Escaped number for use in SPARQL.
+ */
 function sparqlEscapeDecimal( value ){
   return '"' + Number.parseFloat(value) + '"^^xsd:decimal';
 };
 
+/**
+ * Escapes an integer for use in SPARQL as xsd:integer.
+ *
+ * @param {string|number} value Number string or value to be escaped.
+ * @return {string} Escaped number for use in SPARQL.
+ */
 function sparqlEscapeInt( value ){
   return '"' + Number.parseInt(value) + '"^^xsd:integer';
 };
 
+/**
+ * Escapes a number for use in SPARQL as xsd:float.
+ *
+ * @param {string|number} value Number string or value to be escaped.
+ * @return {string} Escaped number for use in SPARQL.
+ */
 function sparqlEscapeFloat( value ){
   return '"' + Number.parseFloat(value) + '"^^xsd:float';
 };
 
+/**
+ * Escapes a date string or date object into an xsd:date for use in SPARQL.
+ *
+ * @param {string|Date|number} value Number string or value to be escaped.
+ * @return {string} Escaped number for use in SPARQL.
+ */
 function sparqlEscapeDate( value ){
   return '"' + new Date(value).toISOString().substring(0, 10) + '"^^xsd:date'; // only keep 'YYYY-MM-DD' portion of the string
 };
 
 /**
- * Escape date string or date object into an xsd:dateTime for use in a SPARQL string.
+ * Escapes a date string or date object into an xsd:dateTime for use in a SPARQL.
  *
- * @param { Date | string | number } value Date representation
- * (understood by `new Date`) to convert.
+ * @param { Date | string | number } value Date representation (understood by `new Date`) to convert.
  * @return { string } Date representation for SPARQL query.
  */
 function sparqlEscapeDateTime( value ){
@@ -164,6 +221,14 @@ function sparqlEscapeBool( value ){
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
 };
 
+/**
+ * Escapes a value based on the supplide type rather than the separately published functions.  Prefer to use the
+ * functions.
+ *
+ * @param { "string"|"uri"|"bool"|"decimal"|"int"|"float"|"date"|"dateTime"} type The value to be escaped.
+ * @param {*} value The value to be escaped.
+ * @return { string } Boolean representation for SPARQL query.
+ */
 function sparqlEscape( value, type ){
   switch(type) {
   case 'string':

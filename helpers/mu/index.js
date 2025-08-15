@@ -1,44 +1,34 @@
 import { app, errorHandler, beforeExit, exitHandler, setExitHandler } from './server.js';
 import sparql from './sparql.js';
+import { SPARQL, query, update, sparqlEscape, sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDecimal, sparqlEscapeInt, sparqlEscapeFloat, sparqlEscapeDate, sparqlEscapeDateTime, sparqlEscapeBool } from './sparql.js';
 import { v1 as uuidV1 } from 'uuid';
 
 // generates a uuid
 const uuid = uuidV1;
 
 const mu = {
-  app: app,
-  sparql: sparql,
-  SPARQL: sparql.sparql,
-  query: sparql.query,
-  update: sparql.update,
-  sparqlEscape: sparql.sparqlEscape,
-  sparqlEscapeString: sparql.sparqlEscapeString,
-  sparqlEscapeUri: sparql.sparqlEscapeUri,
-  sparqlEscapeDecimal: sparql.sparqlEscapeDecimal,
-  sparqlEscapeInt: sparql.sparqlEscapeInt,
-  sparqlEscapeFloat: sparql.sparqlEscapeFloat,
-  sparqlEscapeDate: sparql.sparqlEscapeDate,
-  sparqlEscapeDateTime: sparql.sparqlEscapeDateTime,
-  sparqlEscapeBool: sparql.sparqlEscapeBool,
+  app,
+  sparql,
+
   uuid,
   errorHandler,
   beforeExit,
   exitHandler,
-  setExitHandler
-};
+  setExitHandler,
 
-const SPARQL = mu.SPARQL,
-      query = mu.query,
-      update = mu.update,
-      sparqlEscape = mu.sparqlEscape,
-      sparqlEscapeString = mu.sparqlEscapeString,
-      sparqlEscapeUri = mu.sparqlEscapeUri,
-      sparqlEscapeInt = mu.sparqlEscapeInt,
-      sparqlEscapeDecimal = mu.sparqlEscapeDecimal,
-      sparqlEscapeFloat = mu.sparqlEscapeFloat,
-      sparqlEscapeDate = mu.sparqlEscapeDate,
-      sparqlEscapeDateTime = mu.sparqlEscapeDateTime,
-      sparqlEscapeBool = mu.sparqlEscapeBool;
+  SPARQL,
+  query,
+  update,
+  sparqlEscape,
+  sparqlEscapeString,
+  sparqlEscapeUri,
+  sparqlEscapeDecimal,
+  sparqlEscapeInt,
+  sparqlEscapeFloat,
+  sparqlEscapeDate,
+  sparqlEscapeDateTime,
+  sparqlEscapeBool
+};
 
 export {
   app,

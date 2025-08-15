@@ -2,6 +2,10 @@ import httpContext from 'express-http-context';
 import express from 'express';
 import bodyParser from 'body-parser';
 
+/**
+ * The express JS server
+ * @type {express.Express}
+ */
 var app = express();
 
 var bodySizeLimit = process.env.MAX_BODY_SIZE || '100kb';
