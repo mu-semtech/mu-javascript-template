@@ -31,7 +31,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-const errorHandler = function(err, req, res, next) {
+const errorHandler = function(err, _req, res, _next) {
   res.status(err.status || 400);
   res.json({
     errors: [ {title: err.message} ]
@@ -53,7 +53,6 @@ function beforeExit(callback) {
 let exitHandler = async function(server) {
   console.debug("Shutting down server");
   if (beforeExitCallbacks.length) {
-    console.debug("Executing before exit callbacks");
     for (let callback of beforeExitCallbacks) {
       await callback(server);
     }
