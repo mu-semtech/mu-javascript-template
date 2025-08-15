@@ -163,6 +163,21 @@ app.post("/delta", bodyParser.json({ limit: '50mb' }), function(req, res) {
 }
 ```
 
+### Clean up on service exit
+Most services just want to stop answering questions when the service exits, some need to clean up state.  Cleaning up state can be done by supplying an async fincution to `beforeExit`.  The service will stop accepting connections but will execute this async function before gracefully exiting.  Most setups provide up to 10 seconds for the container to cleanly exit.
+
+An example
+
+```javascript
+import { beforeExit } from 'mu';
+
+beforeExit( async () => {
+  console.log("Cleaning up...");
+  await new Promise( (acc) => setTimeout(acc, 1000) );
+  console.log("Finished cleaning up.");
+});
+```
+
 ## Reference
 ### Framework
 The mu-javascript-template is built on ExpressJS. Check [Express' Getting Started guide](https://expressjs.com/en/starter/basic-routing.html) to learn how to build a REST API in Express.
