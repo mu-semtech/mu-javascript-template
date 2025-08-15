@@ -148,11 +148,18 @@ docker-compose up -d your-microservice-name
 You can install additional dependencies by including a `package.json` file next to your `app.js`. It works as you would expect: just define the packages in the `dependencies` section of the `package.json`. They will be installed automatically at build time and in development mode. There is no need to restart the container.
 
 ### Handle delta's from the delta-service
-If you are building a reactive service that should execute certain logic based on changes in the database, you want to hook it up to the [delta-notifier](https://github.com/mu-semtech/delta-notifier/). Some extra steps need to be taken to properly handle delta's, specifically the route handling delta's will need to use a specific bodyParser. 
+If you are building a reactive service that should execute certain logic based on changes in the database, you want to hook it up to the [delta-notifier](https://github.com/mu-semtech/delta-notifier/). Some extra steps need to be taken to properly handle delta's, specifically the route handling delta's will need to use a specific bodyParser.
 
 The default bodyParser provided by the template will only accept `application/vnd.api+json` and the delta-notifier is sending `application/json` content. Aside from that the body of a delta message may be very large, often several megabytes. By specifying the bodyParser on the route accepting delta messages you can easily modify it when required.
 
-An example
+The mu script `add-delta-handler` can be ran to update your app.js file:
+
+```bash
+mu script add-delta-handler
+```
+
+The resulting changes will look similar to:
+
 ```javascript
 // app.js
 import bodyParser from 'body-parser';

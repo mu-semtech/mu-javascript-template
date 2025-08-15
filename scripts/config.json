@@ -28,6 +28,21 @@
       "mounts": {
         "service": "/app"
       }
+    },
+    {
+      "documentation": {
+        "command": "add-delta-handler",
+        "description": "Sets up the delta handler for the scripts",
+        "arguments": []
+      },
+      "environment": {
+        "image": "ubuntu:25.10",
+        "interactive": false,
+        "script": "add-delta-handler/run.sh"
+      },
+      "mounts": {
+        "service": "/app"
+      }
     }
   ]
 }
