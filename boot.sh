@@ -9,7 +9,6 @@ then
          --project-origin="/" \
          --watch="/app" \
          --watch="/config" \
-         --watch="/tmp/service-restart" \
          --exts="js,coffee,ts,mjs,cjs,json" \
          --stop-timeout="60s" \
          --stop-signal="SIGUSR2" \

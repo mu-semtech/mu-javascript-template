@@ -1,5 +1,4 @@
 #!/bin/bash
-
 SERVICE_STATUS=$(cat /tmp/service-status.lock)
 if [ "$SERVICE_STATUS" == "exit_after_compile" ]
 then
@@ -7,7 +6,11 @@ then
     exit 0
 fi
 
-trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; elif [ $SERVICE_STATUS == "running" ]; then echo "Received USR2 whilst running"; kill -s SIGUSR2 $$; fi }' SIGUSR2 > /dev/null 2>&1 # TODO: do we need to forward SIGUSR2?
+# watchexec may send SIGUSR2 during compilation when more files have changed.
+# This requires to finish the compilation so no files are lingering about, but
+# stop the script before starting node.  watchexec will then start the script
+# again.
+trap '{ SERVICE_STATUS=$(cat /tmp/service-status.lock); if [ $SERVICE_STATUS == "compiling" ]; then echo "exit_after_compile" > /tmp/service-status.lock; fi }' SIGUSR2 > /dev/null 2>&1
 
 echo "compiling" > /tmp/service-status.lock
 
@@ -23,7 +26,6 @@ source ./helpers.sh
 
 # Move to right folder
 cd /usr/src/app/
-
 
 
 ######################
@@ -95,6 +97,7 @@ fi
 ./validate-package-json.sh
 touch /tmp/dependencies-installed-once-for-dev
 
+
 ###############
 # Transpilation
 ###############
@@ -103,6 +106,7 @@ touch /tmp/dependencies-installed-once-for-dev
 
 cp /usr/src/app/helpers/mu/package.json /usr/src/dist/node_modules/mu/
 
+
 ##############
 # Start server
 ##############
@@ -110,27 +114,22 @@ SERVICE_STATUS=$(cat /tmp/service-status.lock)
 if [ "$SERVICE_STATUS" == "exit_after_compile" ]
 then
     echo "" > /tmp/service-status.lock
-    touch /tmp/service-restart
-    # echo "STATUS IS EXIT AFTER COMPILE" # TODO: remove debug info
     exit 0
 else
     echo "running" > /tmp/service-status.lock
     cd /usr/src/dist/
-    # echo "STARTING NODE PROCESS" # TODO: remove debug info
     node \
         --inspect="0.0.0.0:9229" \
         ./start-server.js &
     NODE_PID=$!
     trap 'kill -s SIGUSR2 $NODE_PID' SIGUSR2 # SIGINT and SIGTERM are not necessary here now
-    # echo "NODE PROCESS $NODE_PID" # TODO: remove debug info
+
+    # TODO: Is this ps + while verification step is still necessary?  The
+    # process appeared not to fully exit after `wait`.
     while ps -p $NODE_PID > /dev/null
     do
-        # echo "WAITING FOR PID $NODE_PID STATE CHANGE" # TODO: remove debug info
         wait $NODE_PID
     done
-    sleep 0.5 # extra time to free up sockets
-
-    # echo "SERVER $NODE_PID STOPPED, exiting" # TODO: remove debug info
+    echo "" > /tmp/service-status.lock
     exit 0
 fi
-
