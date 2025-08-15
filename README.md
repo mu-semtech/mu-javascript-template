@@ -67,6 +67,8 @@ services:
       - /absolute/path/to/your/sources/:/app/
 ```
 
+Mounting the sources will automatically populate the local `node_modules` folder and will provide a package-lock.json (providing you don't opt out of the generation).  This should provide enough initial support for editor hints.
+
 ### Build a microservice based on mu-javascript-template
 Requires:
 - a semantic.works stack, like mu-project
@@ -156,7 +158,7 @@ An example
 import bodyParser from 'body-parser';
 // ...
 
-app.post("/delta-updates", bodyParser.json({ limit: '50mb' }), function(req, res) {
+app.post("/delta", bodyParser.json({ limit: '50mb' }), function(req, res) {
 //...
 }
 ```
@@ -257,7 +259,6 @@ The following environment variables can be configured:
   - `ALLOW_MU_AUTH_SUDO`: Allow sudo queries when the service requests it.
   - `DEFAULT_MU_AUTH_SCOPE`: Default mu-auth-scope to use for calls.
 
-
 #### Mounting `/config`
 You may let users extend the microservice with code.
 
@@ -274,6 +275,14 @@ The verbosity of logging can be configured through following environment variabl
 - `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
 
 Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
+
+### Code hints
+The template will automatically supply a `node_modules` folder for code hints when the microservice runs in development and the sources are mounted in `/app`.  You may need to restart the language server so these are picked up.
+
+Use the mu-script `setup-ide` to install these without running in development mode.
+
+### Package lock
+Changes to dependencies in `package.json` will be picked up and an updated `package-lock.json` will be copied into the mounted sources provided `package-lock.json` is enabled.  Local packages are installed through the `package-lock.json` and the template's dependencies are merged in.  The `package-lock.json` thus only contains your own dependencies and should not conflict with future upgrades in the template.
 
 ### Custom build commands
 To execute custom bash statements during the image build (e.g. to install aditional system libraries), provide an `on-build.sh` script in the root of your service. It will be automatically picked up and executed by the Docker build.
