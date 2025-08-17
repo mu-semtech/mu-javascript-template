@@ -3,12 +3,16 @@ FROM node:20-bookworm
 LABEL maintainer="team@semantic.works"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync jq
-RUN if [[ "$TARGETPLATFORM" -eq "linux/amd64" ]]; then \
-    cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-x86_64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-x86_64-unknown-linux-gnu.deb; \
-    elif [[ "$TARGETPLATFORM" -eq "linux/arm64" ]]; then \
-    cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-aarch64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-aarch64-unknown-linux-gnu.deb; \
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+      echo "BUILDING FOR AMD64 through $TARGETPLATFORM"; cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-x86_64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-x86_64-unknown-linux-gnu.deb; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+      echo "BUILDING FOR ARM64" && cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-aarch64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-aarch64-unknown-linux-gnu.deb; \
+    elif [ "$TARGETPLATFORM" = "" ]; then \
+      echo "BUILDING FOR AMD64 through $TARGETPLATFORM"; cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-x86_64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-x86_64-unknown-linux-gnu.deb; \
     else \
-    echo "$TARGETPLATFORM not supported, check watchexec" ; \
+      echo "Target platform \"$TARGETPLATFORM\" not supported, check watchexec" ; \
+      exit 1; \
     fi
 
 ENV MU_SPARQL_ENDPOINT='http://database:8890/sparql'
