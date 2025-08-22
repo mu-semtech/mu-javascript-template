@@ -5,6 +5,9 @@ then
     echo "" > /tmp/service-status.lock
     echo "" > /tmp/service-restart
 
+    # Ensure watched folders exist
+    mkdir -p /config
+
     exec watchexec \
          --project-origin="/" \
          --watch="/app" \
