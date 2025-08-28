@@ -161,7 +161,7 @@ function sparqlEscapeDateTime( value ){
  * @return { string } Boolean representation for SPARQL query.
  */
 function sparqlEscapeBool(value) {
-  if (!typeof variable == "boolean") {
+  if (!typeof value == "boolean") {
     throw new Error("The value passes to sparqlEscapeBool should be a boolean");
   }
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
