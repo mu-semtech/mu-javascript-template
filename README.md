@@ -167,7 +167,7 @@ import bodyParser from 'body-parser';
 
 app.post("/delta", bodyParser.json({ limit: '50mb' }), function(req, res) {
 //...
-}
+});
 ```
 
 ### Clean up on service exit
