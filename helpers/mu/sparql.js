@@ -213,9 +213,18 @@ function sparqlEscapeDateTime( value ){
  * @param { any } value Boolean-like value, anything javascript finds truethy is true.
  * @return { string } Boolean representation for SPARQL query.
  */
-function sparqlEscapeBool( value ){
+function sparqlEscapeBool(value) {
+  if (!typeof value == "boolean") {
+    throw new Error("The value passes to sparqlEscapeBool should be a boolean");
+  }
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
-};
+}
+
+function sparqlEscapeBool2(value) {
+  const booleanValue =
+    value === true || value === 1 || value?.toLowerCase() === "true";
+  return booleanValue ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
+}
 
 /**
  * Escapes a value based on the supplide type rather than the separately published functions.  Prefer to use the
