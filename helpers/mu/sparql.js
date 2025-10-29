@@ -12,6 +12,13 @@ const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
 
 // builds a new sparqlClient
 function newSparqlClient(userOptions) {
+  if (userOptions.endpoint) {
+    if (DEBUG_AUTH_HEADERS) {
+      console.log(`Not setting auth headers for SPARQL client for external requests to ${userOptions.endpoint}`);
+    }
+    return new SparqlClient(userOptions.endpoint);
+  }
+
   let options = { requestDefaults: { headers: { } } };
 
   if (userOptions.sudo === true) {
@@ -51,6 +58,7 @@ function newSparqlClient(userOptions) {
  * @typedef {Object} QueryOptions
  * @property {boolean?} sudo Execute the query as sudo
  * @property {string?} scope URI of the scope with whith the query is executed.  Use the environment variable `DEFAULT_MU_AUTH_SCOPE` if possible.
+ * @property {string?} endpoint The URL to make the request to if different to `MU_SPARQL_ENDPOINT`. Do not use unless you're making a request outside of the stack as normal auth headers will not be set.
  */
 
 /**
