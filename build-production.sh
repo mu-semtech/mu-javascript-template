@@ -6,6 +6,9 @@
 # so we can warn at runtime in case developers accidentally mount
 # sources without setting the development environment variable.
 
+# Fail build on error
+set -eo pipefail
+
 source ./helpers.sh
 
 # Copy sources from /app to where they can be built

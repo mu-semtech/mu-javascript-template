@@ -307,4 +307,4 @@ Use the mu-script `setup-ide` to install these without running in development mo
 Changes to dependencies in `package.json` will be picked up and an updated `package-lock.json` will be copied into the mounted sources provided `package-lock.json` is enabled.  Local packages are installed through the `package-lock.json` and the template's dependencies are merged in.  The `package-lock.json` thus only contains your own dependencies and should not conflict with future upgrades in the template.
 
 ### Custom build commands
-To execute custom bash statements during the image build (e.g. to install aditional system libraries), provide an `on-build.sh` script in the root of your service. It will be automatically picked up and executed by the Docker build.
+To execute custom bash statements during the image build (e.g. to install aditional system libraries), provide an `on-build.sh` script in the root of your service. It will be automatically picked up and executed by the Docker build. Make sure to return a non-zero return code in case of failure, in order to fail the build. For example using `set -eo` to exit on any non-zero statuses or if any part of a pipe fails.

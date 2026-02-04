@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Fail build on error
+set -eo pipefail
+
 source ./helpers.sh
 
 ####
