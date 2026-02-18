@@ -1,46 +1,117 @@
 import httpContext from 'express-http-context';
 import SC2 from 'sparql-client-2';
 import env from 'env-var';
+import { createNamespace } from 'cls-hooked';
 
 const { SparqlClient, SPARQL } = SC2;
 
 const LOG_SPARQL_QUERIES = process.env.LOG_SPARQL_QUERIES != undefined ? env.get('LOG_SPARQL_QUERIES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const LOG_SPARQL_UPDATES = process.env.LOG_SPARQL_UPDATES != undefined ? env.get('LOG_SPARQL_UPDATES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
+const LOG_SPARQL_RESULTS = env.get('LOG_SPARQL_RESULTS').asBool();
 const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
+const DEFAULT_MU_AUTH_SCOPE = process.env.DEFAULT_MU_AUTH_SCOPE;
+
+const CONTEXTUAL_QUERY = createNamespace('contextualQuery');
+const DEFAULT_NAMESPACE_KEY = 'contextualQueryDefaultNamespaceKey';
+const ALLOWED_GROUPS_PREFIX = 'allowedGroups_';
+const SCOPE_PREFIX = 'scope_';
+
+function scopeName(name) { return `${SCOPE_PREFIX}${name}`; }
+function allowedGroupsName(name) { return `${ALLOWED_GROUPS_PREFIX}${name}`; }
+
+function setAllowedGroups(allowedGroups, name = DEFAULT_NAMESPACE_KEY) {
+  setAllowedGroupsHeader(JSON.stringify(allowedGroups), name);
+}
+
+function setCurrentAllowedGroups(name = DEFAULT_NAMESPACE_KEY) {
+  setAllowedGroupsHeader(httpContext.get('request')?.get('mu-auth-allowed-groups'), name);
+}
+
+function setAllowedGroupsHeader(allowedGroups, name = DEFAULT_NAMESPACE_KEY) {
+  CONTEXTUAL_QUERY.set(allowedGroupsName(name), allowedGroups);
+}
+
+function getAllowedGroupsHeader(name = DEFAULT_NAMESPACE_KEY) {
+  return CONTEXTUAL_QUERY.get(allowedGroupsName(name));
+}
+
+function getAllowedGroups(name = DEFAULT_NAMESPACE_KEY) {
+  return JSON.parse(getAllowedGroupsHeader(name));
+}
+
+function setScope(scope, name = DEFAULT_NAMESPACE_KEY) {
+  CONTEXTUAL_QUERY.set(scopeName(name), scope);
+}
+
+function getScope(name = DEFAULT_NAMESPACE_KEY) {
+  return CONTEXTUAL_QUERY.get(scopeName(name));
+}
+
+//==-- Usage (contextual query) --==//
+// First import `CONTEXTUAL_QUERY`. Call `CONTEXTUAL_QUERY.run(() => contextedFunction())`
+// with the function that should be run inside one context.
+// use `CONTEXTUAL_QUERY.runAndReturn(() => contextedFunction())` to return the value returned by `contextedFunction()`.
+// Inside this context, use `setAllowedGroupsHeader(allowedGroupsAsJsonString)` to set the allowed groups.
+//                      use `setScopeHeader(scopeAsString)` to set the scope.
+// Use the provided `update` and `query` functions that will query with these allowed groups.
+//
+// If you want to do queries with different allowed groups/scopes in the same context, use `setAllowedGroupsHeader(allowedGroupsString, name)`
+// and `update(query, name)` and `query(query, name)`. With `name` a defined constant.
+//
+// Can also be used for enhanced regular query/update function.
+// Can pass an options object to set the following values (overrides values set in context of namespace).
+// - name: namespace key to use (instead of the default)
+// - sudo: should it be a query sudo (send header for sudo query)
+// - allowedGroups: allowed groups (as array) to set in the header
+// - allowedGroupsHeader: allowed groups, already serialized to directly set as the header
+// - scope: scope to set as header
 
 //==-- logic --==//
 
-// builds a new sparqlClient
-function newSparqlClient(userOptions) {
+function newSparqlClient(userOptions = {}) {
+  const {
+    name = DEFAULT_NAMESPACE_KEY,
+    sudo,
+    allowedGroups,
+    allowedGroupsHeader,
+    scope
+  } = userOptions;
+
   let options = { requestDefaults: { headers: { } } };
 
-  if (userOptions.sudo === true) {
-    if (env.get("ALLOW_MU_AUTH_SUDO").asBool()) {
-      options.requestDefaults.headers['mu-auth-sudo'] = "true";
+  if (sudo === true) {
+    if (env.get('ALLOW_MU_AUTH_SUDO').asBool()) {
+      options.requestDefaults.headers['mu-auth-sudo'] = 'true';
     } else {
-      throw "Error, sudo request but service lacks ALLOW_MU_AUTH_SUDO header";
+      throw 'Error, sudo request but service lacks ALLOW_MU_AUTH_SUDO header';
     }
-  }
-
-  if (userOptions.scope) {
-    options.requestDefaults.headers['mu-auth-scope'] = userOptions.scope;
-  } else if (process.env.DEFAULT_MU_AUTH_SCOPE) {
-    options.requestDefaults.headers['mu-auth-scope'] = process.env.DEFAULT_MU_AUTH_SCOPE;
+  } else {
+    options.requestDefaults.headers['mu-auth-sudo'] = 'false';
   }
 
   if (httpContext.get('request')) {
     options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
     options.requestDefaults.headers['mu-call-id'] = httpContext.get('request').get('mu-call-id');
-    options.requestDefaults.headers['mu-auth-allowed-groups'] = httpContext.get('request').get('mu-auth-allowed-groups'); // groups of incoming request
+  } 
+
+  const resolvedAllowedGroupsHeader =
+    allowedGroupsHeader ||
+    (allowedGroups && JSON.stringify(allowedGroups)) ||
+    getAllowedGroupsHeader(name) ||
+    httpContext.get('request')?.get('mu-auth-allowed-groups');
+
+  if (resolvedAllowedGroupsHeader) {
+    options.requestDefaults.headers['mu-auth-allowed-groups'] = resolvedAllowedGroupsHeader;
   }
 
-  if (httpContext.get('response')) {
-    const allowedGroups = httpContext.get('response').get('mu-auth-allowed-groups'); // groups returned by a previous SPARQL query
-    if (allowedGroups)
-      options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
+  const namespaceScope = getScope(name);
+  const scopeHeader = scope || namespaceScope || DEFAULT_MU_AUTH_SCOPE;
+  if (scopeHeader) {
+    options.requestDefaults.headers['mu-auth-scope'] = scopeHeader;
   }
 
   if (DEBUG_AUTH_HEADERS) {
+    console.log(`Namespace used for contextual query: ${name}`);
     console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
   }
 
@@ -127,6 +198,10 @@ function executeQuery( queryString, options ) {
       } catch (ex) {
         return null;
       }
+    }
+
+    if (LOG_SPARQL_RESULTS) {
+      console.log(`Query results: ${response.body}`);
     }
 
     return maybeParseJSON(response.body);
@@ -256,6 +331,14 @@ const exports = {
   sparql: SPARQL,
   query: query,
   update: update,
+  CONTEXTUAL_QUERY: CONTEXTUAL_QUERY,
+  setAllowedGroups: setAllowedGroups,
+  setCurrentAllowedGroups: setCurrentAllowedGroups,
+  setAllowedGroupsHeader: setAllowedGroupsHeader,
+  getAllowedGroupsHeader: getAllowedGroupsHeader,
+  getAllowedGroups: getAllowedGroups,
+  setScope: setScope,
+  getScope: getScope,
   sparqlEscape: sparqlEscape,
   sparqlEscapeString: sparqlEscapeString,
   sparqlEscapeUri: sparqlEscapeUri,
@@ -274,6 +357,14 @@ export {
   SPARQL as sparql,
   query,
   update,
+  CONTEXTUAL_QUERY,
+  setAllowedGroups,
+  setCurrentAllowedGroups,
+  setAllowedGroupsHeader,
+  getAllowedGroupsHeader,
+  getAllowedGroups,
+  setScope,
+  getScope,
   sparqlEscape,
   sparqlEscapeString,
   sparqlEscapeUri,
