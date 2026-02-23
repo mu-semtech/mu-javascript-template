@@ -226,8 +226,8 @@ mu.app.get('/', function( req, res ) {
 ```
 
 The following helper functions are provided by the template
-  - `query(query, options) => Promise`: Function for sending queries to the triplestore.  Options is an object which may include `sudo` and `scope` keys.
-  - `update(query, options) => Promise`: Function for sending updates to the triplestore.  Options is an object which may include `sudo` and `scope` keys.
+  - `query(query, options) => Promise`: Function for sending queries to the triplestore.  Options is an object which may include `sudo`, `scope`, `allowedGroups` and `allowedGroupsHeader`.
+  - `update(query, options) => Promise`: Function for sending updates to the triplestore.  Options is an object which may include `sudo`, `scope`, `allowedGroups` and `allowedGroupsHeader`.
   - `uuid() => string`: Generates a random UUID (e.g. to construct new resource URIs)
 
 The following SPARQL escape helpers are provided to construct safe SPARQL query strings
@@ -240,6 +240,34 @@ The following SPARQL escape helpers are provided to construct safe SPARQL query 
   - `sparqlEscapeDateTime(value) => string`
   - `sparqlEscapeBool(value) => string`: The given value is evaluated to a boolean value in javascript. E.g. the string value `'0'` evaluates to `false` in javascript.
   - `sparqlEscape(value, type) => string`: Function to escape a value in SPARQL according to the given type. Type must be one of `'string'`, `'uri'`, `'int'`, `'float'`, `'date'`, `'dateTime'`, `'bool'`.
+  
+#### Contextual SPARQL queries
+You can use a context if multiple queries need the same options (sudo, headers, scope).  You set the options once and they are used for all the following calls to query/update that happen inside the context You can always override a specific setting via the options parameter of query/update. Pass a `name` to have multiple contexts.  
+You can always override via the options parameter.
+
+```javascript
+import { CONTEXTUAL_QUERY, query, setAllowedGroups, setScope } from 'mu';
+
+CONTEXTUAL_QUERY.run(() => {
+  setAllowedGroups([...]); // set allowed groups for all following queries in this context
+  setScope('http://example.com/scope'); // set scope for all following queries in this context
+  await query(`...`); // uses the set scope and allowed groups
+  await doInsert(); // queries inside this function use set scope and allowed groups
+  await query(`...`, {scope: 'http://example.com/scope2', allowedGroupsHeader: ''}) // override per query with options parameter
+
+  setScope('http://example.com/private-scope', 'privateScope'); // set scope for all following queries using the privateScope name
+  await query(`...`, { name: 'privateScope' });
+});
+
+function doInsert() {
+  await query(`...`);
+}
+```
+  - `CONTEXTUAL_QUERY`: namespace to start a context.  Use `run` or `runAndReturn`.
+  - `setAllowedGroups(allowedGroups, name?)`, `setAllowedGroupsHeader(headerValue, name?)`: set an array of allowed groups or already serialized value for all following queries in the context (for the given name, optional).
+  - `setCurrentAllowedGroups(name?)`: Save the current `mu-auth-allowed-groups` header into the context. Only needed if you want to keep using the original allowed groups when leaving the httpContext (e.g. in a callback).
+  - `setScope(scope, name?)`: set the scope for all following queries.
+  - `getAllowedGroups`, `getAllowedGroupsHeader`, `getScope`
 
 ### Error handling
 The template offers [an error handler](https://expressjs.com/en/guide/error-handling.html) to send error responses in a JSON:API compliant way. The handler can be imported from `'mu'` and need to be loaded at the end.
@@ -294,6 +322,7 @@ The verbosity of logging can be configured through following environment variabl
 - `LOG_SPARQL_ALL`: Logging of all executed SPARQL queries, read as well as update (default `true`)
 - `LOG_SPARQL_QUERIES`: Logging of executed SPARQL read queries (default: `undefined`). Overrules `LOG_SPARQL_ALL`.
 - `LOG_SPARQL_UPDATES`: Logging of executed SPARQL update queries (default `undefined`). Overrules `LOG_SPARQL_ALL`.
+- `LOG_SPARQL_RESULTS`: Logging of the raw SPARQL responses before they are parsed.
 - `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
 
 Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
