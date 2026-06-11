@@ -1,60 +1,16 @@
 import httpContext from 'express-http-context';
-import SC2 from 'sparql-client-2';
 import env from 'env-var';
-
-const { SparqlClient, SPARQL } = SC2;
+import SPARQL from './sparql-tag.js';
 
 const LOG_SPARQL_QUERIES = process.env.LOG_SPARQL_QUERIES != undefined ? env.get('LOG_SPARQL_QUERIES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const LOG_SPARQL_UPDATES = process.env.LOG_SPARQL_UPDATES != undefined ? env.get('LOG_SPARQL_UPDATES').asBool() : env.get('LOG_SPARQL_ALL').asBool();
 const DEBUG_AUTH_HEADERS = env.get('DEBUG_AUTH_HEADERS').asBool();
+const MU_SPARQL_ENDPOINT = process.env.MU_SPARQL_ENDPOINT || 'http://database:8890/sparql';
 
 //==-- logic --==//
 
-// builds a new sparqlClient
-function newSparqlClient(userOptions) {
-  let options = { requestDefaults: { headers: { } } };
-
-  if (userOptions.sudo === true) {
-    if (env.get("ALLOW_MU_AUTH_SUDO").asBool()) {
-      options.requestDefaults.headers['mu-auth-sudo'] = "true";
-    } else {
-      throw "Error, sudo request but service lacks ALLOW_MU_AUTH_SUDO header";
-    }
-  }
-
-  if (userOptions.scope) {
-    options.requestDefaults.headers['mu-auth-scope'] = userOptions.scope;
-  } else if (process.env.DEFAULT_MU_AUTH_SCOPE) {
-    options.requestDefaults.headers['mu-auth-scope'] = process.env.DEFAULT_MU_AUTH_SCOPE;
-  }
-
-  if (httpContext.get('request')) {
-    options.requestDefaults.headers['mu-session-id'] = httpContext.get('request').get('mu-session-id');
-    options.requestDefaults.headers['mu-call-id'] = httpContext.get('request').get('mu-call-id');
-    options.requestDefaults.headers['mu-auth-allowed-groups'] = httpContext.get('request').get('mu-auth-allowed-groups'); // groups of incoming request
-  }
-
-  if (httpContext.get('response')) {
-    const allowedGroups = httpContext.get('response').get('mu-auth-allowed-groups'); // groups returned by a previous SPARQL query
-    if (allowedGroups)
-      options.requestDefaults.headers['mu-auth-allowed-groups'] = allowedGroups;
-  }
-
-  if (DEBUG_AUTH_HEADERS) {
-    console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
-  }
-
-  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options);
-}
-
 /**
- * @typedef {Object} QueryOptions
- * @property {boolean?} sudo Execute the query as sudo
- * @property {string?} scope URI of the scope with whith the query is executed.  Use the environment variable `DEFAULT_MU_AUTH_SCOPE` if possible.
- */
-
-/**
- * Execute a sparql QUERY.  Intended for use with QUERY and ASK.
+ * Execute a sparql QUERY.  Intended for use with SELECT and ASK.
  *
  * See environment variables for logging: `LOG_SPARQL_ALL`, `LOG_SPARQL_QUERIES`, `DEBUG_AUTH_HEADERS`
  *
@@ -62,15 +18,15 @@ function newSparqlClient(userOptions) {
  * @param { QueryOptions? } options Operational changes to the SPARQL query.
  * @return { Promise<object?> } The response is returned as a parsed JSON object, or null if the response could not be parsed as JSON.
  */
-function query( queryString, options ) {
+function query(queryString, options = {}) {
   if (LOG_SPARQL_QUERIES) {
     console.log(queryString);
   }
   return executeQuery(queryString, options);
-};
+}
 
 /**
- * Execute a sparql QUERY.
+ * Execute a sparql UPDATE.
  * Intended for use with `DELETE {} INSERT {} WHERE {}`, `INSERT DATA` and `DELETE DATA`.
  *
  * See environment variables for logging: `LOG_SPARQL_ALL`, `LOG_SPARQL_UPDATES`, `DEBUG_AUTH_HEADERS`
@@ -79,58 +35,150 @@ function query( queryString, options ) {
  * @param { QueryOptions? } options Operational changes to the SPARQL query.
  * @return { Promise<object?> } The response is returned as a parsed JSON object, or null if the response could not be parsed as JSON.
  */
-function update( queryString, options ) {
+function update(queryString, options = {}) {
   if (LOG_SPARQL_UPDATES) {
     console.log(queryString);
   }
   return executeQuery(queryString, options);
-};
+}
 
-function executeQuery( queryString, options ) {
-  return newSparqlClient(options || {}).query(queryString).executeRaw().then(response => {
-    const temp = httpContext;
+/**
+ * Build the default headers for a SPARQL request from the current HTTP
+ * context, forwarding mu-auth headers so mu-authorization can apply the
+ * correct access rules.
+ */
+function defaultHeaders() {
+  const headers = new Headers();
+  headers.set('content-type', 'application/x-www-form-urlencoded');
+  headers.set('Accept', 'application/sparql-results+json');
 
-    if (httpContext.get('response') && !httpContext.get('response').headersSent) {
-      // set mu-auth-allowed-groups on outgoing response
-      const allowedGroups = response.headers['mu-auth-allowed-groups'];
-      if (allowedGroups) {
-        httpContext.get('response').setHeader('mu-auth-allowed-groups', allowedGroups);
-        if (DEBUG_AUTH_HEADERS) {
-          console.log(`Update mu-auth-allowed-groups to ${allowedGroups}`);
-        }
-      } else {
-        httpContext.get('response').removeHeader('mu-auth-allowed-groups');
-        if (DEBUG_AUTH_HEADERS) {
-          console.log('Remove mu-auth-allowed-groups');
-        }
-      }
+  const req = httpContext.get('request');
+  if (req) {
+    const muSessionId = req.get('mu-session-id');
+    if (muSessionId) headers.set('mu-session-id', muSessionId);
 
-      // set mu-auth-used-groups on outgoing response
-      const usedGroups = response.headers['mu-auth-used-groups'];
-      if (usedGroups) {
-        httpContext.get('response').setHeader('mu-auth-used-groups', usedGroups);
-        if (DEBUG_AUTH_HEADERS) {
-          console.log(`Update mu-auth-used-groups to ${usedGroups}`);
-        }
-      } else {
-        httpContext.get('response').removeHeader('mu-auth-used-groups');
-        if (DEBUG_AUTH_HEADERS) {
-          console.log('Remove mu-auth-used-groups');
-        }
-      }
+    const muCallId = req.get('mu-call-id');
+    if (muCallId) headers.set('mu-call-id', muCallId);
+
+    // Forward allowed-groups from the incoming request so mu-authorization
+    // does not have to recompute them on every SPARQL call.
+    const allowedGroups = req.get('mu-auth-allowed-groups');
+    if (allowedGroups) headers.set('mu-auth-allowed-groups', allowedGroups);
+  }
+
+  const res = httpContext.get('response');
+  if (res) {
+    // If a previous SPARQL query within this request already resolved the
+    // allowed groups, forward them to avoid redundant lookups.
+    const allowedGroups = res.get('mu-auth-allowed-groups');
+    if (allowedGroups) headers.set('mu-auth-allowed-groups', allowedGroups);
+  }
+
+  return headers;
+}
+
+/**
+ * @typedef {Object} QueryOptions
+ * @property {boolean?} sudo Execute the query with mu-auth-sudo privileges.
+ * @property {string?}  scope URI of the scope to use.  Falls back to the DEFAULT_MU_AUTH_SCOPE environment variable.
+ * @property {object?}  extraHeaders Additional headers to include in the request.
+ */
+
+/**
+ * Send a SPARQL query to the configured endpoint and return the parsed JSON
+ * response.
+ *
+ * @param { string } queryString SPARQL query as a string.
+ * @param { QueryOptions? } options Operational changes to the SPARQL query.
+ * @return { Promise<object?> } The response is returned as a parsed JSON object, or null if the response could not be parsed as JSON.
+ */
+async function executeQuery(queryString, options = {}) {
+  const headers = defaultHeaders();
+
+  const extraHeaders = options.extraHeaders ?? {};
+  for (const key of Object.keys(extraHeaders)) {
+    headers.append(key, extraHeaders[key]);
+  }
+
+  if (options.sudo === true) {
+    if (env.get('ALLOW_MU_AUTH_SUDO').asBool()) {
+      headers.set('mu-auth-sudo', 'true');
+    } else {
+      throw new Error('sudo query requested but ALLOW_MU_AUTH_SUDO is not set');
+    }
+  }
+
+  if (options.scope) {
+    headers.set('mu-auth-scope', options.scope);
+  } else if (process.env.DEFAULT_MU_AUTH_SCOPE) {
+    headers.set('mu-auth-scope', process.env.DEFAULT_MU_AUTH_SCOPE);
+  }
+
+  if (DEBUG_AUTH_HEADERS) {
+    const muHeaders = Array.from(headers.entries())
+      .filter(([key]) => key.startsWith('mu-'))
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(', ');
+    console.log(`SPARQL request mu-headers: ${muHeaders}`);
+  }
+
+  const formData = new URLSearchParams();
+  formData.set('query', queryString);
+
+  try {
+    const response = await fetch(MU_SPARQL_ENDPOINT, {
+      method: 'POST',
+      body: formData.toString(),
+      headers,
+    });
+
+    updateResponseHeaders(response);
+
+    if (!response.ok) {
+      throw new Error(`SPARQL endpoint returned HTTP ${response.status} ${response.statusText}`);
     }
 
-    function maybeParseJSON(body) {
-      // Catch invalid JSON
-      try {
-        return JSON.parse(body);
-      } catch (ex) {
-        return null;
-      }
-    }
+    return await maybeJSON(response);
+  } catch (ex) {
+    console.log(`Failed Query:
+${queryString}`);
+    throw ex;
+  }
+}
 
-    return maybeParseJSON(response.body);
-  });
+/**
+ * Copy mu-auth group headers from the SPARQL response back onto the outgoing
+ * HTTP response so the client receives up-to-date group information.
+ */
+function updateResponseHeaders(response) {
+  const res = httpContext.get('response');
+  if (!res || res.headersSent) return;
+
+  const allowedGroups = response.headers.get('mu-auth-allowed-groups');
+  if (allowedGroups) {
+    res.setHeader('mu-auth-allowed-groups', allowedGroups);
+    if (DEBUG_AUTH_HEADERS) console.log(`Forwarded mu-auth-allowed-groups: ${allowedGroups}`);
+  } else {
+    res.removeHeader('mu-auth-allowed-groups');
+    if (DEBUG_AUTH_HEADERS) console.log('Removed mu-auth-allowed-groups from response');
+  }
+
+  const usedGroups = response.headers.get('mu-auth-used-groups');
+  if (usedGroups) {
+    res.setHeader('mu-auth-used-groups', usedGroups);
+    if (DEBUG_AUTH_HEADERS) console.log(`Forwarded mu-auth-used-groups: ${usedGroups}`);
+  } else {
+    res.removeHeader('mu-auth-used-groups');
+    if (DEBUG_AUTH_HEADERS) console.log('Removed mu-auth-used-groups from response');
+  }
+}
+
+async function maybeJSON(response) {
+  try {
+    return await response.json();
+  } catch (_) {
+    return null;
+  }
 }
 
 /**
@@ -198,9 +246,10 @@ function sparqlEscapeDate( value ){
 };
 
 /**
- * Escapes a date string or date object into an xsd:dateTime for use in a SPARQL.
+ * Escape date string or date object into an xsd:dateTime for use in a SPARQL string.
  *
- * @param { Date | string | number } value Date representation (understood by `new Date`) to convert.
+ * @param { Date | string | number } value Date representation
+ * (understood by `new Date`) to convert.
  * @return { string } Date representation for SPARQL query.
  */
 function sparqlEscapeDateTime( value ){
@@ -217,14 +266,6 @@ function sparqlEscapeBool( value ){
   return value ? '"true"^^xsd:boolean' : '"false"^^xsd:boolean';
 };
 
-/**
- * Escapes a value based on the supplide type rather than the separately published functions.  Prefer to use the
- * functions.
- *
- * @param { "string"|"uri"|"bool"|"decimal"|"int"|"float"|"date"|"dateTime"} type The value to be escaped.
- * @param {*} value The value to be escaped.
- * @return { string } Boolean representation for SPARQL query.
- */
 function sparqlEscape( value, type ){
   switch(type) {
   case 'string':
@@ -251,25 +292,23 @@ function sparqlEscape( value, type ){
 
 //==-- exports --==//
 const exports = {
-  newSparqlClient: newSparqlClient,
-  SPARQL: SPARQL,
+  SPARQL,
   sparql: SPARQL,
-  query: query,
-  update: update,
-  sparqlEscape: sparqlEscape,
-  sparqlEscapeString: sparqlEscapeString,
-  sparqlEscapeUri: sparqlEscapeUri,
-  sparqlEscapeDecimal: sparqlEscapeDecimal,
-  sparqlEscapeInt: sparqlEscapeInt,
-  sparqlEscapeFloat: sparqlEscapeFloat,
-  sparqlEscapeDate: sparqlEscapeDate,
-  sparqlEscapeDateTime: sparqlEscapeDateTime,
-  sparqlEscapeBool: sparqlEscapeBool
-}
+  query,
+  update,
+  sparqlEscape,
+  sparqlEscapeString,
+  sparqlEscapeUri,
+  sparqlEscapeDecimal,
+  sparqlEscapeInt,
+  sparqlEscapeFloat,
+  sparqlEscapeDate,
+  sparqlEscapeDateTime,
+  sparqlEscapeBool,
+};
 export default exports;
 
 export {
-  newSparqlClient,
   SPARQL as SPARQL,
   SPARQL as sparql,
   query,
@@ -282,5 +321,5 @@ export {
   sparqlEscapeFloat,
   sparqlEscapeDate,
   sparqlEscapeDateTime,
-  sparqlEscapeBool
+  sparqlEscapeBool,
 };
