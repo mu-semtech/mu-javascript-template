@@ -18,7 +18,7 @@ function newSparqlClient(userOptions) {
     if (env.get("ALLOW_MU_AUTH_SUDO").asBool()) {
       options.requestDefaults.headers['mu-auth-sudo'] = "true";
     } else {
-      throw "Error, sudo request but service lacks ALLOW_MU_AUTH_SUDO header";
+      throw new Error(`Sudo request denied: environment variable ALLOW_MU_AUTH_SUDO is not set to true`);
     }
   }
 
