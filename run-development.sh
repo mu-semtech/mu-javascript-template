@@ -124,9 +124,8 @@ else
     NODE_PID=$!
     trap 'kill -s SIGUSR2 $NODE_PID' SIGUSR2 # SIGINT and SIGTERM are not necessary here now
 
-    # TODO: Is this ps + while verification step is still necessary?  The
-    # process appeared not to fully exit after `wait`.
-    while ps -p $NODE_PID > /dev/null
+    # check if pid is still running
+    while kill -0 $NODE_PID 2>/dev/null
     do
         wait $NODE_PID
     done
