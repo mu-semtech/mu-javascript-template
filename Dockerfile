@@ -1,8 +1,9 @@
-FROM node:20-bookworm
+FROM node:22-bookworm-slim
 
 LABEL maintainer="team@semantic.works"
 
-RUN apt-get update && apt-get -y upgrade && apt-get -y install git openssh-client rsync jq
+RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-recommends ca-certificates git openssh-client rsync jq wget \
+    && rm -rf /var/lib/apt/lists/*
 ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
       echo "BUILDING FOR AMD64 through $TARGETPLATFORM"; cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-x86_64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-x86_64-unknown-linux-gnu.deb; \

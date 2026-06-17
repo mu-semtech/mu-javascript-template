@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 14",
+  "display": "Node 22",
 
   "compilerOptions": {
-    "lib": ["es2020"],
-    "module": "es2020",
-    "target": "es2020",
+    "lib": ["es2022"],
+    "module": "es2022",
+    "target": "es2022",
     "allowJs": true,
     "noEmit": true,
 
