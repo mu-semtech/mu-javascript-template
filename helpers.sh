@@ -15,5 +15,6 @@ function docker-rsync() {
   # --numeric-ids: use uuid by number instead of by name
   # --info: silent output
   # --no-compress: no compression algorithm
-  rsync -aHAWXS --numeric-ids --info= --no-compress "$@"
+  # --filer='-x security.selinux': don't try to copy SELinux xattrs since this just results in spamming the log with errors
+  rsync -aHAWXS --numeric-ids --info= --no-compress --filter='-x security.selinux' "$@"
 }
