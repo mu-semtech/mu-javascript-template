@@ -1,6 +1,7 @@
 import { app, errorHandler, beforeExit, exitHandler, setExitHandler } from './server.js';
 import sparql from './sparql.js';
 import { SPARQL, query, update, sparqlEscape, sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDecimal, sparqlEscapeInt, sparqlEscapeFloat, sparqlEscapeDate, sparqlEscapeDateTime, sparqlEscapeBool } from './sparql.js';
+import { createCounter, createGauge, createHistogram, createSummary, registerMetric, getMetrics, metricsHandler, serializeJsonLD } from './metrics.js';
 import { v1 as uuidV1 } from 'uuid';
 
 // generates a uuid
@@ -27,7 +28,16 @@ const mu = {
   sparqlEscapeFloat,
   sparqlEscapeDate,
   sparqlEscapeDateTime,
-  sparqlEscapeBool
+  sparqlEscapeBool,
+
+  createCounter,
+  createGauge,
+  createHistogram,
+  createSummary,
+  registerMetric,
+  getMetrics,
+  metricsHandler,
+  serializeJsonLD
 };
 
 export {
@@ -49,7 +59,15 @@ export {
   errorHandler,
   beforeExit,
   exitHandler,
-  setExitHandler
+  setExitHandler,
+  createCounter,
+  createGauge,
+  createHistogram,
+  createSummary,
+  registerMetric,
+  getMetrics,
+  metricsHandler,
+  serializeJsonLD
 };
 
 export default mu;

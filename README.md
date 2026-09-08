@@ -258,7 +258,66 @@ app.get('/hello', function( req, res, next ) {
 app.use(errorHandler)
 ```
 
-### Transpiled languages
+### Metrics
+The template provides helpers for registering and exposing monitoring metrics. Metrics are offered in two formats via content negotiation on the `/metrics` endpoint:
+
+- **OpenMetrics** (`application/openmetrics-text`): the standard text format for Prometheus and other compatible scrapers.
+- **JSON-LD** (`application/ld+json`): a linked-data representation using the [metrics.data.gift vocabulary](http://metrics.data.gift/).
+
+The service is responsible for setting up the route. The simplest way is to run the mu script:
+
+```bash
+mu script add-metrics-endpoint
+```
+
+This adds `app.get('/metrics', metricsHandler)` to your `app.js`. You can also add it manually:
+
+```javascript
+import { app, metricsHandler } from 'mu';
+
+app.get('/metrics', metricsHandler);
+```
+
+#### Registering metrics
+Metrics are created using factory functions imported from `'mu'`. All metrics share a single registry, so they are all served from the `/metrics` endpoint automatically.
+
+```javascript
+import { createCounter, createGauge, createHistogram } from 'mu';
+
+const requestsTotal = createCounter({
+  name: 'myservice_requests_total',
+  help: 'Total requests received',
+  labelNames: ['method']
+});
+
+const queueSize = createGauge({
+  name: 'myservice_queue_size',
+  help: 'Current queue size'
+});
+
+const requestDuration = createHistogram({
+  name: 'myservice_request_duration_seconds',
+  help: 'Request latency',
+  labelNames: ['method'],
+  buckets: [0.005, 0.01, 0.05, 0.1, 0.5, 1, 5]
+});
+
+// Record values
+requestsTotal.inc({ method: 'GET' });
+queueSize.set(42);
+requestDuration.observe({ method: 'GET' }, 0.234);
+```
+
+#### Available functions
+  - `createCounter(options) => Counter`: A monotonically increasing counter. Options: `name`, `help`, `labelNames`.
+  - `createGauge(options) => Gauge`: A value that can increase or decrease. Options: `name`, `help`, `labelNames`.
+  - `createHistogram(options) => Histogram`: A distribution of observations across buckets. Options: `name`, `help`, `labelNames`, `buckets`.
+  - `createSummary(options) => Summary`: A summary with quantiles. Options: `name`, `help`, `labelNames`, `percentiles`, `maxAgeSeconds`, `ageBuckets`.
+  - `metricsHandler(req, res)`: Express route handler that serves metrics in OpenMetrics or JSON-LD format based on the `Accept` header.
+  - `getMetrics() => array`: Returns the raw metric data for custom serialization.
+
+#### JSON-LD vocabulary
+The JSON-LD output uses the `http://metrics.data.gift/` namespace (prefix `mdg`). The vocabulary is defined in `helpers/mu/vocab/metrics.ttl` and models the OpenMetrics data model: `MetricSet` contains `MetricFamily` entries, each with a type (`Counter`, `Gauge`, `Histogram`, etc.), `Metric` entries with `Label` sets, and `MetricPoint` values.
 The template has second-class support for transpiling TypeScript and CoffeeScript.  These are considered second-class and support may be removed in a minor release but not in a patch release.
 
 Overwriting files through the config folder may require you to stick to the original format.  There are currently no guarantees on this.

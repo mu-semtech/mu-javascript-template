@@ -1,0 +1,192 @@
+@prefix mdg: <http://metrics.data.gift/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+
+#
+# Metrics vocabulary — an RDF rendering of the OpenMetrics data model.
+#
+# This vocabulary mirrors the MetricSet / MetricFamily / Metric / MetricPoint
+# structure from the OpenMetrics specification, making it possible to expose
+# monitoring metrics as linked data in addition to the OpenMetrics text format.
+#
+# Namespace: http://metrics.data.gift/
+#
+
+mdg: a owl:Ontology ;
+    dct:title "Metrics Vocabulary" ;
+    dct:description "An RDF vocabulary for exposing monitoring metrics, modelled on the OpenMetrics data model." ;
+    vann:preferredNamespacePrefix "mdg" ;
+    vann:preferredNamespaceUri "http://metrics.data.gift/" .
+
+# -- Root container --
+
+mdg:MetricSet a rdfs:Class ;
+    rdfs:label "Metric Set" ;
+    rdfs:comment "The top-level container for a collection of metric families. Corresponds to the OpenMetrics MetricSet." .
+
+mdg:metricFamily a rdf:Property ;
+    rdfs:label "metric family" ;
+    rdfs:comment "Links a MetricSet to its MetricFamilies." ;
+    rdfs:domain mdg:MetricSet ;
+    rdfs:range mdg:MetricFamily .
+
+# -- Metric family --
+
+mdg:MetricFamily a rdfs:Class ;
+    rdfs:label "Metric Family" ;
+    rdfs:comment "A named family of metrics with a shared type, help text, and unit. Corresponds to the OpenMetrics MetricFamily." .
+
+mdg:name a rdf:Property ;
+    rdfs:label "name" ;
+    rdfs:comment "The metric family name. SHOULD be in snake_case." ;
+    rdfs:domain mdg:MetricFamily ;
+    rdfs:range xsd:string .
+
+mdg:help a rdf:Property ;
+    rdfs:label "help" ;
+    rdfs:comment "A short human-readable description of the metric family." ;
+    rdfs:domain mdg:MetricFamily ;
+    rdfs:range xsd:string .
+
+mdg:type a rdf:Property ;
+    rdfs:label "type" ;
+    rdfs:comment "The metric type: one of Counter, Gauge, Histogram, Summary, Info, or StateSet." ;
+    rdfs:domain mdg:MetricFamily ;
+    rdfs:range mdg:MetricType .
+
+mdg:unit a rdf:Property ;
+    rdfs:label "unit" ;
+    rdfs:comment "The unit of measurement. If non-empty, MUST be a suffix of the metric family name separated by an underscore." ;
+    rdfs:domain mdg:MetricFamily ;
+    rdfs:range xsd:string .
+
+mdg:metric a rdf:Property ;
+    rdfs:label "metric" ;
+    rdfs:comment "Links a MetricFamily to its Metrics." ;
+    rdfs:domain mdg:MetricFamily ;
+    rdfs:range mdg:Metric .
+
+# -- Metric types --
+
+mdg:MetricType a rdfs:Class ;
+    rdfs:label "Metric Type" ;
+    rdfs:comment "The type of a metric family." .
+
+mdg:Counter a mdg:MetricType ;
+    rdfs:label "Counter" ;
+    rdfs:comment "A counter measures discrete events and is monotonically non-decreasing. The value is a running total." .
+
+mdg:Gauge a mdg:MetricType ;
+    rdfs:label "Gauge" ;
+    rdfs:comment "A gauge represents a current measurement that can increase, decrease, or stay constant." .
+
+mdg:Histogram a mdg:MetricType ;
+    rdfs:label "Histogram" ;
+    rdfs:comment "A histogram measures the distribution of discrete events across cumulative buckets." .
+
+mdg:Summary a mdg:MetricType ;
+    rdfs:label "Summary" ;
+    rdfs:comment "A summary measures distributions and MAY expose precomputed quantiles." .
+
+mdg:Info a mdg:MetricType ;
+    rdfs:label "Info" ;
+    rdfs:comment "An info metric exposes textual information that SHOULD NOT change during process lifetime. The value is always 1." .
+
+mdg:StateSet a mdg:MetricType ;
+    rdfs:label "State Set" ;
+    rdfs:comment "A state set represents a series of related boolean values." .
+
+# -- Metric (unique label set within a family) --
+
+mdg:Metric a rdfs:Class ;
+    rdfs:label "Metric" ;
+    rdfs:comment "A single metric identified by a unique label set within its metric family." .
+
+mdg:label a rdf:Property ;
+    rdfs:label "label" ;
+    rdfs:comment "Links a Metric (or MetricPoint) to its labels." ;
+    rdfs:range mdg:Label .
+
+mdg:metricPoint a rdf:Property ;
+    rdfs:label "metric point" ;
+    rdfs:comment "Links a Metric to its MetricPoints." ;
+    rdfs:domain mdg:Metric ;
+    rdfs:range mdg:MetricPoint .
+
+# -- Label --
+
+mdg:Label a rdfs:Class ;
+    rdfs:label "Label" ;
+    rdfs:comment "A key-value pair identifying a metric." .
+
+mdg:labelName a rdf:Property ;
+    rdfs:label "label name" ;
+    rdfs:comment "The name (key) of a label." ;
+    rdfs:domain mdg:Label ;
+    rdfs:range xsd:string .
+
+mdg:labelValue a rdf:Property ;
+    rdfs:label "label value" ;
+    rdfs:comment "The value of a label." ;
+    rdfs:domain mdg:Label ;
+    rdfs:range xsd:string .
+
+# -- Metric point --
+
+mdg:MetricPoint a rdfs:Class ;
+    rdfs:label "Metric Point" ;
+    rdfs:comment "A single point of data for a metric, containing the current value(s)." .
+
+mdg:value a rdf:Property ;
+    rdfs:label "value" ;
+    rdfs:comment "The current numeric value of a metric point (for counters and gauges)." ;
+    rdfs:domain mdg:MetricPoint ;
+    rdfs:range xsd:double .
+
+# -- Histogram bucket --
+
+mdg:Bucket a rdfs:Class ;
+    rdfs:label "Bucket" ;
+    rdfs:comment "A cumulative bucket in a histogram. The value counts observations less than or equal to the upper bound." .
+
+mdg:bucket a rdf:Property ;
+    rdfs:label "bucket" ;
+    rdfs:comment "Links a histogram metric point to its buckets." ;
+    rdfs:range mdg:Bucket .
+
+mdg:upperBound a rdf:Property ;
+    rdfs:label "upper bound" ;
+    rdfs:comment "The upper threshold (le) of a histogram bucket. +Inf for the final bucket." ;
+    rdfs:domain mdg:Bucket ;
+    rdfs:range xsd:double .
+
+mdg:count a rdf:Property ;
+    rdfs:label "count" ;
+    rdfs:comment "The number of observations in a histogram bucket, or the total count of a histogram or summary." ;
+    rdfs:range xsd:integer .
+
+mdg:sum a rdf:Property ;
+    rdfs:label "sum" ;
+    rdfs:comment "The sum of all observed values in a histogram or summary." ;
+    rdfs:range xsd:double .
+
+mdg:created a rdf:Property ;
+    rdfs:label "created" ;
+    rdfs:comment "The timestamp when metric collection started for this metric point." ;
+    rdfs:range xsd:dateTime .
+
+# -- Summary quantile --
+
+mdg:Quantile a rdfs:Class ;
+    rdfs:label "Quantile" ;
+    rdfs:comment "A quantile value in a summary metric." .
+
+mdg:quantile a rdf:Property ;
+    rdfs:label "quantile" ;
+    rdfs:comment "The quantile (between 0 and 1) of a summary quantile entry." ;
+    rdfs:domain mdg:Quantile ;
+    rdfs:range xsd:double .

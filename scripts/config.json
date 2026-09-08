@@ -43,6 +43,21 @@
       "mounts": {
         "service": "/app"
       }
+    },
+    {
+      "documentation": {
+        "command": "add-metrics-endpoint",
+        "description": "Adds a /metrics endpoint to app.js exposing OpenMetrics and JSON-LD",
+        "arguments": []
+      },
+      "environment": {
+        "image": "ubuntu:25.10",
+        "interactive": false,
+        "script": "add-metrics-endpoint/run.sh"
+      },
+      "mounts": {
+        "service": "/app"
+      }
     }
   ]
 }
