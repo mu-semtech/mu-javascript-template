@@ -12,7 +12,7 @@
   ],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "version": "2023-05" }],
-    ["babel-plugin-add-import-extension"]
+    ["/usr/src/app/babel-plugins/import-extension.cjs"]
   ],
   "ignore": [
     "./node_modules",
