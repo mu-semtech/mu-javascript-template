@@ -15,5 +15,16 @@ function docker-rsync() {
   # --numeric-ids: use uuid by number instead of by name
   # --info: silent output
   # --no-compress: no compression algorithm
-  rsync -aHAWXS --numeric-ids --info= --no-compress "$@"
+  # --filter='-x security.selinux': don't copy SELinux labels, which fails and
+  #   spams the log on SELinux hosts such as OpenShift nodes
+  #
+  # When running as an arbitrary non-root user (e.g. OpenShift), files created at
+  # build time are owned by root and only group writable: their permissions and
+  # directory and link times can't be changed, so don't try.
+  local non_root_options=()
+  if [ "$(id -u)" != "0" ]
+  then
+    non_root_options=(--no-perms --omit-dir-times --omit-link-times)
+  fi
+  rsync -aHAWXS --numeric-ids --info= --no-compress --filter='-x security.selinux' "${non_root_options[@]}" "$@"
 }

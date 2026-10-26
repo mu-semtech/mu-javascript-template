@@ -70,11 +70,11 @@ HAS_PACKAGE_LOCK=([ -f /app/package-lock.json ])
 ## not remove anything.
 docker-rsync --delete --exclude node_modules /app/ /usr/src/app/app/
 
-## Copy config folder
+## Copy config folder, skipping the ..data entries of Kubernetes ConfigMaps
 if [[ "$(ls -A /config/ 2> /dev/null)" ]]
 then
     mkdir -p ./app/config/
-    cp -rf /config/* ./app/config/
+    rsync -rL --checksum --exclude '..*' /config/ ./app/config/
 fi
 
 # Determine npm command and install dependencies

@@ -288,6 +288,8 @@ When you import content from `./config/some-file`, the sources can be provided b
 
 You may provide default values for each of these files. The sources provided by the app are merged with the sources provided by the microservice, with the app's configuration taking precedence.
 
+When `/config` differs from these defaults at startup, the built microservice is copied to a temporary folder (`$TMPDIR`, default `/tmp`) where the files of `/config` are added to its `config/` folder and transpiled. Only the sources of the microservice are copied, `node_modules` are shared with the image. Nothing in the image or in `/config` is changed, so `/config` may be mounted read-only, e.g. as a Kubernetes ConfigMap, and the container may run as an arbitrary user, as on OpenShift. With a read-only root filesystem, mount a writable volume (e.g. an `emptyDir`) on `/tmp`.
+
 ### Logging
 The verbosity of logging can be configured through following environment variables:
 

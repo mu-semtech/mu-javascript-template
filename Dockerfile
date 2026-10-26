@@ -25,10 +25,16 @@ ENV PORT='80'
 ENV LOG_SPARQL_ALL='true'
 ENV DEBUG_AUTH_HEADERS='true'
 
+# OpenShift runs containers as an arbitrary UID in group 0 with HOME=/.
+# Development mode runs npm, which needs a writable HOME.
+ENV HOME=/root
+
 WORKDIR /usr/src/app
 COPY package.json /usr/src/app/package.json
 COPY ./scripts /app/scripts
-RUN npm install
+RUN npm install \
+  && mkdir -p /config \
+  && chgrp -R 0 /root && chmod -R g=u /root
 COPY . /usr/src/app
 RUN chmod +x /usr/src/app/run-development.sh
 RUN chmod +x /usr/src/app/run-production.sh
