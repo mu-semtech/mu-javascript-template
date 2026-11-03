@@ -36,7 +36,7 @@
         "arguments": []
       },
       "environment": {
-        "image": "ubuntu:25.10",
+        "image": "ubuntu:26.04",
         "interactive": false,
         "script": "add-delta-handler/run.sh"
       },
