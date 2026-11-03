@@ -77,7 +77,7 @@ Requires:
 Add a Dockerfile with the following contents:
 
 ```docker
-FROM semtech/mu-javascript-template
+FROM semtech/mu-javascript-template:1.10.0
 LABEL maintainer="madnificent@gmail.com"
 ```
 
