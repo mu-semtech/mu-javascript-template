@@ -1,12 +1,12 @@
-ARG BASE_IMAGE_POSTFIX=
-ARG TARGETPLATFORM=
-
+ARG BASE_IMAGE_POSTFIX
 FROM node:26-bookworm${BASE_IMAGE_POSTFIX}
 
 LABEL maintainer="team@semantic.works"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-recommends ca-certificates git openssh-client rsync jq wget \
     && rm -rf /var/lib/apt/lists/*
+
+ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
       echo "BUILDING FOR AMD64 through $TARGETPLATFORM"; cd /tmp/ && wget https://github.com/watchexec/watchexec/releases/download/v2.3.2/watchexec-2.3.2-x86_64-unknown-linux-gnu.deb && dpkg -i watchexec-2.3.2-x86_64-unknown-linux-gnu.deb; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
