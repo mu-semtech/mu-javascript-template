@@ -12,8 +12,8 @@ steps:
       platforms:
         - linux/amd64
         - linux/arm64
-      build_args_from_env:
-        - BASE_IMAGE_POSTFIX
+      build_args:
+        - "BASE_IMAGE_POSTFIX=${BASE_IMAGE_POSTFIX}"
       username:
         from_secret: docker_username
       password:
