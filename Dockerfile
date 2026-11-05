@@ -5,6 +5,7 @@ LABEL maintainer="team@semantic.works"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-recommends ca-certificates git openssh-client rsync jq wget \
     && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean; apt-get distclean;
 
 ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
