@@ -1,14 +1,26 @@
+matrix:
+  include:
+    - BASE_IMAGE_POSTFIX: ""
+    - BASE_IMAGE_POSTFIX: "-slim"
+
 steps:
   release:
-    image: woodpeckerci/plugin-docker-buildx
+    image: redpencil/plugin-docker-buildx:latest
+    pull: true
     settings:
       repo: ${CI_REPO/mu-semtech/semtech}
-      tags: "${CI_COMMIT_TAG##v}"
-      platforms: linux/amd64,linux/arm64
+      tags: "${CI_COMMIT_TAG##v}${BASE_IMAGE_POSTFIX}"
+      platforms:
+        - linux/amd64
+        - linux/arm64
+      build_args:
+        - "BASE_IMAGE_POSTFIX=${BASE_IMAGE_POSTFIX}"
       username:
         from_secret: docker_username
       password:
         from_secret: docker_password
+      ssh_key:
+        from_secret: ssh_key
 when:
   - event: tag
     ref: refs/tags/v*
