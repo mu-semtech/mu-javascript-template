@@ -5,7 +5,7 @@ matrix:
 
 steps:
   build-and-push:
-    image: woodpeckerci/plugin-docker-buildx
+    image: redpencil/plugin-docker-buildx:latest
     settings:
       repo: ${CI_REPO/mu-semtech/semtech}
       tags: "feature-${CI_COMMIT_BRANCH##feature/}${BASE_IMAGE_POSTFIX}"
@@ -18,6 +18,8 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
+      ssh_key:
+        from_secret: ssh_key
 when:
   - event: push
     branch: [feature/*]
