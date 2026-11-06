@@ -122,7 +122,8 @@ else
         --inspect="0.0.0.0:9229" \
         ./start-server.js &
     NODE_PID=$!
-    trap 'kill -s SIGUSR2 $NODE_PID' SIGUSR2 # SIGINT and SIGTERM are not necessary here now
+    # SIGINT and SIGTERM are not necessary here now.
+    trap 'kill -s SIGUSR2 $NODE_PID 2>/dev/null; ( sleep 2; kill -s SIGKILL $NODE_PID 2>/dev/null ) &' SIGUSR2
 
     # check if pid is still running
     while kill -0 $NODE_PID 2>/dev/null
