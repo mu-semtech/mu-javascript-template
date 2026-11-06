@@ -44,7 +44,7 @@ function newSparqlClient(userOptions) {
     console.log(`Headers set on SPARQL client: ${JSON.stringify(options)}`);
   }
 
-  return new SparqlClient(process.env.MU_SPARQL_ENDPOINT, options);
+  return new SparqlClient("MAGIC_STRING_ALLOW_SPARQL_CLIENT", process.env.MU_SPARQL_ENDPOINT, options);
 }
 
 /**

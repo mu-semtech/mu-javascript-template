@@ -280,6 +280,7 @@ The following environment variables can be configured:
   - `PORT` (default: `80`): The port you want the service to bind to.
   - `ALLOW_MU_AUTH_SUDO`: Allow sudo queries when the service requests it.
   - `DEFAULT_MU_AUTH_SCOPE`: Default mu-auth-scope to use for calls.
+  - `ALLOW_SPARQL_CLIENT_2`: Set to truethy to allow importing SC.SparqlClient from 'sparql-client-2'.  This is a temporary measure.
 
 #### Mounting `/config`
 You may let users extend the microservice with code.
