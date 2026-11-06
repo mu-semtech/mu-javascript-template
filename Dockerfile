@@ -25,9 +25,9 @@ ENV NODE_ENV='production'
 ENV HOST='0.0.0.0'
 ENV PORT='80'
 
-ENV LOG_SPARQL_ALL='true'
-ENV DEBUG_AUTH_HEADERS='true'
+ENV LOG_SPARQL_ALL='false'
 # check=skip=SecretsUsedInArgOrEnv
+ENV DEBUG_AUTH_HEADERS='false'
 
 WORKDIR /usr/src/app
 COPY package.json /usr/src/app/package.json
