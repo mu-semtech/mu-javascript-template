@@ -29,6 +29,7 @@ ENV PORT='80'
 
 ENV LOG_SPARQL_ALL='true'
 ENV DEBUG_AUTH_HEADERS='true'
+# check=skip=SecretsUsedInArgOrEnv
 
 WORKDIR /usr/src/app
 COPY package.json /usr/src/app/package.json
