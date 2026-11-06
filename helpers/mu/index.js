@@ -1,3 +1,4 @@
+import './sparql_client_2_deprecation_hack.js';
 import { app, errorHandler, beforeExit, exitHandler, setExitHandler } from './server.js';
 import sparql from './sparql.js';
 import { SPARQL, query, update, sparqlEscape, sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDecimal, sparqlEscapeInt, sparqlEscapeFloat, sparqlEscapeDate, sparqlEscapeDateTime, sparqlEscapeBool } from './sparql.js';
