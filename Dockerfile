@@ -4,7 +4,6 @@ FROM node:26-bookworm${BASE_IMAGE_POSTFIX}
 LABEL maintainer="team@semantic.works"
 
 RUN apt-get update && apt-get -y upgrade && apt-get -y install --no-install-recommends ca-certificates git openssh-client rsync jq wget
-RUN apt-get clean; apt-get distclean; rm -rf /var/lib/apt/lists/*
 
 ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
@@ -17,6 +16,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
       echo "Target platform \"$TARGETPLATFORM\" not supported, check watchexec" ; \
       exit 1; \
     fi
+
+RUN apt-get clean; apt-get autoremove --purge -y
+RUN rm -Rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV MU_SPARQL_ENDPOINT='http://database:8890/sparql'
 ENV MU_APPLICATION_GRAPH='http://mu.semte.ch/application'
