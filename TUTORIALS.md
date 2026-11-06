@@ -17,7 +17,7 @@ We’ve now defined a simple API endpoint on the path ‘/hello’. Next, we wil
 
 Create a Dockerfile next to the web.rb file with the following content:
 ```Dockerfile
-FROM semtech/mu-javascript-template:1.1.0
+FROM semtech/mu-javascript-template:1.10.0
 ```
 
 Congratulations! You’ve build your first javascript microservice in mu.semte.ch. If you now build this Docker image and include it in your [mu-project](https://github.com/mu-semtech/mu-project), you will have a `/hello` endpoint available in your platform. Don’t forget to add a rule to your dispatcher to make this endpoint available to the frontend application.
@@ -27,7 +27,7 @@ Building the Docker image each time you’ve changed some code is rather cumber
 ```bash
 docker run --volume /path/to/your/code:/app
             -e NODE\_ENV=development
-            -d semtech/mu-javascript-template:1.1.0
+            -d semtech/mu-javascript-template:1.10.0
 ```
 
 Each time you change some code, the microservice will be automatically updated.
