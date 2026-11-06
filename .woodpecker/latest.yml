@@ -6,6 +6,7 @@ matrix:
 steps:
   build-and-push:
     image: redpencil/plugin-docker-buildx:latest
+    pull: true
     settings:
       repo: ${CI_REPO/mu-semtech/semtech}
       tags: latest${BASE_IMAGE_POSTFIX}
