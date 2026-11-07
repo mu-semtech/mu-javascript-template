@@ -24,7 +24,7 @@
     "express": "^4.22.3",
     "express-http-context": "~1.2.5",
     "sparql-client-2": "https://github.com/erikap/node-sparql-client.git",
-    "typescript": "^4.9.5",
+    "typescript": "^5.9.3",
     "uuid": "^9.0.0"
   },
   "author": "Aad Versteden <aad.versteden@gmail.com>",
