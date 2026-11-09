@@ -1,3 +1,4 @@
+# check=skip=SecretsUsedInArgOrEnv
 ARG BASE_IMAGE_POSTFIX
 FROM node:26-bookworm${BASE_IMAGE_POSTFIX}
 
@@ -27,8 +28,8 @@ ENV NODE_ENV='production'
 ENV HOST='0.0.0.0'
 ENV PORT='80'
 
-ENV LOG_SPARQL_ALL='true'
-ENV DEBUG_AUTH_HEADERS='true'
+ENV LOG_SPARQL_ALL='false'
+ENV DEBUG_AUTH_HEADERS='false'
 # check=skip=SecretsUsedInArgOrEnv
 
 WORKDIR /usr/src/app
