@@ -292,10 +292,10 @@ You may provide default values for each of these files. The sources provided by 
 ### Logging
 The verbosity of logging can be configured through following environment variables:
 
-- `LOG_SPARQL_ALL`: Logging of all executed SPARQL queries, read as well as update (default `true`)
+- `LOG_SPARQL_ALL`: Logging of all executed SPARQL queries, read as well as update (default `false`)
 - `LOG_SPARQL_QUERIES`: Logging of executed SPARQL read queries (default: `undefined`). Overrules `LOG_SPARQL_ALL`.
 - `LOG_SPARQL_UPDATES`: Logging of executed SPARQL update queries (default `undefined`). Overrules `LOG_SPARQL_ALL`.
-- `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `true`)
+- `DEBUG_AUTH_HEADERS`: Debugging of [mu-authorization](https://github.com/mu-semtech/mu-authorization) access-control related headers (default `false`)
 
 Following values are considered true: [`"true"`, `"TRUE"`, `"1"`].
 
